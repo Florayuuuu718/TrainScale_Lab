@@ -1,0 +1,46 @@
+{
+  "experiment": "dataloader_workers_throughput",
+  "environment": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.15",
+    "torch": "2.11.0+cu128"
+  },
+  "controlled_variables": {
+    "samples": 512,
+    "input_dim": 128,
+    "batch_size": 32,
+    "delay_ms": 1.0,
+    "repeats": 3,
+    "seed": 7
+  },
+  "results": [
+    {
+      "num_workers": 0,
+      "samples": 512,
+      "median_samples_per_second": 584.7692063222928,
+      "min_samples_per_second": 572.7973397126447,
+      "max_samples_per_second": 587.8038957695616
+    },
+    {
+      "num_workers": 1,
+      "samples": 512,
+      "median_samples_per_second": 171.62179918675344,
+      "min_samples_per_second": 163.16853927068613,
+      "max_samples_per_second": 172.22149958729048
+    },
+    {
+      "num_workers": 2,
+      "samples": 512,
+      "median_samples_per_second": 199.72379603276698,
+      "min_samples_per_second": 195.6628052695602,
+      "max_samples_per_second": 201.2672129636004
+    },
+    {
+      "num_workers": 4,
+      "samples": 512,
+      "median_samples_per_second": 163.4775245530677,
+      "min_samples_per_second": 161.09399941876424,
+      "max_samples_per_second": 175.68421366623267
+    }
+  ]
+}

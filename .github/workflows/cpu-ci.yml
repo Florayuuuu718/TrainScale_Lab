@@ -1,0 +1,25 @@
+name: CPU CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.2"
+          enable-cache: true
+      - name: Install Python 3.11 and CPU dependencies
+        run: uv sync --extra cpu --extra dev
+      - name: Lint
+        run: uv run ruff check .
+      - name: Type check
+        run: uv run mypy
+      - name: Test
+        run: uv run pytest

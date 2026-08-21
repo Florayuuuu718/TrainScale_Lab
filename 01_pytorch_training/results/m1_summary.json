@@ -1,0 +1,1091 @@
+{
+  "training_runs": {
+    "synthetic_cpu": {
+      "experiment_name": "synthetic_cpu_fp32",
+      "total_wall_seconds": 0.07071379999979399,
+      "global_step": 35,
+      "peak_cuda_memory_bytes": null,
+      "final_epoch": 5,
+      "final_train_loss": 0.2618554472923279,
+      "final_train_accuracy": 0.9375,
+      "final_valid_loss": 0.3258905964238303,
+      "final_valid_accuracy": 0.8928571428571429,
+      "final_train_samples_per_second": 79126.44423887251
+    },
+    "synthetic_cuda": {
+      "experiment_name": "synthetic_cuda_fp32",
+      "total_wall_seconds": 0.24192619998939335,
+      "global_step": 35,
+      "peak_cuda_memory_bytes": 18127872,
+      "final_epoch": 5,
+      "final_train_loss": 0.2618554639816284,
+      "final_train_accuracy": 0.9375,
+      "final_valid_loss": 0.3258906304836273,
+      "final_valid_accuracy": 0.8928571428571429,
+      "final_train_samples_per_second": 30901.39360635495
+    },
+    "synthetic_accumulation": {
+      "experiment_name": "synthetic_accumulation",
+      "total_wall_seconds": 0.12248089999775402,
+      "global_step": 35,
+      "peak_cuda_memory_bytes": null,
+      "final_epoch": 5,
+      "final_train_loss": 0.2618554526567459,
+      "final_train_accuracy": 0.9375,
+      "final_valid_loss": 0.32589061345372883,
+      "final_valid_accuracy": 0.8928571428571429,
+      "final_train_samples_per_second": 38557.93327634624
+    },
+    "cifar10_baseline": {
+      "experiment_name": "cifar10_cuda_fp32",
+      "total_wall_seconds": 4.3007635999820195,
+      "global_step": 200,
+      "peak_cuda_memory_bytes": 142372352,
+      "final_epoch": 5,
+      "final_train_loss": 1.5815319278717042,
+      "final_train_accuracy": 0.3972,
+      "final_valid_loss": 1.5683996486663818,
+      "final_valid_accuracy": 0.421,
+      "final_train_samples_per_second": 7613.584400854499
+    }
+  },
+  "ablations": {
+    "synthetic": {
+      "base_config": {
+        "experiment_name": "synthetic_cuda_fp32",
+        "dataset": "synthetic",
+        "model": "mlp",
+        "data_root": "01_pytorch_training/data",
+        "download": false,
+        "train_samples": 400,
+        "valid_samples": 112,
+        "input_dim": 16,
+        "num_classes": 4,
+        "hidden_dim": 32,
+        "epochs": 5,
+        "batch_size": 64,
+        "learning_rate": 0.1,
+        "momentum": 0.9,
+        "weight_decay": 0.0,
+        "accumulation_steps": 1,
+        "scheduler_step_size": 1,
+        "scheduler_gamma": 0.9,
+        "precision": "fp32",
+        "compile_model": false,
+        "device": "cuda",
+        "num_workers": 0,
+        "pin_memory": true,
+        "seed": 7,
+        "output_dir": "01_pytorch_training/results/raw/synthetic_cuda",
+        "resume": null
+      },
+      "results": [
+        {
+          "variant": "fp32_eager",
+          "status": "completed",
+          "precision": "fp32",
+          "compile_model": false,
+          "total_wall_seconds": 0.22401210002135485,
+          "peak_cuda_memory_bytes": 18127872,
+          "first_epoch_train_samples_per_second": 2644.643835589565,
+          "steady_train_samples_per_second": 37620.836740297,
+          "final_valid_loss": 0.3258906304836273,
+          "final_valid_accuracy": 0.8928571428571429
+        },
+        {
+          "variant": "amp_eager",
+          "status": "completed",
+          "precision": "amp",
+          "compile_model": false,
+          "total_wall_seconds": 0.19617999999900348,
+          "peak_cuda_memory_bytes": 18118656,
+          "first_epoch_train_samples_per_second": 4686.535231944413,
+          "steady_train_samples_per_second": 20916.922690169347,
+          "final_valid_loss": 0.3258255422115326,
+          "final_valid_accuracy": 0.8928571428571429
+        },
+        {
+          "variant": "fp32_compile",
+          "status": "completed",
+          "precision": "fp32",
+          "compile_model": true,
+          "total_wall_seconds": 0.07396509998943657,
+          "peak_cuda_memory_bytes": 18127872,
+          "first_epoch_train_samples_per_second": 37218.303975619965,
+          "steady_train_samples_per_second": 40474.682715469666,
+          "final_valid_loss": 0.3258906304836273,
+          "final_valid_accuracy": 0.8928571428571429
+        }
+      ]
+    },
+    "cifar10": {
+      "base_config": {
+        "experiment_name": "cifar10_ablation_base",
+        "dataset": "cifar10",
+        "model": "small_cnn",
+        "data_root": "01_pytorch_training/data",
+        "download": true,
+        "train_samples": 4096,
+        "valid_samples": 1024,
+        "input_dim": 3072,
+        "num_classes": 10,
+        "hidden_dim": 128,
+        "epochs": 3,
+        "batch_size": 128,
+        "learning_rate": 0.05,
+        "momentum": 0.9,
+        "weight_decay": 0.0005,
+        "accumulation_steps": 1,
+        "scheduler_step_size": 1,
+        "scheduler_gamma": 0.8,
+        "precision": "fp32",
+        "compile_model": false,
+        "device": "cuda",
+        "num_workers": 0,
+        "pin_memory": true,
+        "seed": 7,
+        "output_dir": "01_pytorch_training/results/raw/ablation/base",
+        "resume": null
+      },
+      "results": [
+        {
+          "variant": "fp32_eager",
+          "status": "completed",
+          "precision": "fp32",
+          "compile_model": false,
+          "total_wall_seconds": 2.4642206999997143,
+          "peak_cuda_memory_bytes": 142372352,
+          "first_epoch_train_samples_per_second": 4525.389801101535,
+          "steady_train_samples_per_second": 6838.972423577019,
+          "final_valid_loss": 1.7610962390899658,
+          "final_valid_accuracy": 0.33203125
+        },
+        {
+          "variant": "amp_eager",
+          "status": "completed",
+          "precision": "amp",
+          "compile_model": false,
+          "total_wall_seconds": 2.056180099985795,
+          "peak_cuda_memory_bytes": 70057984,
+          "first_epoch_train_samples_per_second": 6306.85465502478,
+          "steady_train_samples_per_second": 7370.156372861189,
+          "final_valid_loss": 1.722813606262207,
+          "final_valid_accuracy": 0.3505859375
+        },
+        {
+          "variant": "fp32_compile",
+          "status": "failed",
+          "precision": "fp32",
+          "compile_model": true,
+          "error_type": "TritonMissing",
+          "error": "Cannot find a working triton installation. Either the package is not installed or it is too old. More information on installing Triton can be found at: https://github.com/triton-lang/triton\n\nSet TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS=\"+dynamo\"\n"
+        }
+      ]
+    }
+  },
+  "dataloader_workers": {
+    "experiment": "dataloader_workers_throughput",
+    "environment": {
+      "platform": "Windows-10-10.0.26200-SP0",
+      "python": "3.11.15",
+      "torch": "2.11.0+cu128"
+    },
+    "controlled_variables": {
+      "samples": 512,
+      "input_dim": 128,
+      "batch_size": 32,
+      "delay_ms": 1.0,
+      "repeats": 3,
+      "seed": 7
+    },
+    "results": [
+      {
+        "num_workers": 0,
+        "samples": 512,
+        "median_samples_per_second": 584.7692063222928,
+        "min_samples_per_second": 572.7973397126447,
+        "max_samples_per_second": 587.8038957695616
+      },
+      {
+        "num_workers": 1,
+        "samples": 512,
+        "median_samples_per_second": 171.62179918675344,
+        "min_samples_per_second": 163.16853927068613,
+        "max_samples_per_second": 172.22149958729048
+      },
+      {
+        "num_workers": 2,
+        "samples": 512,
+        "median_samples_per_second": 199.72379603276698,
+        "min_samples_per_second": 195.6628052695602,
+        "max_samples_per_second": 201.2672129636004
+      },
+      {
+        "num_workers": 4,
+        "samples": 512,
+        "median_samples_per_second": 163.4775245530677,
+        "min_samples_per_second": 161.09399941876424,
+        "max_samples_per_second": 175.68421366623267
+      }
+    ]
+  },
+  "profiler": {
+    "cpu_activity": {
+      "config": {
+        "experiment_name": "synthetic_cpu_fp32",
+        "dataset": "synthetic",
+        "model": "mlp",
+        "data_root": "01_pytorch_training/data",
+        "download": false,
+        "train_samples": 400,
+        "valid_samples": 112,
+        "input_dim": 16,
+        "num_classes": 4,
+        "hidden_dim": 32,
+        "epochs": 5,
+        "batch_size": 64,
+        "learning_rate": 0.1,
+        "momentum": 0.9,
+        "weight_decay": 0.0,
+        "accumulation_steps": 1,
+        "scheduler_step_size": 1,
+        "scheduler_gamma": 0.9,
+        "precision": "fp32",
+        "compile_model": false,
+        "device": "cpu",
+        "num_workers": 0,
+        "pin_memory": false,
+        "seed": 7,
+        "output_dir": "01_pytorch_training/results/raw/synthetic_cpu",
+        "resume": null
+      },
+      "environment": {
+        "platform": "Windows-10-10.0.26200-SP0",
+        "python": "3.11.15",
+        "torch": "2.11.0+cu128",
+        "cuda_runtime": "12.8",
+        "cuda_available": true,
+        "cudnn": 91900,
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "gpu_count": 1,
+        "cpu_logical_count": 16,
+        "memory_total_bytes": 33413771264
+      },
+      "trace": "01_pytorch_training\\results\\raw\\synthetic_cpu_profiler_trace.json",
+      "events": [
+        {
+          "name": "ProfilerStep*",
+          "count": 3,
+          "cpu_time_total_us": 6712.6,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 8340,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__",
+          "count": 3,
+          "cpu_time_total_us": 3364.0,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 13824,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "train_step",
+          "count": 3,
+          "cpu_time_total_us": 2979.3999999999996,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 9140,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::select",
+          "count": 384,
+          "cpu_time_total_us": 1286.100000000004,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::stack",
+          "count": 6,
+          "cpu_time_total_us": 780.7000000000012,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 13824,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "autograd::engine::evaluate_function: AddmmBackward0",
+          "count": 6,
+          "cpu_time_total_us": 610.0999999999995,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 5040,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::linear",
+          "count": 6,
+          "cpu_time_total_us": 445.9000000000001,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 27648,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "AddmmBackward0",
+          "count": 6,
+          "cpu_time_total_us": 429.69999999999936,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 32256,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::unsqueeze",
+          "count": 192,
+          "cpu_time_total_us": 400.7000000000014,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::addmm",
+          "count": 6,
+          "cpu_time_total_us": 338.39999999999964,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 27648,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::as_strided",
+          "count": 609,
+          "cpu_time_total_us": 277.49999999999534,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "Optimizer.step#SGD.step",
+          "count": 3,
+          "cpu_time_total_us": 234.60000000000036,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::mm",
+          "count": 9,
+          "cpu_time_total_us": 233.9000000000001,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 32256,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::t",
+          "count": 27,
+          "cpu_time_total_us": 229.60000000000014,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::cross_entropy_loss",
+          "count": 3,
+          "cpu_time_total_us": 167.0999999999999,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 3096,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "autograd::engine::evaluate_function: NllLossBackward0",
+          "count": 3,
+          "cpu_time_total_us": 145.50000000000045,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 3060,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "NllLossBackward0",
+          "count": 3,
+          "cpu_time_total_us": 121.70000000000027,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 3072,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::transpose",
+          "count": 27,
+          "cpu_time_total_us": 119.2000000000005,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::ones_like",
+          "count": 3,
+          "cpu_time_total_us": 115.30000000000064,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 12,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::cat",
+          "count": 6,
+          "cpu_time_total_us": 107.20000000000005,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 13824,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::empty_like",
+          "count": 3,
+          "cpu_time_total_us": 105.0,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 12,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::nll_loss_backward",
+          "count": 3,
+          "cpu_time_total_us": 104.19999999999982,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 3072,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "autograd::engine::evaluate_function: torch::autograd::AccumulateGrad",
+          "count": 12,
+          "cpu_time_total_us": 95.00000000000182,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::copy_",
+          "count": 6,
+          "cpu_time_total_us": 91.69999999999845,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "autograd::engine::evaluate_function: LogSoftmaxBackward0",
+          "count": 3,
+          "cpu_time_total_us": 90.90000000000009,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": -3072,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::log_softmax",
+          "count": 3,
+          "cpu_time_total_us": 87.09999999999991,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 3072,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::sum",
+          "count": 6,
+          "cpu_time_total_us": 82.0,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 432,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::relu",
+          "count": 3,
+          "cpu_time_total_us": 74.39999999999986,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 24576,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "torch::autograd::AccumulateGrad",
+          "count": 12,
+          "cpu_time_total_us": 71.29999999999927,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::_log_softmax",
+          "count": 3,
+          "cpu_time_total_us": 70.89999999999964,
+          "device_time_total_us": 0,
+          "cpu_memory_usage_bytes": 3072,
+          "device_memory_usage_bytes": 0
+        }
+      ]
+    },
+    "failed_cuda_attempts": {
+      "synthetic": {
+        "config": {
+          "experiment_name": "synthetic_cuda_fp32",
+          "dataset": "synthetic",
+          "model": "mlp",
+          "data_root": "01_pytorch_training/data",
+          "download": false,
+          "train_samples": 400,
+          "valid_samples": 112,
+          "input_dim": 16,
+          "num_classes": 4,
+          "hidden_dim": 32,
+          "epochs": 5,
+          "batch_size": 64,
+          "learning_rate": 0.1,
+          "momentum": 0.9,
+          "weight_decay": 0.0,
+          "accumulation_steps": 1,
+          "scheduler_step_size": 1,
+          "scheduler_gamma": 0.9,
+          "precision": "fp32",
+          "compile_model": false,
+          "device": "cuda",
+          "num_workers": 0,
+          "pin_memory": true,
+          "seed": 7,
+          "output_dir": "01_pytorch_training/results/raw/synthetic_cuda",
+          "resume": null
+        },
+        "environment": {
+          "platform": "Windows-10-10.0.26200-SP0",
+          "python": "3.11.15",
+          "torch": "2.11.0+cu128",
+          "cuda_runtime": "12.8",
+          "cuda_available": true,
+          "cudnn": 91900,
+          "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+          "gpu_count": 1,
+          "cpu_logical_count": 16,
+          "memory_total_bytes": 33413771264
+        },
+        "trace": "01_pytorch_training\\results\\raw\\synthetic_profiler_trace.json",
+        "events": [
+          {
+            "name": "ProfilerStep*",
+            "count": 3,
+            "cpu_time_total_us": 36437.9,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__",
+            "count": 3,
+            "cpu_time_total_us": 5071.8,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::select",
+            "count": 384,
+            "cpu_time_total_us": 1449.2000000000385,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::as_strided",
+            "count": 603,
+            "cpu_time_total_us": 389.6000000000363,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::stack",
+            "count": 6,
+            "cpu_time_total_us": 1068.0999999999972,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 13824,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::cat",
+            "count": 6,
+            "cpu_time_total_us": 136.99999999999977,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 13824,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::view",
+            "count": 9,
+            "cpu_time_total_us": 37.60000000000446,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::unsqueeze",
+            "count": 192,
+            "cpu_time_total_us": 526.4999999999882,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::pin_memory",
+            "count": 6,
+            "cpu_time_total_us": 248.80000000000155,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::is_pinned",
+            "count": 6,
+            "cpu_time_total_us": 46.99999999999409,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::_pin_memory",
+            "count": 6,
+            "cpu_time_total_us": 169.89999999999463,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::fill_",
+            "count": 21,
+            "cpu_time_total_us": 557.8000000000025,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::set_",
+            "count": 6,
+            "cpu_time_total_us": 17.30000000000655,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::copy_",
+            "count": 12,
+            "cpu_time_total_us": 676.5000000000014,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::to",
+            "count": 9,
+            "cpu_time_total_us": 979.0000000000041,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 13824
+          },
+          {
+            "name": "aten::_to_copy",
+            "count": 6,
+            "cpu_time_total_us": 949.2999999999975,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 13824
+          },
+          {
+            "name": "aten::empty_strided",
+            "count": 9,
+            "cpu_time_total_us": 336.39999999998827,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 15360
+          },
+          {
+            "name": "Optimizer.zero_grad#SGD.zero_grad",
+            "count": 3,
+            "cpu_time_total_us": 88.399999999996,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": -10752
+          },
+          {
+            "name": "train_step",
+            "count": 3,
+            "cpu_time_total_us": 30006.7,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 10752
+          },
+          {
+            "name": "aten::linear",
+            "count": 6,
+            "cpu_time_total_us": 660.4999999999995,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 27648
+          },
+          {
+            "name": "aten::t",
+            "count": 27,
+            "cpu_time_total_us": 333.2999999999952,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::transpose",
+            "count": 27,
+            "cpu_time_total_us": 195.60000000000173,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::addmm",
+            "count": 6,
+            "cpu_time_total_us": 529.9000000000037,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 27648
+          },
+          {
+            "name": "aten::relu",
+            "count": 3,
+            "cpu_time_total_us": 132.10000000000127,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 24576
+          },
+          {
+            "name": "aten::clamp_min",
+            "count": 3,
+            "cpu_time_total_us": 94.50000000000455,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 24576
+          },
+          {
+            "name": "aten::cross_entropy_loss",
+            "count": 3,
+            "cpu_time_total_us": 279.700000000003,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 6144
+          },
+          {
+            "name": "aten::log_softmax",
+            "count": 3,
+            "cpu_time_total_us": 106.79999999999563,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 3072
+          },
+          {
+            "name": "aten::_log_softmax",
+            "count": 3,
+            "cpu_time_total_us": 84.8000000000061,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 3072
+          },
+          {
+            "name": "aten::nll_loss_nd",
+            "count": 3,
+            "cpu_time_total_us": 142.80000000000018,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 3072
+          },
+          {
+            "name": "aten::nll_loss",
+            "count": 3,
+            "cpu_time_total_us": 129.099999999999,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 3072
+          }
+        ]
+      },
+      "cifar10": {
+        "config": {
+          "experiment_name": "cifar10_profiler",
+          "dataset": "cifar10",
+          "model": "small_cnn",
+          "data_root": "01_pytorch_training/data",
+          "download": true,
+          "train_samples": 1024,
+          "valid_samples": 256,
+          "input_dim": 3072,
+          "num_classes": 10,
+          "hidden_dim": 128,
+          "epochs": 1,
+          "batch_size": 64,
+          "learning_rate": 0.05,
+          "momentum": 0.9,
+          "weight_decay": 0.0,
+          "accumulation_steps": 1,
+          "scheduler_step_size": 1,
+          "scheduler_gamma": 0.8,
+          "precision": "fp32",
+          "compile_model": false,
+          "device": "cuda",
+          "num_workers": 0,
+          "pin_memory": true,
+          "seed": 7,
+          "output_dir": "01_pytorch_training/results/raw/profiler",
+          "resume": null
+        },
+        "environment": {
+          "platform": "Windows-10-10.0.26200-SP0",
+          "python": "3.11.15",
+          "torch": "2.11.0+cu128",
+          "cuda_runtime": "12.8",
+          "cuda_available": true,
+          "cudnn": 91900,
+          "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+          "gpu_count": 1,
+          "cpu_logical_count": 16,
+          "memory_total_bytes": 33413771264
+        },
+        "trace": "01_pytorch_training\\results\\raw\\cifar10_profiler_trace.json",
+        "events": [
+          {
+            "name": "ProfilerStep*",
+            "count": 3,
+            "cpu_time_total_us": 78885.9,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__",
+            "count": 3,
+            "cpu_time_total_us": 46140.600000000006,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "train_step",
+            "count": 3,
+            "cpu_time_total_us": 30801.700000000004,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 1144320
+          },
+          {
+            "name": "aten::to",
+            "count": 981,
+            "cpu_time_total_us": 7967.100000000135,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 2360832,
+            "device_memory_usage_bytes": 2360832
+          },
+          {
+            "name": "aten::_to_copy",
+            "count": 582,
+            "cpu_time_total_us": 6688.8000000000375,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 2360832,
+            "device_memory_usage_bytes": 2360832
+          },
+          {
+            "name": "aten::clone",
+            "count": 384,
+            "cpu_time_total_us": 5431.600000000007,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 2949120,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::contiguous",
+            "count": 192,
+            "cpu_time_total_us": 3564.4999999999673,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 589824,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::div",
+            "count": 195,
+            "cpu_time_total_us": 3448.6999999999853,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 2359296,
+            "device_memory_usage_bytes": 6291456
+          },
+          {
+            "name": "aten::eq",
+            "count": 192,
+            "cpu_time_total_us": 3111.9000000000233,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 576,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::empty_strided",
+            "count": 777,
+            "cpu_time_total_us": 2990.0999999999626,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 4720128,
+            "device_memory_usage_bytes": 2362368
+          },
+          {
+            "name": "aten::copy_",
+            "count": 972,
+            "cpu_time_total_us": 2975.499999999889,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::empty",
+            "count": 642,
+            "cpu_time_total_us": 2690.1999999999152,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 595968,
+            "device_memory_usage_bytes": 76626432
+          },
+          {
+            "name": "aten::fill_",
+            "count": 1629,
+            "cpu_time_total_us": 2255.7000000000944,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "autograd::engine::evaluate_function: ConvolutionBackward0",
+            "count": 9,
+            "cpu_time_total_us": 2004.4999999999927,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": -42918912
+          },
+          {
+            "name": "ConvolutionBackward0",
+            "count": 9,
+            "cpu_time_total_us": 1920.300000000003,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 10558464
+          },
+          {
+            "name": "aten::convolution_backward",
+            "count": 9,
+            "cpu_time_total_us": 1848.800000000003,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 10558464
+          },
+          {
+            "name": "aten::conv2d",
+            "count": 9,
+            "cpu_time_total_us": 1744.7000000000007,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 44040192
+          },
+          {
+            "name": "aten::empty_like",
+            "count": 201,
+            "cpu_time_total_us": 1727.7000000000005,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 589824,
+            "device_memory_usage_bytes": 37750272
+          },
+          {
+            "name": "aten::convolution",
+            "count": 9,
+            "cpu_time_total_us": 1692.5000000000073,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 44040192
+          },
+          {
+            "name": "aten::_convolution",
+            "count": 9,
+            "cpu_time_total_us": 1512.7000000000116,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 44040192
+          },
+          {
+            "name": "aten::any",
+            "count": 192,
+            "cpu_time_total_us": 1302.400000000051,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 192,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::is_nonzero",
+            "count": 192,
+            "cpu_time_total_us": 1240.300000000116,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::permute",
+            "count": 192,
+            "cpu_time_total_us": 1043.6999999999869,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::view",
+            "count": 609,
+            "cpu_time_total_us": 989.2999999999902,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::item",
+            "count": 192,
+            "cpu_time_total_us": 933.8999999999573,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "autograd::engine::evaluate_function: AddmmBackward0",
+            "count": 3,
+            "cpu_time_total_us": 905.4000000000087,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 9216
+          },
+          {
+            "name": "aten::cudnn_convolution",
+            "count": 9,
+            "cpu_time_total_us": 865.5999999999985,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 44040192
+          },
+          {
+            "name": "Optimizer.step#SGD.step",
+            "count": 3,
+            "cpu_time_total_us": 780.7000000000044,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 0
+          },
+          {
+            "name": "aten::batch_norm",
+            "count": 6,
+            "cpu_time_total_us": 733.1000000000022,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 37754880
+          },
+          {
+            "name": "AddmmBackward0",
+            "count": 3,
+            "cpu_time_total_us": 709.400000000016,
+            "device_time_total_us": 0,
+            "cpu_memory_usage_bytes": 0,
+            "device_memory_usage_bytes": 113664
+          }
+        ]
+      }
+    }
+  }
+}

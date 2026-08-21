@@ -1,0 +1,64 @@
+{
+  "base_config": {
+    "experiment_name": "cifar10_ablation_base",
+    "dataset": "cifar10",
+    "model": "small_cnn",
+    "data_root": "01_pytorch_training/data",
+    "download": true,
+    "train_samples": 4096,
+    "valid_samples": 1024,
+    "input_dim": 3072,
+    "num_classes": 10,
+    "hidden_dim": 128,
+    "epochs": 3,
+    "batch_size": 128,
+    "learning_rate": 0.05,
+    "momentum": 0.9,
+    "weight_decay": 0.0005,
+    "accumulation_steps": 1,
+    "scheduler_step_size": 1,
+    "scheduler_gamma": 0.8,
+    "precision": "fp32",
+    "compile_model": false,
+    "device": "cuda",
+    "num_workers": 0,
+    "pin_memory": true,
+    "seed": 7,
+    "output_dir": "01_pytorch_training/results/raw/ablation/base",
+    "resume": null
+  },
+  "results": [
+    {
+      "variant": "fp32_eager",
+      "status": "completed",
+      "precision": "fp32",
+      "compile_model": false,
+      "total_wall_seconds": 2.4642206999997143,
+      "peak_cuda_memory_bytes": 142372352,
+      "first_epoch_train_samples_per_second": 4525.389801101535,
+      "steady_train_samples_per_second": 6838.972423577019,
+      "final_valid_loss": 1.7610962390899658,
+      "final_valid_accuracy": 0.33203125
+    },
+    {
+      "variant": "amp_eager",
+      "status": "completed",
+      "precision": "amp",
+      "compile_model": false,
+      "total_wall_seconds": 2.056180099985795,
+      "peak_cuda_memory_bytes": 70057984,
+      "first_epoch_train_samples_per_second": 6306.85465502478,
+      "steady_train_samples_per_second": 7370.156372861189,
+      "final_valid_loss": 1.722813606262207,
+      "final_valid_accuracy": 0.3505859375
+    },
+    {
+      "variant": "fp32_compile",
+      "status": "failed",
+      "precision": "fp32",
+      "compile_model": true,
+      "error_type": "TritonMissing",
+      "error": "Cannot find a working triton installation. Either the package is not installed or it is too old. More information on installing Triton can be found at: https://github.com/triton-lang/triton\n\nSet TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS=\"+dynamo\"\n"
+    }
+  ]
+}

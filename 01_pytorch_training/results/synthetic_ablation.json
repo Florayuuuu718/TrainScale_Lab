@@ -1,0 +1,68 @@
+{
+  "base_config": {
+    "experiment_name": "synthetic_cuda_fp32",
+    "dataset": "synthetic",
+    "model": "mlp",
+    "data_root": "01_pytorch_training/data",
+    "download": false,
+    "train_samples": 400,
+    "valid_samples": 112,
+    "input_dim": 16,
+    "num_classes": 4,
+    "hidden_dim": 32,
+    "epochs": 5,
+    "batch_size": 64,
+    "learning_rate": 0.1,
+    "momentum": 0.9,
+    "weight_decay": 0.0,
+    "accumulation_steps": 1,
+    "scheduler_step_size": 1,
+    "scheduler_gamma": 0.9,
+    "precision": "fp32",
+    "compile_model": false,
+    "device": "cuda",
+    "num_workers": 0,
+    "pin_memory": true,
+    "seed": 7,
+    "output_dir": "01_pytorch_training/results/raw/synthetic_cuda",
+    "resume": null
+  },
+  "results": [
+    {
+      "variant": "fp32_eager",
+      "status": "completed",
+      "precision": "fp32",
+      "compile_model": false,
+      "total_wall_seconds": 0.22401210002135485,
+      "peak_cuda_memory_bytes": 18127872,
+      "first_epoch_train_samples_per_second": 2644.643835589565,
+      "steady_train_samples_per_second": 37620.836740297,
+      "final_valid_loss": 0.3258906304836273,
+      "final_valid_accuracy": 0.8928571428571429
+    },
+    {
+      "variant": "amp_eager",
+      "status": "completed",
+      "precision": "amp",
+      "compile_model": false,
+      "total_wall_seconds": 0.19617999999900348,
+      "peak_cuda_memory_bytes": 18118656,
+      "first_epoch_train_samples_per_second": 4686.535231944413,
+      "steady_train_samples_per_second": 20916.922690169347,
+      "final_valid_loss": 0.3258255422115326,
+      "final_valid_accuracy": 0.8928571428571429
+    },
+    {
+      "variant": "fp32_compile",
+      "status": "completed",
+      "precision": "fp32",
+      "compile_model": true,
+      "total_wall_seconds": 0.07396509998943657,
+      "peak_cuda_memory_bytes": 18127872,
+      "first_epoch_train_samples_per_second": 37218.303975619965,
+      "steady_train_samples_per_second": 40474.682715469666,
+      "final_valid_loss": 0.3258906304836273,
+      "final_valid_accuracy": 0.8928571428571429
+    }
+  ]
+}

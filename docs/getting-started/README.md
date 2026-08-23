@@ -4,10 +4,18 @@
 
 M0 建立“别人能重建的项目”，M1 建立“可以证明正确、可以恢复、可以测量的 PyTorch 单卡训练系统”。所有 M1 源码、配置、测试、结果与分析都集中在 [`01_pytorch_training/`](../../01_pytorch_training/README.md)。
 
+## 先选择运行平台
+
+- **Windows + NVIDIA GPU，准备完成完整路线**：推荐先按[从零搭建 WSL2 + Ubuntu + PyTorch GPU 环境](wsl2-gpu.md)操作。教程会说明为什么选择 WSL、Windows 与 Ubuntu 各运行哪些命令、项目放在哪里，以及六层验收标准。
+- **只有 CPU，或暂时只学习基础训练**：可以留在原生 Windows，按[通用环境搭建](m0-m1-environment.md)选择 CPU wheel。
+- **原生 Linux**：沿用通用环境中的 Python/uv 规则，并使用 Linux 的 `.venv/bin/...` 命令；不需要 WSL。
+
+不要先在 Windows 中创建 CUDA 环境，再把同一个 `.venv` 复制给 Ubuntu。Windows 与 Linux 应分别创建环境；性能实验的 Linux 仓库应位于 `/home/<用户名>/...`。
+
 ## 学习顺序
 
-1. 创建 Python 3.11 的项目专属 `.venv`；
-2. 选择 CPU 或 CUDA 12.8 PyTorch wheel；
+1. 选择原生 Windows、WSL2 Ubuntu 或原生 Linux，并创建各自的项目专属 `.venv`；
+2. 选择 CPU 或 CUDA 12.9 PyTorch wheel；
 3. 运行 10 个正确性测试；
 4. 用 synthetic MLP 学懂一次 train/validation；
 5. 验证梯度累积和 checkpoint resume；
@@ -15,9 +23,9 @@ M0 建立“别人能重建的项目”，M1 建立“可以证明正确、可�
 7. 运行 workers、AMP/compile、Profiler 实验；
 8. 对照结构化结果阅读分析报告。
 
-## 第一次复现
+## 第一次复现：原生 Windows 基础路线
 
-命令均在仓库根目录执行。CPU 用户：
+以下命令均在 Windows 仓库根目录的 PowerShell 中执行。WSL2 用户不要照抄这一组路径，应使用 [WSL2 教程](wsl2-gpu.md)中的 `.venv/bin/...` 命令。CPU 用户：
 
 ```powershell
 uv venv --python 3.11 .venv
@@ -26,14 +34,10 @@ uv sync --extra cpu --extra dev
 .venv\Scripts\python -m trainscale_training.train --config 01_pytorch_training/configs/synthetic_cpu.toml
 ```
 
-NVIDIA GPU 用户把同步命令换成 `uv sync --extra cu128 --extra dev`，确认 `torch.cuda.is_available()` 为 `True` 后运行：
+NVIDIA GPU 用户不要在这组原生 Windows 命令中直接替换 extra。请先进入 WSL2 Ubuntu，再按 [WSL2 教程](wsl2-gpu.md)创建 cu129 环境并使用 `.venv/bin/...` 运行 GPU 实验。
 
-```powershell
-.venv\Scripts\python -m trainscale_training.train --config 01_pytorch_training/configs/synthetic_cuda.toml
-.venv\Scripts\python -m trainscale_training.train --config 01_pytorch_training/configs/cifar10_baseline.toml
-```
 
-CPU/GPU wheel、driver、CUDA runtime 和 `nvcc` 的区别见[环境搭建](m0-m1-environment.md)。完整命令、预期指标和知识总结以[阶段总指导](../../01_pytorch_training/README.md)为准。
+CPU/GPU wheel、driver、CUDA runtime 和 `nvcc` 的区别见[环境搭建](m0-m1-environment.md)。Windows + NVIDIA GPU 学习者若要完成 compile、Profiler 和后续 CUDA/Triton/NCCL 路线，应从一开始使用[WSL2 Ubuntu 完整教程](wsl2-gpu.md)，而不是等原生 Windows 实验失败后再临时迁移。完整命令、预期指标和知识总结以[阶段总指导](../../01_pytorch_training/README.md)为准。
 
 ## 你需要能回答的问题
 

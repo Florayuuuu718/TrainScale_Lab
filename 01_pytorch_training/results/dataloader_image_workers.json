@@ -1,0 +1,74 @@
+{
+  "experiment": "dataloader_image_workers_steady_state",
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.11.16",
+    "torch": "2.12.1+cu129"
+  },
+  "controlled_variables": {
+    "image_root": "01_pytorch_training/data/worker_jpegs",
+    "jpeg_files": 512,
+    "samples_per_epoch": 16384,
+    "batch_size": 64,
+    "source_size": 160,
+    "image_size": 128,
+    "warmup_epochs": 1,
+    "timed_epochs": 3,
+    "prefetch_factor": 2,
+    "seed": 7
+  },
+  "results": [
+    {
+      "num_workers": 0,
+      "first_epoch_seconds": 12.174177232000147,
+      "first_epoch_samples_per_second": 1345.7993659673543,
+      "steady_epoch_seconds": [
+        11.552953589000026,
+        10.913891156000318,
+        10.51382851299968
+      ],
+      "median_steady_samples_per_second": 1501.2061020044428,
+      "min_steady_samples_per_second": 1418.1654824269167,
+      "max_steady_samples_per_second": 1558.3286316437657
+    },
+    {
+      "num_workers": 1,
+      "first_epoch_seconds": 9.86136403800083,
+      "first_epoch_samples_per_second": 1661.433442357888,
+      "steady_epoch_seconds": [
+        10.045167692000177,
+        9.550002134999886,
+        9.737011834000441
+      ],
+      "median_steady_samples_per_second": 1682.6517497687637,
+      "min_steady_samples_per_second": 1631.0330003796726,
+      "max_steady_samples_per_second": 1715.6017107005805
+    },
+    {
+      "num_workers": 2,
+      "first_epoch_seconds": 5.10130664099961,
+      "first_epoch_samples_per_second": 3211.7261621405937,
+      "steady_epoch_seconds": [
+        4.9297142710001935,
+        5.243280008999136,
+        4.970005819001017
+      ],
+      "median_steady_samples_per_second": 3296.5756171475114,
+      "min_steady_samples_per_second": 3124.7615942463203,
+      "max_steady_samples_per_second": 3323.519193877303
+    },
+    {
+      "num_workers": 4,
+      "first_epoch_seconds": 2.792200108999168,
+      "first_epoch_samples_per_second": 5867.774285659152,
+      "steady_epoch_seconds": [
+        2.9596453260001,
+        2.8365436750009394,
+        2.8527785149999545
+      ],
+      "median_steady_samples_per_second": 5743.172809894869,
+      "min_steady_samples_per_second": 5535.79844722227,
+      "max_steady_samples_per_second": 5776.043621113845
+    }
+  ]
+}

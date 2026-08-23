@@ -19,10 +19,10 @@ M0 不训练模型。它建立可复现、可测试、可协作的项目边界�
 
 `pyproject.toml` 定义两个互斥 extra：
 
-- `cpu`：安装 `torch==2.11.0+cpu`，供 CPU CI 和无 GPU 学习者使用；
-- `cu128`：安装 `torch==2.11.0+cu128`，供 NVIDIA GPU 环境使用。
+- `cpu`：安装 `torch==2.12.1+cpu`，供 CPU CI 和无 GPU 学习者使用；
+- `cu129`：安装 `torch==2.12.1+cu129`，供 NVIDIA GPU 环境使用。
 
-两者共享 PyTorch 2.11 API，但二进制运行库不同。互斥规则防止同一环境同时请求两个 torch 变体。`uv.lock` 记录两条可复现解析路径，实际安装时必须明确选择一条。
+两者共享 PyTorch 2.12.1 API，但二进制运行库不同。互斥规则防止同一环境同时请求两个 torch 变体。`uv.lock` 记录两条可复现解析路径，实际安装时必须明确选择一条。
 
 ## 从零验收 M0
 

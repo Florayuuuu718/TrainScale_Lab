@@ -1,0 +1,80 @@
+{
+  "base_config": {
+    "experiment_name": "cifar10_modes_wsl_base",
+    "dataset": "cifar10",
+    "model": "small_cnn",
+    "data_root": "01_pytorch_training/data",
+    "download": true,
+    "train_samples": 50000,
+    "valid_samples": 10000,
+    "input_dim": 3072,
+    "num_classes": 10,
+    "hidden_dim": 128,
+    "epochs": 5,
+    "batch_size": 256,
+    "learning_rate": 0.05,
+    "momentum": 0.9,
+    "weight_decay": 0.0005,
+    "accumulation_steps": 1,
+    "scheduler_step_size": 1,
+    "scheduler_gamma": 0.9,
+    "precision": "fp32",
+    "compile_model": false,
+    "device": "cuda",
+    "num_workers": 4,
+    "pin_memory": true,
+    "seed": 7,
+    "output_dir": "01_pytorch_training/results/raw/cifar10_modes_wsl/base",
+    "resume": null
+  },
+  "results": [
+    {
+      "variant": "fp32_eager",
+      "status": "completed",
+      "precision": "fp32",
+      "compile_model": false,
+      "total_wall_seconds": 11.565460298999994,
+      "peak_cuda_memory_bytes": 205435392,
+      "first_epoch_train_samples_per_second": 17221.214960056215,
+      "steady_train_samples_per_second": 27172.117718337227,
+      "final_valid_loss": 1.001337808227539,
+      "final_valid_accuracy": 0.6467
+    },
+    {
+      "variant": "amp_eager",
+      "status": "completed",
+      "precision": "amp",
+      "compile_model": false,
+      "total_wall_seconds": 9.623930674999997,
+      "peak_cuda_memory_bytes": 123752960,
+      "first_epoch_train_samples_per_second": 26218.89929765569,
+      "steady_train_samples_per_second": 31402.807023865786,
+      "final_valid_loss": 0.9969807338714599,
+      "final_valid_accuracy": 0.6497
+    },
+    {
+      "variant": "fp32_compile",
+      "status": "completed",
+      "precision": "fp32",
+      "compile_model": true,
+      "total_wall_seconds": 24.277981657999987,
+      "peak_cuda_memory_bytes": 193860608,
+      "first_epoch_train_samples_per_second": 3247.3448663863974,
+      "steady_train_samples_per_second": 32042.603285699148,
+      "final_valid_loss": 1.017560489654541,
+      "final_valid_accuracy": 0.6405
+    },
+    {
+      "variant": "amp_compile",
+      "status": "completed",
+      "precision": "amp",
+      "compile_model": true,
+      "total_wall_seconds": 20.409923209999988,
+      "peak_cuda_memory_bytes": 121975808,
+      "first_epoch_train_samples_per_second": 4690.720516046856,
+      "steady_train_samples_per_second": 32181.701672372757,
+      "final_valid_loss": 1.005228145980835,
+      "final_valid_accuracy": 0.6463
+    }
+  ]
+}

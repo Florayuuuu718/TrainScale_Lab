@@ -13,11 +13,13 @@ license-files = ["LICENSE"]
 dependencies = ["numpy>=1.26,<3", "psutil>=6,<8"]
 
 [project.optional-dependencies]
-cpu = ["torch==2.11.0", "torchvision==0.26.0"]
-cu128 = ["torch==2.11.0", "torchvision==0.26.0"]
+cpu = ["torch==2.12.1", "torchvision==0.27.1"]
+cu129 = ["torch==2.12.1", "torchvision==0.27.1"]
 dev = ["mypy>=1.15,<2", "pytest>=8.3,<10", "ruff>=0.11,<1", "types-psutil>=7,<8"]
 
 [project.scripts]
+trainscale-benchmark-modes = 'trainscale_training.benchmark_modes:main'
+trainscale-benchmark-image-workers = 'trainscale_training.benchmark_image_workers:main'
 trainscale-train = "trainscale_training.train:main"
 trainscale-benchmark = "trainscale_training.benchmark:main"
 trainscale-benchmark-workers = "trainscale_training.benchmark_workers:main"
@@ -46,16 +48,16 @@ check_untyped_defs = true
 warn_unused_ignores = true
 
 [tool.uv]
-conflicts = [[{ extra = "cpu" }, { extra = "cu128" }]]
+conflicts = [[{ extra = "cpu" }, { extra = "cu129" }]]
 
 [tool.uv.sources]
 torch = [
   { index = "pytorch-cpu", extra = "cpu" },
-  { index = "pytorch-cu128", extra = "cu128" },
+  { index = "pytorch-cu129", extra = "cu129" },
 ]
 torchvision = [
   { index = "pytorch-cpu", extra = "cpu" },
-  { index = "pytorch-cu128", extra = "cu128" },
+  { index = "pytorch-cu129", extra = "cu129" },
 ]
 
 [[tool.uv.index]]
@@ -64,6 +66,6 @@ url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 [[tool.uv.index]]
-name = "pytorch-cu128"
-url = "https://download.pytorch.org/whl/cu128"
+name = "pytorch-cu129"
+url = "https://download.pytorch.org/whl/cu129"
 explicit = true

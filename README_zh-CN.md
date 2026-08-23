@@ -6,6 +6,22 @@
 
 TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Training** 初学者的实践型开源项目。它不是一份链接合集，也不是对现有框架的简单封装；每一阶段都要求你先实现最小版本，再测量、解释瓶颈并完成一次可复现的优化。
 
+## 快速导航
+
+[新手入口](#新手从这里开始) · [环境与运行](#m0m1-快速开始) · [学习路线](#学习路线) · [分阶段任务](#分阶段实践任务) · [可复现约定](#可复现性约定)
+
+| 跳转位置 | 内容 |
+|---|---|
+| [01 · PyTorch Training](01_pytorch_training/README.md) | M1 完整教学与复现顺序 |
+| [训练源码](01_pytorch_training/trainscale_training) | 数据、模型、引擎、checkpoint、benchmark 与 profiler |
+| [实验配置](01_pytorch_training/configs/README.md) | TOML 实验配方 |
+| [正确性测试](01_pytorch_training/tests/README.md) | 10 个测试的逐项解释 |
+| [实验报告](01_pytorch_training/experiments/README.md) | 成功实验、理论分析与排障提示 |
+| [结果目录](01_pytorch_training/results/README.md) | 精简 JSON 总表与 SVG 曲线 |
+| [文档导航](docs/README.md) | 概念、环境和仓库基建 |
+| [技术路线](技术路线.md) | 决策、实施日志与后续阶段 |
+| [v0.1 issue 拆分](docs/v0.1-issues.md) | M0/M1 验收状态 |
+
 ## 新手从这里开始
 
 仓库目前已完成 M0 本地基建和 M1 完整学习单元：从 synthetic MLP 正确性基线扩展到 CIFAR-10 CNN、checkpoint/resume、AMP、梯度累积、Profiler 和性能消融。目标是验证训练系统与实验方法，不是追求 CIFAR-10 榜单精度。
@@ -17,9 +33,11 @@ TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Tr
 3. [PyTorch 训练基础概念](docs/concepts/pytorch-training-basics.md)
 4. [01 · PyTorch Training 完整复现](01_pytorch_training/README.md)
 
+如果你使用 Windows + NVIDIA GPU，并准备完成后续 compile、Profiler、CUDA/Triton 与 NCCL 路线，请在运行实验前先完成[WSL2 + 官方 Ubuntu + PyTorch GPU 从零教程](docs/getting-started/wsl2-gpu.md)。教程明确标注每条命令应在管理员 PowerShell、普通 PowerShell 还是 Ubuntu 终端执行，并解释项目为什么应放在 Ubuntu 的 `/home/<用户名>/projects/` 中。
+
 ## M0/M1 快速开始
 
-第一阶段冻结版本为 Python 3.11、PyTorch 2.11，NVIDIA GPU 主环境使用 CUDA 12.8；CPU CI 使用同一 PyTorch 2.11 API 线的 CPU wheel。
+第一阶段冻结版本为 Python 3.11、PyTorch 2.12.1，NVIDIA GPU 主环境使用 CUDA 12.9；CPU CI 使用同一 PyTorch 2.12.1 API 线的 CPU wheel。
 
 ```powershell
 uv venv --python 3.11 .venv
@@ -29,11 +47,11 @@ uv sync --extra cpu --extra dev
 .venv\Scripts\python -m trainscale_training.train --config 01_pytorch_training/configs/synthetic_cpu.toml
 ```
 
-冻结的 NVIDIA 环境改用 `uv sync --extra cu128 --extra dev`。CPU 与 CUDA extra 被显式设为互斥，避免混装。checkpoint、benchmark 原始结果、本地环境、uv 管理的 Python 与缓存均不会进入 Git。
+完整 NVIDIA 路线不要在上面的原生 Windows 环境中直接换 extra；请进入 WSL2 Ubuntu 后执行 `uv sync --extra cu129 --extra dev --python 3.11`，并使用 `.venv/bin/...`。CPU 与 CUDA extra 被显式设为互斥，避免混装。大型 checkpoint/trace、数据集、本地环境和缓存不会进入 Git；精简 JSON/SVG 结果会连同分析一起保留。
 
 虚拟环境隔离、uv 缓存复用、CPU/GPU wheel 选择、CUDA 验证以及何时需要 `nvcc`，详见 [M0/M1 环境搭建指导](docs/getting-started/m0-m1-environment.md)。
 
-项目当前已完成 M1 本地验收；GitHub 仓库创建、首次 push 和远端 CI 仍需外部操作。M2 尚未开始。
+M1 已在 Windows CPU 与 Ubuntu GPU 两条路线完成本地验收并封存；GitHub 仓库创建、首次 push 和远端 CI 仍需外部操作。M2 尚未开始。
 
 ## 你会学到什么
 
@@ -69,7 +87,7 @@ FSDP2 / Tensor Parallel
 
 | 阶段 | 要构建的东西 | 核心问题 | 最终证据 |
 |---|---|---|---|
-| 01 | PyTorch 单卡训练框架 | 一次可靠训练需要哪些系统组件？ | loss/accuracy、吞吐、显存、断点恢复一致性 |
+| [01](01_pytorch_training/README.md) | PyTorch 单卡训练框架 | 一次可靠训练需要哪些系统组件？ | loss/accuracy、吞吐、显存、断点恢复一致性 |
 | 02 | GPU Kernel Lab | 算子为什么快或慢？ | 正确性测试、延迟、带宽、加速比 |
 | 03 | Distributed Training Lab | 多 GPU 为什么不能线性加速？ | 1/2/4/8 GPU scaling 曲线 |
 | 04 | NCCL Performance Lab | 通信何时受延迟或带宽限制？ | message size–bandwidth 曲线 |
@@ -78,6 +96,8 @@ FSDP2 / Tensor Parallel
 | 07 | FSDP2 / TP 扩展 | 模型放不下一张卡时如何切分？ | 峰值显存、正确性与扩展效率 |
 
 ## 计划中的仓库结构
+
+已经实现的目录可以直接打开：[M1 阶段](01_pytorch_training/README.md) · [M1 源码](01_pytorch_training/trainscale_training) · [文档](docs/README.md) · [CPU CI](.github/workflows/cpu-ci.yml)。
 
 ```text
 trainscale-lab/
@@ -215,7 +235,7 @@ trainscale-lab/
 - 数据集版本、随机种子与预处理；
 - warm-up、重复次数、均值和离散程度；
 - 吞吐的统计口径、峰值显存和正确性阈值；
-- 失败实验与已知限制。
+- 已知限制与排障说明。
 
 未经实际测量的结果一律标注“待实测”。不同硬件的绝对性能不直接排名，优先比较同一环境下的相对变化。
 

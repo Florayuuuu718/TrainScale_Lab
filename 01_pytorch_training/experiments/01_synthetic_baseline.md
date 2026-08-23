@@ -4,6 +4,17 @@
 
 最小 `Dataset -> DataLoader -> model -> loss -> backward -> optimizer` 链路能否在 CPU 和 CUDA 上学习同一条合成分类规律？
 
+## 概念
+
+- Dataset 定义单个样本和标签，DataLoader 将样本组成 batch；
+- forward 把输入映射为 logits，loss 衡量预测与标签的差异；
+- backward 根据链式法则计算参数梯度，optimizer 使用梯度更新参数；
+- validation 使用未参与参数更新的数据，检查模型是否学到可迁移的规律，而不只是记住训练样本。
+
+## 对象特点与机制预测
+
+该数据由固定线性规则生成，模型容量足以逼近规则，因此 loss 应下降、accuracy 应上升。每个 epoch 只有 7 个微小 MLP step，GPU kernel launch、host 调度和 CUDA 初始化的固定成本相对计算量很大，所以 GPU 可能比 CPU 慢；这不代表 GPU 的大规模矩阵计算能力更弱。
+
 ## 运行前假设
 
 - 固定 seed 后 CPU/GPU 的 loss 和 accuracy 应接近；
@@ -58,3 +69,7 @@ GPU 更慢不是异常。每 epoch 只有 400 个样本和 7 个微小 MLP step�
 - loss 下降是“优化链路有效”的证据，validation 指标用于观察未参与更新的数据；
 - 同一算法在不同设备上应数值接近，但性能结论必须与 workload 规模绑定；
 - smoke test 成功不等于真实任务已训练充分。
+
+## 有限结论与一般预期
+
+本实验只证明最小数学链路正确以及 CPU/CUDA 数值接近。一般情况下，随着模型、batch 和每步算术量增大，GPU 固定开销会被摊薄并出现性能交叉点；要验证这个一般预期，需要扩大 MLP 或使用 CNN，而不能外推本实验的 wall time。

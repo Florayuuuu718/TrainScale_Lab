@@ -1,128 +1,83 @@
 # M0/M1 环境搭建：Python、PyTorch 与 CUDA wheel
 
-本阶段的目标不是“让某台机器碰巧能运行”，而是让新机器能够根据锁文件重建同一套环境，并能明确判断当前运行的是 CPU 还是 GPU 版本。
+本页解释环境分层；需要完成 GPU、AMP、compile、Profiler 和后续 Triton/NCCL 的 Windows + NVIDIA 学习者，请直接使用 [WSL2 Ubuntu 完整教程](wsl2-gpu.md)。原生 Windows 只作为 CPU 或基础训练路线，不是完整 GPU 路线。
 
-## 1. 环境与缓存不是一回事
+## 1. 虚拟环境与缓存为什么要分开
 
-每个项目都应该有独立虚拟环境。`trainscale-lab` 的依赖安装在自己的 `.venv` 中，不读取其他项目的 `site-packages`。因此，即使另一项目已经安装 PyTorch，本项目仍需要执行一次 `uv sync`。
-
-但这不等于每个项目都必须重新从网络下载相同 wheel：uv 默认使用用户级共享下载缓存，并可通过复制或硬链接将缓存内容安装到不同虚拟环境。可用以下命令查看缓存位置：
+每个项目都应有独立 `.venv`，避免一个项目升级依赖后破坏另一个项目。uv 的用户级下载缓存可以在多个虚拟环境间复用 wheel，因此“环境隔离”不等于“每个项目重复联网下载”。
 
 ```powershell
 uv cache dir
-```
-
-正常开发无需设置 `UV_CACHE_DIR`。只有在权限受限、离线归档或明确要求缓存也随项目隔离时，才使用项目内缓存：
-
-```powershell
-$env:UV_CACHE_DIR = "$PWD\.uv-cache"
-```
-
-项目内缓存会提高隔离程度，但不同项目之间不能复用下载，会占用更多磁盘和网络流量。无论缓存放在哪里，真正的依赖环境仍由 `.venv` 和 `uv.lock` 隔离。
-
-## 2. 冻结版本
-
-| 层 | M0/M1 基线 | 作用 |
-|---|---|---|
-| Python | 3.11 | 项目解释器，由 `.python-version` 与 `pyproject.toml` 约束 |
-| PyTorch | 2.11.0 | CPU/GPU 共用的 API 基线 |
-| CPU wheel | `2.11.0+cpu` | CPU CI 和无 NVIDIA GPU 的学习路径 |
-| GPU wheel | `2.11.0+cu128` | 本地 NVIDIA GPU 训练，包含 CUDA 12.8 runtime |
-| NVIDIA driver | 本机 577.05 | 由操作系统安装，为 CUDA 程序访问 GPU |
-| CUDA Toolkit / `nvcc` | M1 不需要 | 到 M2 编译自定义 CUDA C++ 时再安装 |
-
-`nvidia-smi` 显示的 `CUDA Version` 是驱动能支持的最高 CUDA 版本，不代表系统已安装相同版本的 CUDA Toolkit。`torch.version.cuda` 才是当前 PyTorch wheel 使用的 CUDA runtime 版本。
-
-## 3. 创建 Python 3.11 虚拟环境
-
-在仓库根目录执行：
-
-```powershell
 uv venv --python 3.11 .venv
 ```
 
-激活不是必需的；文档使用 `.venv\Scripts\...` 可以明确调用本项目解释器。需要交互式激活时执行：
+`.venv` 属于操作系统：Windows 使用 `.venv\Scripts\...`，Linux/Ubuntu 使用 `.venv/bin/...`，两者不能复制或共用。
+
+## 2. 锁定版本解决什么问题
+
+| 层 | M0/M1 基线 | 作用 |
+|---|---|---|
+| Python | 3.11 | 由 `.python-version` 与 `pyproject.toml` 约束 |
+| PyTorch | 2.12.1 | CPU/GPU 共用 API 基线 |
+| CPU wheel | `2.12.1+cpu` | CPU CI 和无 NVIDIA GPU 路线 |
+| GPU wheel | `2.12.1+cu129` | Ubuntu NVIDIA 路线，含 CUDA 12.9 runtime |
+| Triton | 3.7.1 | Linux `torch.compile` 与后续 kernel 学习 |
+| NVIDIA driver | 由 Windows/宿主系统安装 | 让 CUDA 程序访问 GPU |
+| CUDA Toolkit / `nvcc` | M1 不需要 | M2 编译 CUDA C++ 时再安装 |
+
+锁文件固定 Python 包和 wheel 解析，不能固定 GPU、driver、操作系统与 workload。因此安装后仍要分层验收。`nvidia-smi` 的 `CUDA Version` 是驱动可支持的最高版本，不表示安装了同版本 Toolkit；`torch.version.cuda` 才是 PyTorch wheel 使用的 runtime。
+
+## 3. CPU 路线：原生 Windows 或 Linux
+
+Windows PowerShell：
 
 ```powershell
-.venv\Scripts\Activate.ps1
-```
-
-检查解释器边界：
-
-```powershell
-.venv\Scripts\python -c "import sys; print(sys.executable); print(sys.version)"
-```
-
-输出路径必须位于本仓库的 `.venv`，Python 必须为 3.11。
-
-## 4. 选择且只选择一种 PyTorch wheel
-
-### CPU 学习路径与 CI
-
-```powershell
-uv sync --extra cpu --extra dev
-```
-
-验证：
-
-```powershell
+uv sync --extra cpu --extra dev --python 3.11
 .venv\Scripts\python -c "import torch; print(torch.__version__); print(torch.version.cuda); print(torch.cuda.is_available())"
+.venv\Scripts\python -m pytest -v
 ```
 
-预期为 `2.11.0+cpu`、`None`、`False`。这不是错误，而是 CPU 环境的验收结果。
+Ubuntu/Linux 把解释器路径改为 `.venv/bin/python`。预期版本为 `2.12.1+cpu`，CUDA runtime 为 `None`，CUDA available 为 `False`；这是 CPU wheel 的正确验收结果。
 
-### NVIDIA GPU 学习路径
+## 4. GPU 路线：Windows + NVIDIA 从 Ubuntu 开始
 
-```powershell
-uv sync --extra cu128 --extra dev
+先按 [WSL2 Ubuntu 教程](wsl2-gpu.md)安装发行版、验证 GPU 映射，并把项目放入 `/home/<用户名>/...`。然后在 Ubuntu 项目根目录执行：
+
+```bash
+uv sync --extra cu129 --extra dev --python 3.11
+.venv/bin/python -c "import torch, triton; print(torch.__version__); print(torch.version.cuda); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0)); print(triton.__version__)"
 ```
 
-该命令会下载体积较大的 PyTorch/CUDA wheel，并将同一个 `.venv` 从 CPU 变体切换为 CUDA 变体。CUDA runtime、cuDNN、cuBLAS 等运行依赖由 wheel 提供；M1 不需要单独安装 CUDA Toolkit 或 `nvcc`。
+预期为 PyTorch `2.12.1+cu129`、runtime `12.9`、CUDA `True`、实际 GPU 名称和 Triton `3.7.1`。`cpu` 与 `cu129` extras 显式互斥，不能同时安装：
 
-验证：
-
-```powershell
-.venv\Scripts\python -c "import torch; print('PyTorch:', torch.__version__); print('runtime:', torch.version.cuda); print('available:', torch.cuda.is_available()); print('GPU:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU only')"
-```
-
-本项目预期为 `2.11.0+cu128`、`12.8`、`True` 和实际 NVIDIA GPU 名称。
-
-`cpu` 与 `cu128` extras 在 `pyproject.toml` 中显式互斥，禁止同时安装：
-
-```powershell
+```bash
 # 错误示例：不要执行
-uv sync --extra cpu --extra cu128 --extra dev
+uv sync --extra cpu --extra cu129 --extra dev
 ```
 
-切回 CPU 版本时重新执行 `uv sync --extra cpu --extra dev`。远端 CPU CI 始终显式选择 `cpu`，不会被本机选择影响。
+## 5. 为什么 M1 不要求 nvcc
 
-## 5. 驱动、runtime 和 nvcc 的检查方法
+PyTorch CUDA wheel 已包含训练所需的 CUDA runtime、cuDNN、cuBLAS 等用户态库；M1 只调用已编译的库。`nvcc` 用于编译 `.cu` 文件和 CUDA C++ extension，到 M2 需要自定义 CUDA 源码时才安装。
 
-```powershell
-# 操作系统中的 NVIDIA 驱动，以及驱动最高支持的 CUDA 版本
-nvidia-smi
+这些检查回答不同问题：
 
-# 系统是否安装 CUDA Toolkit 编译器；M1 找不到该命令是正常状态
-nvcc --version
+- `nvidia-smi`：驱动和 GPU 映射是否可见；
+- `torch.cuda.is_available()`：PyTorch runtime 能否初始化 CUDA；
+- forward/backward：训练链是否真的执行；
+- Triton import 与 compile benchmark：Inductor/Triton 完整路径是否可用；
+- Profiler 正 device time：Kineto/CUPTI 是否真的采到 GPU activity。
 
-# wheel 自带的 runtime 与最终可用性
-.venv\Scripts\python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"
-```
+## 6. 验收与常见误区
 
-只有进入 M2、开始编译 `.cu` 文件或 PyTorch CUDA C++ extension 时，才把 CUDA Toolkit 12.8 与 `nvcc` 加入环境要求。安装 Toolkit 不会替代 NVIDIA driver，也不会改变当前虚拟环境中的 PyTorch wheel。
-
-## 6. M0/M1 环境验收
+CPU 路线至少运行：
 
 ```powershell
 .venv\Scripts\ruff check .
-.venv\Scripts\pytest
+.venv\Scripts\mypy 01_pytorch_training/trainscale_training
+.venv\Scripts\python -m pytest -v
 .venv\Scripts\python -m trainscale_training.train --config 01_pytorch_training/configs/synthetic_cpu.toml
 ```
 
-GPU wheel 安装后额外运行：
+完整 GPU 路线按 WSL2 教程逐层验收。`+cpu / None / False` 表示 CPU wheel；CUDA 训练可用但 compile/Profiler 不可用时，应检查 Triton 或 CUPTI 用户态链路；首次 compile 慢通常是冷编译成本。原生 Windows 完成 eager 训练，不等于已满足本项目完整 Linux GPU 路线。
 
-```powershell
-.venv\Scripts\python -m trainscale_training.train --config 01_pytorch_training/configs/synthetic_cuda.toml
-```
-
-验收日志至少记录 Python、PyTorch、`torch.version.cuda`、driver、GPU 名称、`torch.cuda.is_available()` 和实际 smoke run 结果。不要把 `.venv`、下载缓存或 CUDA wheel 提交到 Git；提交 `pyproject.toml` 与 `uv.lock` 即可复现依赖选择。
+继续学习：[WSL2 Ubuntu 完整教程](wsl2-gpu.md) → [01 · PyTorch Training](../../01_pytorch_training/README.md)。

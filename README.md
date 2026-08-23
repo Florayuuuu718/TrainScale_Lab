@@ -6,6 +6,22 @@
 
 TrainScale Lab is a hands-on open-source project for learners interested in **ML Systems, AI Infrastructure, and Distributed Training**. It is neither a link collection nor a thin wrapper around existing frameworks. At every stage, you will build the smallest correct implementation, measure it, explain the bottleneck, and complete a reproducible optimization.
 
+## Quick Navigation
+
+[Start here](#start-here) · [Quick start](#m0m1-quick-start) · [Learning path](#learning-path) · [Stage tasks](#stage-by-stage-work) · [Reproducibility](#reproducibility-contract)
+
+| Destination | What it contains |
+|---|---|
+| [01 · PyTorch Training](01_pytorch_training/README.md) | Complete M1 tutorial and reproduction order |
+| [Source code](01_pytorch_training/trainscale_training) | Data, models, engine, checkpoint, benchmarks, and profiler |
+| [Configurations](01_pytorch_training/configs/README.md) | TOML experiment recipes |
+| [Correctness tests](01_pytorch_training/tests/README.md) | Explanation of all 10 tests |
+| [Experiment reports](01_pytorch_training/experiments/README.md) | Successful experiments, theory, and troubleshooting |
+| [Tracked results](01_pytorch_training/results/README.md) | Compact JSON summaries and SVG curves |
+| [Documentation map](docs/README.md) | Concepts, environment, and repository foundation |
+| [Technical roadmap](技术路线.md) | Decisions, execution logs, and later stages |
+| [v0.1 issue breakdown](docs/v0.1-issues.md) | M0/M1 acceptance status |
+
 ## Start Here
 
 The repository now contains the local M0 foundation and the complete M1 learning unit: a synthetic MLP baseline, CIFAR-10 CNN training, checkpoint/resume, AMP, gradient accumulation, profiling, and controlled performance experiments. The goal is training-system correctness and experimental method, not leaderboard accuracy.
@@ -17,9 +33,11 @@ If you are new to PyTorch, follow the Chinese beginner path in this order:
 3. [PyTorch training concepts](docs/concepts/pytorch-training-basics.md)
 4. [01 · PyTorch Training reproduction guide](01_pytorch_training/README.md)
 
+On Windows with an NVIDIA GPU, set up [WSL2 with the official Ubuntu distribution](docs/getting-started/wsl2-gpu.md) before running the GPU track. The native Windows commands below are the CPU/basic route; the complete compile, Profiler, Triton, and later NCCL track runs in Ubuntu.
+
 ## M0/M1 Quick Start
 
-The frozen baseline is Python 3.11, PyTorch 2.11, and CUDA 12.8 for NVIDIA GPU runs. CPU CI uses the matching PyTorch 2.11 CPU wheel.
+The frozen baseline is Python 3.11, PyTorch 2.12.1, and CUDA 12.9 for NVIDIA GPU runs. CPU CI uses the matching PyTorch 2.12.1 CPU wheel.
 
 ```powershell
 uv venv --python 3.11 .venv
@@ -29,11 +47,11 @@ uv sync --extra cpu --extra dev
 .venv\Scripts\python -m trainscale_training.train --config 01_pytorch_training/configs/synthetic_cpu.toml
 ```
 
-For the frozen NVIDIA environment, use `uv sync --extra cu128 --extra dev` instead. The CPU and CUDA extras are intentionally mutually exclusive. Large raw checkpoints/traces, datasets, the local environment, and caches are ignored; compact JSON/SVG results are tracked with their analyses.
+For the full NVIDIA route, run `uv sync --extra cu129 --extra dev --python 3.11` inside Ubuntu and use `.venv/bin/...`; do not reuse the Windows `.venv`. The CPU and CUDA extras are intentionally mutually exclusive. Large raw checkpoints/traces, datasets, the local environment, and caches are ignored; compact JSON/SVG results are tracked with their analyses.
 
 See the [M0/M1 environment guide](docs/getting-started/m0-m1-environment.md) for virtual-environment isolation, uv cache reuse, CPU/GPU wheel selection, CUDA verification, and when `nvcc` becomes necessary.
 
-M1 has passed local acceptance. Creating the GitHub repository, making the first push, and observing the remote CPU CI remain external steps; M2 has not started.
+M1 is sealed after local Windows CPU and Ubuntu GPU acceptance. Creating the GitHub repository, making the first push, and observing the remote CPU CI remain external steps; M2 has not started.
 
 ## What You Will Learn
 
@@ -69,7 +87,7 @@ FSDP2 / Tensor Parallel
 
 | Stage | What you build | Central question | Evidence produced |
 |---|---|---|---|
-| 01 | Single-GPU PyTorch trainer | What makes a training run reliable? | Loss/accuracy, throughput, memory, resume consistency |
+| [01](01_pytorch_training/README.md) | Single-GPU PyTorch trainer | What makes a training run reliable? | Loss/accuracy, throughput, memory, resume consistency |
 | 02 | GPU Kernel Lab | Why is an operator fast or slow? | Correctness tests, latency, bandwidth, speedup |
 | 03 | Distributed Training Lab | Why does multi-GPU training not scale linearly? | 1/2/4/8-GPU scaling curves |
 | 04 | NCCL Performance Lab | When is communication latency- or bandwidth-bound? | Message-size–bandwidth curves |
@@ -78,6 +96,8 @@ FSDP2 / Tensor Parallel
 | 07 | FSDP2 / TP extension | How should a model be partitioned when it no longer fits? | Peak memory, correctness, scaling efficiency |
 
 ## Planned Repository Layout
+
+Implemented directories can be opened directly: [M1 stage](01_pytorch_training/README.md) · [M1 source](01_pytorch_training/trainscale_training) · [docs](docs/README.md) · [CPU CI](.github/workflows/cpu-ci.yml).
 
 ```text
 trainscale-lab/
@@ -236,4 +256,4 @@ TrainScale Lab is an educational and research implementation. It does not promis
 
 ## License
 
-The project plans to use the Apache-2.0 License. A `LICENSE` file and a dependency/license audit will be added before the first public release. Reference projects are used for study and comparison; this does not imply that their code will be copied into this repository.
+The project uses the [Apache-2.0 License](LICENSE). Reference projects are used for study and comparison; this does not imply that their code will be copied into this repository.

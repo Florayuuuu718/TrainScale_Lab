@@ -47,15 +47,15 @@ def main() -> None:
         "training_runs": training_runs,
         "ablations": {
             "synthetic": _read(root / "synthetic_ablation.json"),
-            "cifar10": _read(root / "cifar10_ablation.json"),
+            "cifar10_long_wsl": _read(root / "cifar10_modes_wsl.json"),
         },
-        "dataloader_workers": _read(root / "dataloader_workers.json"),
+        "dataloader_workers": {
+            "synthetic_short": _read(root / "dataloader_workers.json"),
+            "jpeg_long": _read(root / "dataloader_image_workers.json"),
+        },
         "profiler": {
             "cpu_activity": _read(root / "profiler_summary.json"),
-            "failed_cuda_attempts": {
-                "synthetic": _read(root / "synthetic_profiler_summary.json"),
-                "cifar10": _read(root / "cifar10_profiler_summary.json"),
-            },
+            "cuda_activity": _read(root / "cifar10_cuda_profiler_wsl_cu129.json"),
         },
     }
     write_json(args.output, value)

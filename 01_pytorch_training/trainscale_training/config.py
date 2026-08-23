@@ -1,4 +1,4 @@
-"""Typed TOML configuration for reproducible M1 experiments."""
+"""Typed TOML configuration for reproducible module 01 experiments."""
 
 from __future__ import annotations
 

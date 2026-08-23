@@ -1,10 +1,10 @@
-# M1 结果目录
+# 01 结果目录
 
 这里保存适合 Git 的小型、可审阅结果；大型 trace、checkpoint 和逐 epoch 日志位于忽略的 `raw/`，因为它们能由命令重建且体积较大。
 
 | 文件 | 回答的问题 |
 |---|---|
-| `m1_summary.json` | M1 训练与性能实验的机器可读总表 |
+| `summary.json` | 01 训练与性能实验的机器可读总表 |
 | `synthetic_*` | 最小训练链是否学习、CPU/CUDA 是否数值对齐 |
 | `cifar10_curve.svg` | CIFAR 子集学习曲线 |
 | `dataloader_workers.json` | 短 synthetic 管线的 worker 固定成本 |

@@ -1,4 +1,4 @@
-# M0/M1 环境搭建：Python、PyTorch 与 CUDA wheel
+# 01 环境搭建：Python、PyTorch 与 CUDA wheel
 
 本页解释环境分层；需要完成 GPU、AMP、compile、Profiler 和后续 Triton/NCCL 的 Windows + NVIDIA 学习者，请直接使用 [WSL2 Ubuntu 完整教程](wsl2-gpu.md)。原生 Windows 只作为 CPU 或基础训练路线，不是完整 GPU 路线。
 
@@ -15,7 +15,7 @@ uv venv --python 3.11 .venv
 
 ## 2. 锁定版本解决什么问题
 
-| 层 | M0/M1 基线 | 作用 |
+| 层 | 01 基线 | 作用 |
 |---|---|---|
 | Python | 3.11 | 由 `.python-version` 与 `pyproject.toml` 约束 |
 | PyTorch | 2.12.1 | CPU/GPU 共用 API 基线 |
@@ -23,7 +23,7 @@ uv venv --python 3.11 .venv
 | GPU wheel | `2.12.1+cu129` | Ubuntu NVIDIA 路线，含 CUDA 12.9 runtime |
 | Triton | 3.7.1 | Linux `torch.compile` 与后续 kernel 学习 |
 | NVIDIA driver | 由 Windows/宿主系统安装 | 让 CUDA 程序访问 GPU |
-| CUDA Toolkit / `nvcc` | M1 不需要 | M2 编译 CUDA C++ 时再安装 |
+| CUDA Toolkit / `nvcc` | 01 不需要 | 02 编译 CUDA C++ 时再安装 |
 
 锁文件固定 Python 包和 wheel 解析，不能固定 GPU、driver、操作系统与 workload。因此安装后仍要分层验收。`nvidia-smi` 的 `CUDA Version` 是驱动可支持的最高版本，不表示安装了同版本 Toolkit；`torch.version.cuda` 才是 PyTorch wheel 使用的 runtime。
 
@@ -55,9 +55,9 @@ uv sync --extra cu129 --extra dev --python 3.11
 uv sync --extra cpu --extra cu129 --extra dev
 ```
 
-## 5. 为什么 M1 不要求 nvcc
+## 5. 为什么 01 不要求 nvcc
 
-PyTorch CUDA wheel 已包含训练所需的 CUDA runtime、cuDNN、cuBLAS 等用户态库；M1 只调用已编译的库。`nvcc` 用于编译 `.cu` 文件和 CUDA C++ extension，到 M2 需要自定义 CUDA 源码时才安装。
+PyTorch CUDA wheel 已包含训练所需的 CUDA runtime、cuDNN、cuBLAS 等用户态库；01 只调用已编译的库。`nvcc` 用于编译 `.cu` 文件和 CUDA C++ extension，到 02 需要自定义 CUDA 源码时才安装。
 
 这些检查回答不同问题：
 

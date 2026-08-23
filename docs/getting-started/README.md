@@ -1,13 +1,13 @@
-# M0/M1 从这里开始
+# 01 · PyTorch Training 从这里开始
 
 ## 一句话说明
 
-M0 建立“别人能重建的项目”，M1 建立“可以证明正确、可以恢复、可以测量的 PyTorch 单卡训练系统”。所有 M1 源码、配置、测试、结果与分析都集中在 [`01_pytorch_training/`](../../01_pytorch_training/README.md)。
+01 模块先建立“别人能重建的项目”，再建立“可以证明正确、可以恢复、可以测量的 PyTorch 单卡训练系统”。它的源码、配置、测试、结果与分析都集中在 [`01_pytorch_training/`](../../01_pytorch_training/README.md)。仓库不再使用独立的顶层里程碑编号。
 
 ## 先选择运行平台
 
 - **Windows + NVIDIA GPU，准备完成完整路线**：推荐先按[从零搭建 WSL2 + Ubuntu + PyTorch GPU 环境](wsl2-gpu.md)操作。教程会说明为什么选择 WSL、Windows 与 Ubuntu 各运行哪些命令、项目放在哪里，以及六层验收标准。
-- **只有 CPU，或暂时只学习基础训练**：可以留在原生 Windows，按[通用环境搭建](m0-m1-environment.md)选择 CPU wheel。
+- **只有 CPU，或暂时只学习基础训练**：可以留在原生 Windows，按[通用环境搭建](environment.md)选择 CPU wheel。
 - **原生 Linux**：沿用通用环境中的 Python/uv 规则，并使用 Linux 的 `.venv/bin/...` 命令；不需要 WSL。
 
 不要先在 Windows 中创建 CUDA 环境，再把同一个 `.venv` 复制给 Ubuntu。Windows 与 Linux 应分别创建环境；性能实验的 Linux 仓库应位于 `/home/<用户名>/...`。
@@ -37,7 +37,7 @@ uv sync --extra cpu --extra dev
 NVIDIA GPU 用户不要在这组原生 Windows 命令中直接替换 extra。请先进入 WSL2 Ubuntu，再按 [WSL2 教程](wsl2-gpu.md)创建 cu129 环境并使用 `.venv/bin/...` 运行 GPU 实验。
 
 
-CPU/GPU wheel、driver、CUDA runtime 和 `nvcc` 的区别见[环境搭建](m0-m1-environment.md)。Windows + NVIDIA GPU 学习者若要完成 compile、Profiler 和后续 CUDA/Triton/NCCL 路线，应从一开始使用[WSL2 Ubuntu 完整教程](wsl2-gpu.md)，而不是等原生 Windows 实验失败后再临时迁移。完整命令、预期指标和知识总结以[阶段总指导](../../01_pytorch_training/README.md)为准。
+CPU/GPU wheel、driver、CUDA runtime 和 `nvcc` 的区别见[环境搭建](environment.md)。Windows + NVIDIA GPU 学习者若要完成 compile、Profiler 和后续 CUDA/Triton/NCCL 路线，应从一开始使用[WSL2 Ubuntu 完整教程](wsl2-gpu.md)，而不是等原生 Windows 实验失败后再临时迁移。完整命令、预期指标和知识总结以[模块总指导](../../01_pytorch_training/README.md)为准。
 
 ## 你需要能回答的问题
 
@@ -50,4 +50,4 @@ CPU/GPU wheel、driver、CUDA runtime 和 `nvcc` 的区别见[环境搭建](m0-m
 - 为什么 workers、AMP 和 compile 都不能假定必然加速？
 - 为什么“CUDA 训练能跑”不等于 nvcc、CUPTI、Triton 都可用？
 
-回答不清楚时不要进入 M2，回到阶段 README 按实验顺序重跑并对照源码。
+回答不清楚时不要进入 02，回到 01 README 按实验顺序重跑并对照源码。

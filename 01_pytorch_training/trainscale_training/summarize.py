@@ -1,4 +1,4 @@
-"""Collect reproducible M1 artifacts into one compact tracked summary."""
+"""Collect reproducible module 01 artifacts into one compact tracked summary."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def _training_summary(path: Path) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default="01_pytorch_training/results")
-    parser.add_argument("--output", default="01_pytorch_training/results/m1_summary.json")
+    parser.add_argument("--output", default="01_pytorch_training/results/summary.json")
     args = parser.parse_args()
     root = Path(args.root)
     raw = root / "raw"

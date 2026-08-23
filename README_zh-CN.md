@@ -8,11 +8,11 @@ TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Tr
 
 ## 快速导航
 
-[新手入口](#新手从这里开始) · [环境与运行](#m0m1-快速开始) · [学习路线](#学习路线) · [分阶段任务](#分阶段实践任务) · [可复现约定](#可复现性约定)
+[新手入口](#新手从这里开始) · [环境与运行](#01-快速开始) · [学习路线](#学习路线) · [分阶段任务](#分阶段实践任务) · [可复现约定](#可复现性约定)
 
 | 跳转位置 | 内容 |
 |---|---|
-| [01 · PyTorch Training](01_pytorch_training/README.md) | M1 完整教学与复现顺序 |
+| [01 · PyTorch Training](01_pytorch_training/README.md) | 01 模块完整教学与复现顺序 |
 | [训练源码](01_pytorch_training/trainscale_training) | 数据、模型、引擎、checkpoint、benchmark 与 profiler |
 | [实验配置](01_pytorch_training/configs/README.md) | TOML 实验配方 |
 | [正确性测试](01_pytorch_training/tests/README.md) | 10 个测试的逐项解释 |
@@ -20,22 +20,22 @@ TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Tr
 | [结果目录](01_pytorch_training/results/README.md) | 精简 JSON 总表与 SVG 曲线 |
 | [文档导航](docs/README.md) | 概念、环境和仓库基建 |
 | [技术路线](技术路线.md) | 决策、实施日志与后续阶段 |
-| [v0.1 issue 拆分](docs/v0.1-issues.md) | M0/M1 验收状态 |
+| [01 验收清单](docs/01-issues.md) | 01 模块的准备工作与实现状态 |
 
 ## 新手从这里开始
 
-仓库目前已完成 M0 本地基建和 M1 完整学习单元：从 synthetic MLP 正确性基线扩展到 CIFAR-10 CNN、checkpoint/resume、AMP、梯度累积、Profiler 和性能消融。目标是验证训练系统与实验方法，不是追求 CIFAR-10 榜单精度。
+仓库目前已完成 01 模块及其仓库基建：从 synthetic MLP 正确性基线扩展到 CIFAR-10 CNN、checkpoint/resume、AMP、梯度累积、Profiler 和性能消融。目标是验证训练系统与实验方法，不是追求 CIFAR-10 榜单精度。
 
 请按顺序阅读和操作：
 
 1. [文档总导航](docs/README.md)
-2. [我们目前在做什么](docs/getting-started/README.md)
+2. [01 模块从这里开始](docs/getting-started/README.md)
 3. [PyTorch 训练基础概念](docs/concepts/pytorch-training-basics.md)
 4. [01 · PyTorch Training 完整复现](01_pytorch_training/README.md)
 
 如果你使用 Windows + NVIDIA GPU，并准备完成后续 compile、Profiler、CUDA/Triton 与 NCCL 路线，请在运行实验前先完成[WSL2 + 官方 Ubuntu + PyTorch GPU 从零教程](docs/getting-started/wsl2-gpu.md)。教程明确标注每条命令应在管理员 PowerShell、普通 PowerShell 还是 Ubuntu 终端执行，并解释项目为什么应放在 Ubuntu 的 `/home/<用户名>/projects/` 中。
 
-## M0/M1 快速开始
+## 01 快速开始
 
 第一阶段冻结版本为 Python 3.11、PyTorch 2.12.1，NVIDIA GPU 主环境使用 CUDA 12.9；CPU CI 使用同一 PyTorch 2.12.1 API 线的 CPU wheel。
 
@@ -49,9 +49,9 @@ uv sync --extra cpu --extra dev
 
 完整 NVIDIA 路线不要在上面的原生 Windows 环境中直接换 extra；请进入 WSL2 Ubuntu 后执行 `uv sync --extra cu129 --extra dev --python 3.11`，并使用 `.venv/bin/...`。CPU 与 CUDA extra 被显式设为互斥，避免混装。大型 checkpoint/trace、数据集、本地环境和缓存不会进入 Git；精简 JSON/SVG 结果会连同分析一起保留。
 
-虚拟环境隔离、uv 缓存复用、CPU/GPU wheel 选择、CUDA 验证以及何时需要 `nvcc`，详见 [M0/M1 环境搭建指导](docs/getting-started/m0-m1-environment.md)。
+虚拟环境隔离、uv 缓存复用、CPU/GPU wheel 选择、CUDA 验证以及何时需要 `nvcc`，详见 [环境搭建指导](docs/getting-started/environment.md)。
 
-M1 已在 Windows CPU 与 Ubuntu GPU 两条路线完成本地验收并封存；GitHub 仓库创建、首次 push 和远端 CI 仍需外部操作。M2 尚未开始。
+01 已在 Windows CPU 与 Ubuntu GPU 两条路线完成本地验收并封存；GitHub 仓库创建、首次 push 和远端 CI 仍需外部操作。02 尚未开始。
 
 ## 你会学到什么
 
@@ -97,7 +97,7 @@ FSDP2 / Tensor Parallel
 
 ## 计划中的仓库结构
 
-已经实现的目录可以直接打开：[M1 阶段](01_pytorch_training/README.md) · [M1 源码](01_pytorch_training/trainscale_training) · [文档](docs/README.md) · [CPU CI](.github/workflows/cpu-ci.yml)。
+七个模块目录均已建立；目前可运行的是：[01 模块](01_pytorch_training/README.md) · [01 源码](01_pytorch_training/trainscale_training) · [文档](docs/README.md) · [CPU CI](.github/workflows/cpu-ci.yml)。其余目录的 README 明确记录范围和当前状态。
 
 ```text
 trainscale-lab/
@@ -110,11 +110,11 @@ trainscale-lab/
 ├── 07_parallelism/            # FSDP2、TP 与组合并行
 ├── benchmarks/                # 统一 benchmark 入口与结果 schema
 ├── docs/                      # 原理说明、实验记录与故障排查
-├── 01_pytorch_training/tests/ # M1 单元与数值正确性测试
+├── docs/                      # 跨模块概念、环境与实验记录
 └── README.md
 ```
 
-目录会按阶段建立。每个阶段都应包含自己的 `README.md`、环境说明、最小运行命令、测试和实验报告。
+`01`–`07` 是唯一的模块编号。模块内部可以按实验编号继续细分，但不再使用另一套顶层里程碑编号。每个模块都应包含自己的 `README.md`、环境说明、最小运行命令、测试和实验报告。
 
 ## 如何学习，而不是只把代码跑起来
 

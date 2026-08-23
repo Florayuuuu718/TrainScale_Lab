@@ -10,7 +10,7 @@ from .engine import run_training
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", required=True, help="Path to an M1 TOML config")
+    parser.add_argument("--config", required=True, help="Path to a module 01 TOML config")
     parser.add_argument("--device", choices=("cpu", "cuda"))
     parser.add_argument("--precision", choices=("fp32", "amp"))
     parser.add_argument("--epochs", type=int)

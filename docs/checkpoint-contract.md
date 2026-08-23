@@ -1,4 +1,4 @@
-# M1 checkpoint 完整状态契约
+# 01 checkpoint 完整状态契约
 
 checkpoint 使用 `schema_version=1`，并采用同目录临时文件加原子替换，避免进程中断留下半写文件。
 
@@ -19,4 +19,4 @@ checkpoint 使用 `schema_version=1`，并采用同目录临时文件加原子�
 | `metrics` | 保存点指标 | 选择 best/last 与报告 |
 | `metadata` | PyTorch 版本 | 环境兼容性诊断 |
 
-恢复测试同时覆盖 Python/PyTorch/DataLoader RNG，以及“连续训练下一步”和“保存后恢复下一步”的 loss 与参数一致性。M1 不承诺跨 PyTorch 主版本读取 checkpoint。
+恢复测试同时覆盖 Python/PyTorch/DataLoader RNG，以及“连续训练下一步”和“保存后恢复下一步”的 loss 与参数一致性。01 不承诺跨 PyTorch 主版本读取 checkpoint。

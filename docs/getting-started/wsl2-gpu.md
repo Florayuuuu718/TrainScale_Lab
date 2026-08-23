@@ -52,7 +52,7 @@ WSL 是 Windows Subsystem for Linux。WSL2 在 Windows 中运行一个真实 Lin
 - 至少预留约 20 GB 磁盘空间。PyTorch CUDA wheel、数据集和编译缓存会持续占用空间；
 - 能访问 GitHub、PyTorch wheel 源和 uv 安装地址的网络。
 
-M1 阶段不要求安装完整 CUDA Toolkit，也不要求 `nvcc`。PyTorch CUDA wheel 会携带训练需要的 CUDA runtime。进入自定义 CUDA C++ 编译章节时，教程才会明确要求 Toolkit。
+01 不要求安装完整 CUDA Toolkit，也不要求 `nvcc`。PyTorch CUDA wheel 会携带训练需要的 CUDA runtime。进入 02 的自定义 CUDA C++ 编译章节时，教程才会明确要求 Toolkit。
 
 ## 4. 安装 WSL2 和 Ubuntu
 

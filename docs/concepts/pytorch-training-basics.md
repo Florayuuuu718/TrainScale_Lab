@@ -107,4 +107,4 @@ single-batch overfit 证明训练链路有基本学习能力，但不证明泛�
 
 ## 10. 当前阶段的知识边界
 
-M1 已覆盖 FP32、数据加载、训练/验证、随机种子、完整 checkpoint/resume、AMP、梯度累积、Profiler、CIFAR-10 和 `torch.compile` 消融。当前 Windows 环境的 CIFAR compile 因缺少可用 Triton 失败并已记录；自定义 CUDA kernel 属于 M2，尚未实现。
+01 已覆盖 FP32、数据加载、训练/验证、随机种子、完整 checkpoint/resume、AMP、梯度累积、Profiler、CIFAR-10 和 `torch.compile` 消融。当前 Windows 环境的 CIFAR compile 因缺少可用 Triton 失败并已记录；自定义 CUDA kernel 属于 02，尚未实现。

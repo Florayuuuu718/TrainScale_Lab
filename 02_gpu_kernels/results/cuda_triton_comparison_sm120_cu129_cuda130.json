@@ -1,0 +1,2288 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-24T14:34:44.561127+08:00",
+  "scope": "kernel-only Vector Add and Softmax",
+  "git_commit": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "git_dirty": true,
+  "repository_root": "/home/shunzi/projects/TrainScale_Lab-sm120-validation",
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.11.16",
+    "torch": "2.12.1+cu129",
+    "torch_cuda_runtime": "12.9",
+    "triton": "3.7.1",
+    "triton_package": "3.7.1",
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "driver": "610.88"
+  },
+  "cuda_cpp_build": {
+    "binary": "/tmp/trainscale-kernel-bench",
+    "binary_sha256": "4d881ff3477a60b35991c3167e53c15b2fbbc8f2bc142ff51b11c8b980da0d8c",
+    "toolkit": "13.0.88",
+    "nvcc_flags": [
+      "-O3",
+      "--use_fast_math",
+      "-arch=sm_120",
+      "-U_GNU_SOURCE",
+      "-D_DEFAULT_SOURCE"
+    ],
+    "source": "02_gpu_kernels/cuda/kernel_bench.cu"
+  },
+  "protocol": {
+    "input_formula": "Vector: sin(i*0.001), cos(i*0.0013). Softmax: sin(i*0.013)*20 + cos(row*0.17).",
+    "same_domain_note": "All implementations use the same deterministic formula and shape/dtype.",
+    "allocation_note": "Device allocations and host-device copies are excluded for all four paths.",
+    "correctness_before_performance": true,
+    "samples": 21,
+    "warmup_calls": 10
+  },
+  "cases": {
+    "vector_add_n257_fp32": {
+      "operator": "vector_add",
+      "shape": [
+        257
+      ],
+      "dtype": "float32",
+      "layout": "contiguous",
+      "inner": 1000
+    },
+    "vector_add_n4097_fp16": {
+      "operator": "vector_add",
+      "shape": [
+        4097
+      ],
+      "dtype": "float16",
+      "layout": "contiguous",
+      "inner": 500
+    },
+    "vector_add_n4097_bf16": {
+      "operator": "vector_add",
+      "shape": [
+        4097
+      ],
+      "dtype": "bfloat16",
+      "layout": "contiguous",
+      "inner": 500
+    },
+    "vector_add_n1048576_fp32": {
+      "operator": "vector_add",
+      "shape": [
+        1048576
+      ],
+      "dtype": "float32",
+      "layout": "contiguous",
+      "inner": 50
+    },
+    "softmax_1x17": {
+      "operator": "softmax",
+      "shape": [
+        1,
+        17
+      ],
+      "dtype": "float32",
+      "layout": "contiguous",
+      "inner": 1000
+    },
+    "softmax_8x127": {
+      "operator": "softmax",
+      "shape": [
+        8,
+        127
+      ],
+      "dtype": "float32",
+      "layout": "contiguous",
+      "inner": 500
+    },
+    "softmax_32x509": {
+      "operator": "softmax",
+      "shape": [
+        32,
+        509
+      ],
+      "dtype": "float32",
+      "layout": "contiguous",
+      "inner": 200
+    },
+    "softmax_256x1024": {
+      "operator": "softmax",
+      "shape": [
+        256,
+        1024
+      ],
+      "dtype": "float32",
+      "layout": "contiguous",
+      "inner": 50
+    },
+    "softmax_32x4097": {
+      "operator": "softmax",
+      "shape": [
+        32,
+        4097
+      ],
+      "dtype": "float32",
+      "layout": "contiguous",
+      "inner": 50
+    }
+  },
+  "results": [
+    {
+      "case_id": "vector_add_n257_fp32",
+      "implementation": "pytorch",
+      "status": "success",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          257
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 1000
+      },
+      "cold_start_ms": 0.3810109999946576,
+      "correctness": {
+        "status": "passed",
+        "atol": 1e-06,
+        "rtol": 1e-06,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 1000,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 10.61564826965332,
+          "p10": 8.675392150878906,
+          "p90": 17.13910484313965
+        }
+      },
+      "metrics": {
+        "effective_bytes": 3084,
+        "effective_gb_per_s": 0.29051452362227853
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "vector_add_n257_fp32",
+      "implementation": "triton",
+      "status": "success",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          257
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 1000
+      },
+      "cold_start_ms": 927.3833150000002,
+      "correctness": {
+        "status": "passed",
+        "atol": 1e-06,
+        "rtol": 1e-06,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 1000,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 16.505279541015625,
+          "p10": 14.613504409790039,
+          "p90": 17.025888442993164
+        }
+      },
+      "metrics": {
+        "effective_bytes": 3084,
+        "effective_gb_per_s": 0.1868493043293365
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpalw4hjnl/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpalw4hjnl/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "vector_add",
+      "implementation": "cuda_baseline",
+      "variant": "baseline",
+      "effective_variant": "scalar",
+      "dtype": "float32",
+      "shape": [
+        257
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 1000,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.423225,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 1e-06,
+        "max_absolute_error": 0
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 10.0390081406,
+          "p10": 7.47164821625,
+          "p90": 11.2623996735
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 1000,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 3084,
+        "effective_gb_per_s": 0.307201663433
+      },
+      "case_id": "vector_add_n257_fp32",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          257
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 1000
+      },
+      "returncode": 0
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "vector_add",
+      "implementation": "cuda_optimized",
+      "variant": "optimized",
+      "effective_variant": "float4",
+      "dtype": "float32",
+      "shape": [
+        257
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 1000,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.634578,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 1e-06,
+        "max_absolute_error": 0
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 13.2556800842,
+          "p10": 10.129535675,
+          "p90": 17.9637756348
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 1000,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 3084,
+        "effective_gb_per_s": 0.23265498114
+      },
+      "case_id": "vector_add_n257_fp32",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          257
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 1000
+      },
+      "returncode": 0
+    },
+    {
+      "case_id": "vector_add_n4097_fp16",
+      "implementation": "pytorch",
+      "status": "success",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          4097
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "cold_start_ms": 0.15916200000276604,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.001,
+        "rtol": 0.001,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 8.55174446105957,
+          "p10": 7.141119956970215,
+          "p90": 16.833343505859375
+        }
+      },
+      "metrics": {
+        "effective_bytes": 24582,
+        "effective_gb_per_s": 2.8745012332786968
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "vector_add_n4097_fp16",
+      "implementation": "triton",
+      "status": "success",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          4097
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "cold_start_ms": 827.7703770000003,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.001,
+        "rtol": 0.001,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 16.042816162109375,
+          "p10": 14.050496101379395,
+          "p90": 16.918272018432617
+        }
+      },
+      "metrics": {
+        "effective_bytes": 24582,
+        "effective_gb_per_s": 1.5322746175985513
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmp5taroobm/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmp5taroobm/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "vector_add",
+      "implementation": "cuda_baseline",
+      "variant": "baseline",
+      "effective_variant": "scalar",
+      "dtype": "float16",
+      "shape": [
+        4097
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 500,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.674404,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 0.001,
+        "max_absolute_error": 0
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 9.50944042206,
+          "p10": 7.5655040741,
+          "p90": 10.6861438751
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 24582,
+        "effective_gb_per_s": 2.58501014875
+      },
+      "case_id": "vector_add_n4097_fp16",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          4097
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "returncode": 0
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "vector_add",
+      "implementation": "cuda_optimized",
+      "variant": "optimized",
+      "effective_variant": "packed_pair",
+      "dtype": "float16",
+      "shape": [
+        4097
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 500,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.447763,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 0.001,
+        "max_absolute_error": 0
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 8.71263980865,
+          "p10": 7.3752322197,
+          "p90": 10.60729599
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 24582,
+        "effective_gb_per_s": 2.82141813961
+      },
+      "case_id": "vector_add_n4097_fp16",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          4097
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "returncode": 0
+    },
+    {
+      "case_id": "vector_add_n4097_bf16",
+      "implementation": "pytorch",
+      "status": "success",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          4097
+        ],
+        "dtype": "bfloat16",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "cold_start_ms": 0.1489120000002231,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.001,
+        "rtol": 0.001,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 15.00716781616211,
+          "p10": 8.148672103881836,
+          "p90": 17.309568405151367
+        }
+      },
+      "metrics": {
+        "effective_bytes": 24582,
+        "effective_gb_per_s": 1.6380172662243562
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "vector_add_n4097_bf16",
+      "implementation": "triton",
+      "status": "success",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          4097
+        ],
+        "dtype": "bfloat16",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "cold_start_ms": 782.7286119999997,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.001,
+        "rtol": 0.001,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 15.435839653015137,
+          "p10": 13.401663780212402,
+          "p90": 17.102783203125
+        }
+      },
+      "metrics": {
+        "effective_bytes": 24582,
+        "effective_gb_per_s": 1.592527556166879
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpz1ad6v5t/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpz1ad6v5t/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "vector_add",
+      "implementation": "cuda_baseline",
+      "variant": "baseline",
+      "effective_variant": "scalar",
+      "dtype": "bfloat16",
+      "shape": [
+        4097
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 500,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.428415,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 0.001,
+        "max_absolute_error": 0
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 8.65952014923,
+          "p10": 7.70585584641,
+          "p90": 9.80780792236
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 24582,
+        "effective_gb_per_s": 2.83872542316
+      },
+      "case_id": "vector_add_n4097_bf16",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          4097
+        ],
+        "dtype": "bfloat16",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "returncode": 0
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "vector_add",
+      "implementation": "cuda_optimized",
+      "variant": "optimized",
+      "effective_variant": "packed_pair",
+      "dtype": "bfloat16",
+      "shape": [
+        4097
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 500,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.450387,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 0.001,
+        "max_absolute_error": 0
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 9.16819190979,
+          "p10": 8.11545562744,
+          "p90": 10.502655983
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 24582,
+        "effective_gb_per_s": 2.68122659755
+      },
+      "case_id": "vector_add_n4097_bf16",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          4097
+        ],
+        "dtype": "bfloat16",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "returncode": 0
+    },
+    {
+      "case_id": "vector_add_n1048576_fp32",
+      "implementation": "pytorch",
+      "status": "success",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          1048576
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 0.2103590000004374,
+      "correctness": {
+        "status": "passed",
+        "atol": 1e-06,
+        "rtol": 1e-06,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 16.945279836654663,
+          "p10": 11.023999452590942,
+          "p90": 18.03007960319519
+        }
+      },
+      "metrics": {
+        "effective_bytes": 12582912,
+        "effective_gb_per_s": 742.561475602289
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "vector_add_n1048576_fp32",
+      "implementation": "triton",
+      "status": "success",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          1048576
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 753.6667759999957,
+      "correctness": {
+        "status": "passed",
+        "atol": 1e-06,
+        "rtol": 1e-06,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 16.741119623184204,
+          "p10": 14.227839708328247,
+          "p90": 19.185919761657715
+        }
+      },
+      "metrics": {
+        "effective_bytes": 12582912,
+        "effective_gb_per_s": 751.6171130259625
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmp0bmmvm07/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmp0bmmvm07/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "vector_add",
+      "implementation": "cuda_baseline",
+      "variant": "baseline",
+      "effective_variant": "scalar",
+      "dtype": "float32",
+      "shape": [
+        1048576
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 50,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.48332,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 1e-06,
+        "max_absolute_error": 0
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 14.5023994446,
+          "p10": 13.4918403625,
+          "p90": 15.8207998276
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 12582912,
+        "effective_gb_per_s": 867.643457766
+      },
+      "case_id": "vector_add_n1048576_fp32",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          1048576
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "returncode": 0
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "vector_add",
+      "implementation": "cuda_optimized",
+      "variant": "optimized",
+      "effective_variant": "float4",
+      "dtype": "float32",
+      "shape": [
+        1048576
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 50,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.687771,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 1e-06,
+        "max_absolute_error": 0
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 11.8406410217,
+          "p10": 10.8703994751,
+          "p90": 13.1392002106
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 12582912,
+        "effective_gb_per_s": 1062.68841162
+      },
+      "case_id": "vector_add_n1048576_fp32",
+      "case": {
+        "operator": "vector_add",
+        "shape": [
+          1048576
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "returncode": 0
+    },
+    {
+      "case_id": "softmax_1x17",
+      "implementation": "pytorch",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          1,
+          17
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 1000
+      },
+      "cold_start_ms": 0.2017529999989165,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 1000,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 10.221471786499023,
+          "p10": 8.029472351074219,
+          "p90": 18.245567321777344
+        }
+      },
+      "metrics": {
+        "effective_bytes": 136,
+        "effective_gb_per_s": 0.013305324599108602
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "softmax_1x17",
+      "implementation": "triton_baseline",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          1,
+          17
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 1000
+      },
+      "cold_start_ms": 785.313998999996,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 1.4901161193847656e-08
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 1000,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 17.527103424072266,
+          "p10": 15.47372817993164,
+          "p90": 20.418720245361328
+        }
+      },
+      "metrics": {
+        "effective_bytes": 136,
+        "effective_gb_per_s": 0.007759411050956281
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmp2g3nzkq8/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmp2g3nzkq8/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "softmax_1x17",
+      "implementation": "triton",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          1,
+          17
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 1000
+      },
+      "cold_start_ms": 843.1352899999922,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 1.4901161193847656e-08
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 1000,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 16.51740837097168,
+          "p10": 15.190143585205078,
+          "p90": 17.492416381835938
+        }
+      },
+      "metrics": {
+        "effective_bytes": 136,
+        "effective_gb_per_s": 0.008233737215034991
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmp5t8ssmiq/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmp5t8ssmiq/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_baseline",
+      "variant": "baseline",
+      "effective_variant": "one_thread_per_row",
+      "dtype": "float32",
+      "shape": [
+        1,
+        17
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 1000,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.455185,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 1.49011611938e-08
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 8.67750358582,
+          "p10": 8.28979206085,
+          "p90": 10.3791999817
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 1000,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 136,
+        "effective_gb_per_s": 0.0156727103199
+      },
+      "case_id": "softmax_1x17",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          1,
+          17
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 1000
+      },
+      "returncode": 0
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_optimized",
+      "variant": "optimized",
+      "effective_variant": "one_block_per_row",
+      "dtype": "float32",
+      "shape": [
+        1,
+        17
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 1000,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.314153,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 7.45058059692e-09
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 8.72083187103,
+          "p10": 8.37471961975,
+          "p90": 10.2842559814
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 1000,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 136,
+        "effective_gb_per_s": 0.0155948425576
+      },
+      "case_id": "softmax_1x17",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          1,
+          17
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 1000
+      },
+      "returncode": 0
+    },
+    {
+      "case_id": "softmax_8x127",
+      "implementation": "pytorch",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          8,
+          127
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "cold_start_ms": 0.17856799999549366,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 11.820799827575684,
+          "p10": 8.046655654907227,
+          "p90": 18.326976776123047
+        }
+      },
+      "metrics": {
+        "effective_bytes": 8128,
+        "effective_gb_per_s": 0.6876015260015585
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "softmax_8x127",
+      "implementation": "triton_baseline",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          8,
+          127
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "cold_start_ms": 768.1993030000029,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 2.9802322387695312e-08
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 13.887359619140625,
+          "p10": 13.201343536376953,
+          "p90": 16.249919891357422
+        }
+      },
+      "metrics": {
+        "effective_bytes": 8128,
+        "effective_gb_per_s": 0.585280443720732
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpei8fhzek/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpei8fhzek/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "softmax_8x127",
+      "implementation": "triton",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          8,
+          127
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "cold_start_ms": 802.2829659999928,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 2.9802322387695312e-08
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 16.79961585998535,
+          "p10": 14.48089599609375,
+          "p90": 18.959423065185547
+        }
+      },
+      "metrics": {
+        "effective_bytes": 8128,
+        "effective_gb_per_s": 0.483820586598049
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpy_hvi36f/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpy_hvi36f/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_baseline",
+      "variant": "baseline",
+      "effective_variant": "one_thread_per_row",
+      "dtype": "float32",
+      "shape": [
+        8,
+        127
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 500,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.444086,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 2.08616256714e-07
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 11.9084796906,
+          "p10": 11.4549121857,
+          "p90": 12.6240644455
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 8128,
+        "effective_gb_per_s": 0.682538847209
+      },
+      "case_id": "softmax_8x127",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          8,
+          127
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "returncode": 0
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_optimized",
+      "variant": "optimized",
+      "effective_variant": "one_block_per_row",
+      "dtype": "float32",
+      "shape": [
+        8,
+        127
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 500,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.380759,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 1.49011611938e-08
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 9.02764797211,
+          "p10": 8.50675201416,
+          "p90": 10.4511356354
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 500,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 8128,
+        "effective_gb_per_s": 0.900345253283
+      },
+      "case_id": "softmax_8x127",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          8,
+          127
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 500
+      },
+      "returncode": 0
+    },
+    {
+      "case_id": "softmax_32x509",
+      "implementation": "pytorch",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          509
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 200
+      },
+      "cold_start_ms": 0.16663599998878453,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 200,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 8.765919804573059,
+          "p10": 8.011839985847473,
+          "p90": 11.287519931793213
+        }
+      },
+      "metrics": {
+        "effective_bytes": 130304,
+        "effective_gb_per_s": 14.864840530713298
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "softmax_32x509",
+      "implementation": "triton_baseline",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          509
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 200
+      },
+      "cold_start_ms": 760.8837669999957,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 5.587935447692871e-09
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 200,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 14.270559549331665,
+          "p10": 13.463200330734253,
+          "p90": 17.73200035095215
+        }
+      },
+      "metrics": {
+        "effective_bytes": 130304,
+        "effective_gb_per_s": 9.130966417228016
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmp429188sd/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmp429188sd/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "softmax_32x509",
+      "implementation": "triton",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          509
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 200
+      },
+      "cold_start_ms": 748.6472589999948,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 5.587935447692871e-09
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 200,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 14.683200120925903,
+          "p10": 14.00607943534851,
+          "p90": 17.982239723205566
+        }
+      },
+      "metrics": {
+        "effective_bytes": 130304,
+        "effective_gb_per_s": 8.87435973948867
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmprvcchtqb/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmprvcchtqb/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_baseline",
+      "variant": "baseline",
+      "effective_variant": "one_thread_per_row",
+      "dtype": "float32",
+      "shape": [
+        32,
+        509
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 200,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.535917,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 1.86264514923e-08
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 25.0244808197,
+          "p10": 24.6313591003,
+          "p90": 25.4944000244
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 200,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 130304,
+        "effective_gb_per_s": 5.20706107507
+      },
+      "case_id": "softmax_32x509",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          509
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 200
+      },
+      "returncode": 0
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_optimized",
+      "variant": "optimized",
+      "effective_variant": "one_block_per_row",
+      "dtype": "float32",
+      "shape": [
+        32,
+        509
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 200,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.403956,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 3.72529029846e-09
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 10.9510402679,
+          "p10": 9.15167999268,
+          "p90": 12.2942390442
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 200,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 130304,
+        "effective_gb_per_s": 11.8987782724
+      },
+      "case_id": "softmax_32x509",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          509
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 200
+      },
+      "returncode": 0
+    },
+    {
+      "case_id": "softmax_256x1024",
+      "implementation": "pytorch",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          256,
+          1024
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 0.18482999999491767,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 9.444479942321777,
+          "p10": 8.24064016342163,
+          "p90": 10.885119438171387
+        }
+      },
+      "metrics": {
+        "effective_bytes": 2097152,
+        "effective_gb_per_s": 222.05055363635492
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "softmax_256x1024",
+      "implementation": "triton_baseline",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          256,
+          1024
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 778.2547850000014,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 3.725290298461914e-09
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 16.507519483566284,
+          "p10": 14.920320510864258,
+          "p90": 19.237760305404663
+        }
+      },
+      "metrics": {
+        "effective_bytes": 2097152,
+        "effective_gb_per_s": 127.04222473205473
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmp6izmymzy/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmp6izmymzy/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "softmax_256x1024",
+      "implementation": "triton",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          256,
+          1024
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 863.5226120000112,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 3.725290298461914e-09
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 15.121920108795166,
+          "p10": 13.792639970779419,
+          "p90": 18.142720460891724
+        }
+      },
+      "metrics": {
+        "effective_bytes": 2097152,
+        "effective_gb_per_s": 138.68291757342777
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpeg4e6eqi/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpeg4e6eqi/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_baseline",
+      "variant": "baseline",
+      "effective_variant": "one_thread_per_row",
+      "dtype": "float32",
+      "shape": [
+        256,
+        1024
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 50,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.60835,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 1.210719347e-08
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 61.5379180908,
+          "p10": 61.4860839844,
+          "p90": 61.8732757568
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 2097152,
+        "effective_gb_per_s": 34.0790209527
+      },
+      "case_id": "softmax_256x1024",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          256,
+          1024
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "returncode": 0
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_optimized",
+      "variant": "optimized",
+      "effective_variant": "one_block_per_row",
+      "dtype": "float32",
+      "shape": [
+        256,
+        1024
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 50,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.419438,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 1.86264514923e-09
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 12.0767993927,
+          "p10": 11.3254404068,
+          "p90": 12.9804801941
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 2097152,
+        "effective_gb_per_s": 173.651307089
+      },
+      "case_id": "softmax_256x1024",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          256,
+          1024
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "returncode": 0
+    },
+    {
+      "case_id": "softmax_32x4097",
+      "implementation": "pytorch",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          4097
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 0.17959000000189462,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 0.0
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 9.759359955787659,
+          "p10": 9.020159840583801,
+          "p90": 12.45568037033081
+        }
+      },
+      "metrics": {
+        "effective_bytes": 1048832,
+        "effective_gb_per_s": 107.46934273881395
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "softmax_32x4097",
+      "implementation": "triton_baseline",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          4097
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 1373.689464999998,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 6.984919309616089e-10
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 16.895999908447266,
+          "p10": 14.048000574111938,
+          "p90": 20.565760135650635
+        }
+      },
+      "metrics": {
+        "effective_bytes": 1048832,
+        "effective_gb_per_s": 62.07575791212153
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpc4t24n6i/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpc4t24n6i/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "softmax_32x4097",
+      "implementation": "triton",
+      "status": "success",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          4097
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 804.4791379999907,
+      "correctness": {
+        "status": "passed",
+        "atol": 2e-06,
+        "rtol": 2e-05,
+        "max_absolute_error": 6.984919309616089e-10
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 18.25600028038025,
+          "p10": 16.45375967025757,
+          "p90": 20.726399421691895
+        }
+      },
+      "metrics": {
+        "effective_bytes": 1048832,
+        "effective_gb_per_s": 57.451357575140996
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpsk_6tq_f/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpsk_6tq_f/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_baseline",
+      "variant": "baseline",
+      "effective_variant": "one_thread_per_row",
+      "dtype": "float32",
+      "shape": [
+        32,
+        4097
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 50,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.529169,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 7.45058059692e-09
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 180.995834351,
+          "p10": 180.694412231,
+          "p90": 181.117446899
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 1048832,
+        "effective_gb_per_s": 5.79478529859
+      },
+      "case_id": "softmax_32x4097",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          4097
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "returncode": 0
+    },
+    {
+      "schema_version": 1,
+      "status": "success",
+      "operator": "softmax",
+      "implementation": "cuda_optimized",
+      "variant": "optimized",
+      "effective_variant": "one_block_per_row",
+      "dtype": "float32",
+      "shape": [
+        32,
+        4097
+      ],
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "compute_capability": [
+          12,
+          0
+        ],
+        "cuda_driver_api": 13030,
+        "cuda_runtime": 13000
+      },
+      "protocol": {
+        "samples": 21,
+        "warmup_calls": 10,
+        "inner_iterations": 50,
+        "timer": "cudaEvent",
+        "allocation_note": "device allocation excluded; kernel launch and execution included"
+      },
+      "cold_start_ms": 1.577742,
+      "correctness": {
+        "status": "passed",
+        "reference": "cpu_fp32",
+        "atol": 2e-05,
+        "max_absolute_error": 4.65661287308e-10
+      },
+      "steady_state": {
+        "latency_us": {
+          "median": 10.8339195251,
+          "p10": 9.64288043976,
+          "p90": 12.0019197464
+        },
+        "timer": "cudaEvent",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10
+      },
+      "metrics": {
+        "effective_bytes": 1048832,
+        "effective_gb_per_s": 96.8100231468
+      },
+      "case_id": "softmax_32x4097",
+      "case": {
+        "operator": "softmax",
+        "shape": [
+          32,
+          4097
+        ],
+        "dtype": "float32",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "returncode": 0
+    }
+  ],
+  "comparisons": [
+    {
+      "case_id": "vector_add_n257_fp32",
+      "status": "success",
+      "median_us": {
+        "pytorch": 10.61564826965332,
+        "triton": 16.505279541015625,
+        "cuda_baseline": 10.0390081406,
+        "cuda_optimized": 13.2556800842
+      },
+      "speedup_over_pytorch": {
+        "triton": 0.6431668269097431,
+        "cuda_baseline": 1.0574399503394423,
+        "cuda_optimized": 0.800837693895959
+      }
+    },
+    {
+      "case_id": "vector_add_n4097_fp16",
+      "status": "success",
+      "median_us": {
+        "pytorch": 8.55174446105957,
+        "triton": 16.042816162109375,
+        "cuda_baseline": 9.50944042206,
+        "cuda_optimized": 8.71263980865
+      },
+      "speedup_over_pytorch": {
+        "triton": 0.5330575613811155,
+        "cuda_baseline": 0.8992899772757641,
+        "cuda_optimized": 0.9815331115340392
+      }
+    },
+    {
+      "case_id": "vector_add_n4097_bf16",
+      "status": "success",
+      "median_us": {
+        "pytorch": 15.00716781616211,
+        "triton": 15.435839653015137,
+        "cuda_baseline": 8.65952014923,
+        "cuda_optimized": 9.16819190979
+      },
+      "speedup_over_pytorch": {
+        "triton": 0.9722287969757905,
+        "cuda_baseline": 1.7330253359935353,
+        "cuda_optimized": 1.6368732203497094
+      }
+    },
+    {
+      "case_id": "vector_add_n1048576_fp32",
+      "status": "success",
+      "median_us": {
+        "pytorch": 16.945279836654663,
+        "triton": 16.741119623184204,
+        "cuda_baseline": 14.5023994446,
+        "cuda_optimized": 11.8406410217
+      },
+      "speedup_over_pytorch": {
+        "triton": 1.0121951349769776,
+        "cuda_baseline": 1.1684466354265448,
+        "cuda_optimized": 1.4311116945104188
+      }
+    },
+    {
+      "case_id": "softmax_1x17",
+      "status": "success",
+      "median_us": {
+        "pytorch": 10.221471786499023,
+        "triton_baseline": 17.527103424072266,
+        "triton": 16.51740837097168,
+        "cuda_baseline": 8.67750358582,
+        "cuda_optimized": 8.72083187103
+      },
+      "speedup_over_pytorch": {
+        "triton_baseline": 0.5831808907146938,
+        "triton": 0.6188302400068176,
+        "cuda_baseline": 1.1779276937669076,
+        "cuda_optimized": 1.1720753177749068
+      }
+    },
+    {
+      "case_id": "softmax_8x127",
+      "status": "success",
+      "median_us": {
+        "pytorch": 11.820799827575684,
+        "triton_baseline": 13.887359619140625,
+        "triton": 16.79961585998535,
+        "cuda_baseline": 11.9084796906,
+        "cuda_optimized": 9.02764797211
+      },
+      "speedup_over_pytorch": {
+        "triton_baseline": 0.851191310066123,
+        "triton": 0.7036351263085364,
+        "cuda_baseline": 0.9926371908671493,
+        "cuda_optimized": 1.3093997311475638
+      }
+    },
+    {
+      "case_id": "softmax_32x509",
+      "status": "success",
+      "median_us": {
+        "pytorch": 8.765919804573059,
+        "triton_baseline": 14.270559549331665,
+        "triton": 14.683200120925903,
+        "cuda_baseline": 25.0244808197,
+        "cuda_optimized": 10.9510402679
+      },
+      "speedup_over_pytorch": {
+        "triton_baseline": 0.6142660190912832,
+        "triton": 0.5970033597839632,
+        "cuda_baseline": 0.35029377303493436,
+        "cuda_optimized": 0.8004645759789571
+      }
+    },
+    {
+      "case_id": "softmax_256x1024",
+      "status": "success",
+      "median_us": {
+        "pytorch": 9.444479942321777,
+        "triton_baseline": 16.507519483566284,
+        "triton": 15.121920108795166,
+        "cuda_baseline": 61.5379180908,
+        "cuda_optimized": 12.0767993927
+      },
+      "speedup_over_pytorch": {
+        "triton_baseline": 0.5721319881962903,
+        "triton": 0.6245556036781802,
+        "cuda_baseline": 0.15347415439674647,
+        "cuda_optimized": 0.7820350107024742
+      }
+    },
+    {
+      "case_id": "softmax_32x4097",
+      "status": "success",
+      "median_us": {
+        "pytorch": 9.759359955787659,
+        "triton_baseline": 16.895999908447266,
+        "triton": 18.25600028038025,
+        "cuda_baseline": 180.995834351,
+        "cuda_optimized": 10.8339195251
+      },
+      "speedup_over_pytorch": {
+        "triton_baseline": 0.5776136368767617,
+        "triton": 0.53458368787801,
+        "cuda_baseline": 0.05392035673518106,
+        "cuda_optimized": 0.9008152527972166
+      }
+    }
+  ],
+  "all_cases_passed": true
+}

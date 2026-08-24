@@ -1,6 +1,16 @@
-# 01 环境搭建：Python、PyTorch 与 CUDA wheel
+# 项目环境搭建：Python、PyTorch、Triton 与 CUDA Toolkit
 
 本页解释环境分层；需要完成 GPU、AMP、compile、Profiler 和后续 Triton/NCCL 的 Windows + NVIDIA 学习者，请直接使用 [WSL2 Ubuntu 完整教程](wsl2-gpu.md)。原生 Windows 只作为 CPU 或基础训练路线，不是完整 GPU 路线。
+
+## 先选路线，不要一次安装全部东西
+
+| 学习目标 | 默认环境 | 系统 CUDA Toolkit |
+|---|---|---|
+| 01 CPU/基础训练 | Windows 或 Linux `.venv` + CPU wheel | 不需要 |
+| 01 GPU + 02 Triton | WSL/Linux 根 `.venv` + cu129 stable | 不需要 |
+| 02 CUDA C++ | 上述 stable 环境之外，再安装兼容 Toolkit | 需要 |
+
+SM 12.0 不需要一开始就维护两套 Python GPU 环境。先使用根 `.venv` 和真实 kernel 探针；只有在更新驱动后仍失败，才建立仓库外 cu130 nightly 诊断环境。详细决策树与精确命令见 [02 环境指南](../../02_gpu_kernels/ENVIRONMENT.md)。
 
 ## 1. 虚拟环境与缓存为什么要分开
 
@@ -46,18 +56,20 @@ Ubuntu/Linux 把解释器路径改为 `.venv/bin/python`。预期版本为 `2.12
 ```bash
 uv sync --extra cu129 --extra dev --python 3.11
 .venv/bin/python -c "import torch, triton; print(torch.__version__); print(torch.version.cuda); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0)); print(triton.__version__)"
+.venv/bin/python 02_gpu_kernels/benchmarks/check_environment.py
+uv pip check --python .venv/bin/python
 ```
 
-预期为 PyTorch `2.12.1+cu129`、runtime `12.9`、CUDA `True`、实际 GPU 名称和 Triton `3.7.1`。`cpu` 与 `cu129` extras 显式互斥，不能同时安装：
+预期为 PyTorch `2.12.1+cu129`、runtime `12.9`、CUDA `True`、实际 GPU 名称和 Triton `3.7.1`。环境探针还必须让 eager、`torch.compile`、Triton Softmax 与 Triton Vector Add 真正 launch；仅 import 成功不够。`cpu` 与 `cu129` extras 显式互斥，不能同时安装：
 
 ```bash
 # 错误示例：不要执行
 uv sync --extra cpu --extra cu129 --extra dev
 ```
 
-## 5. 为什么 01 不要求 nvcc
+## 5. 为什么 PyTorch/Triton 主线不要求 nvcc
 
-PyTorch CUDA wheel 已包含训练所需的 CUDA runtime、cuDNN、cuBLAS 等用户态库；01 只调用已编译的库。`nvcc` 用于编译 `.cu` 文件和 CUDA C++ extension，到 02 需要自定义 CUDA 源码时才安装。
+PyTorch CUDA wheel 已包含训练所需的 CUDA runtime、cuDNN、cuBLAS 等用户态库；Triton wheel 也带自己的设备编译链。`nvcc` 用于编译 `.cu` 文件和 CUDA C++ extension，到 02 的 CUDA C++ 对照才安装。Toolkit 版本不必与 `nvidia-smi` 显示的 UMD 上限相同。
 
 这些检查回答不同问题：
 
@@ -80,4 +92,4 @@ CPU 路线至少运行：
 
 完整 GPU 路线按 WSL2 教程逐层验收。`+cpu / None / False` 表示 CPU wheel；CUDA 训练可用但 compile/Profiler 不可用时，应检查 Triton 或 CUPTI 用户态链路；首次 compile 慢通常是冷编译成本。原生 Windows 完成 eager 训练，不等于已满足本项目完整 Linux GPU 路线。
 
-继续学习：[WSL2 Ubuntu 完整教程](wsl2-gpu.md) → [01 · PyTorch Training](../../01_pytorch_training/README.md)。
+继续学习：[WSL2 Ubuntu 完整教程](wsl2-gpu.md) → [01 · PyTorch Training](../../01_pytorch_training/README.md) → [02 环境指南](../../02_gpu_kernels/ENVIRONMENT.md)。

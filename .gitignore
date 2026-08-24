@@ -5,6 +5,7 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.pytest-tmp/
 .mypy_cache/
 .ruff_cache/
 .venv/
@@ -19,6 +20,8 @@ dist/
 checkpoints/
 01_pytorch_training/results/raw/
 01_pytorch_training/data/
+02_gpu_kernels/results/raw/
+02_gpu_kernels/cuda/build/
 *.nsys-rep
 *.ncu-rep
 

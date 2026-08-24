@@ -1,0 +1,31 @@
+[[candidate]]
+id = "m32_n32_k32_g8_w4"
+block_m = 32
+block_n = 32
+block_k = 32
+group_m = 8
+num_warps = 4
+
+[[candidate]]
+id = "m64_n32_k32_g8_w4"
+block_m = 64
+block_n = 32
+block_k = 32
+group_m = 8
+num_warps = 4
+
+[[candidate]]
+id = "m32_n64_k32_g8_w4"
+block_m = 32
+block_n = 64
+block_k = 32
+group_m = 8
+num_warps = 4
+
+[[candidate]]
+id = "m64_n64_k32_g8_w8"
+block_m = 64
+block_n = 64
+block_k = 32
+group_m = 8
+num_warps = 8

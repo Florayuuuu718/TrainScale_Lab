@@ -1,0 +1,35 @@
+[[case]]
+id = "layer_norm_8x127_fp32_eps1e5"
+operator = "layer_norm"
+shape = [8, 127]
+dtype = "float32"
+layout = "contiguous"
+inner = 200
+eps = 0.00001
+
+[[case]]
+id = "layer_norm_32x509_fp16_eps1e5"
+operator = "layer_norm"
+shape = [32, 509]
+dtype = "float16"
+layout = "contiguous"
+inner = 100
+eps = 0.00001
+
+[[case]]
+id = "layer_norm_32x509_fp16_eps1e3"
+operator = "layer_norm"
+shape = [32, 509]
+dtype = "float16"
+layout = "contiguous"
+inner = 100
+eps = 0.001
+
+[[case]]
+id = "layer_norm_256x1024_fp32_eps1e5"
+operator = "layer_norm"
+shape = [256, 1024]
+dtype = "float32"
+layout = "contiguous"
+inner = 50
+eps = 0.00001

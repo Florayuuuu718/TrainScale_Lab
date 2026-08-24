@@ -1,0 +1,574 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-23T18:14:34.044119+08:00",
+  "git_commit": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "git_dirty": true,
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.11.16",
+    "torch": "2.12.1+cu129",
+    "torch_cuda": "12.9",
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_bytes": 8546484224,
+    "driver": "577.05"
+  },
+  "measurement": {
+    "timer": "torch.cuda.Event",
+    "warmup_calls": 10,
+    "samples": 21,
+    "note": "Allocation and framework dispatch are included in logical operator latency."
+  },
+  "triton_status": {
+    "status": "blocked",
+    "symptom": "SIGSEGV while Triton CompiledKernel initializes launch handles",
+    "minimal_torch_compile_exit_code": 1,
+    "vector_add_single_warp_exit_code": 1,
+    "softmax_single_load_exit_code": 1
+  },
+  "attention_sdpa_vs_explicit": [
+    {
+      "shape": [
+        1,
+        2,
+        64,
+        32
+      ],
+      "causal": false,
+      "max_abs_error": 0.00067138671875
+    },
+    {
+      "shape": [
+        1,
+        8,
+        128,
+        64
+      ],
+      "causal": false,
+      "max_abs_error": 0.00146484375
+    },
+    {
+      "shape": [
+        1,
+        8,
+        128,
+        64
+      ],
+      "causal": true,
+      "max_abs_error": 0.001953125
+    },
+    {
+      "shape": [
+        1,
+        8,
+        257,
+        64
+      ],
+      "causal": false,
+      "max_abs_error": 0.0009765625
+    }
+  ],
+  "cases": [
+    {
+      "name": "vector_add_n257",
+      "status": "success",
+      "inner_iterations": 2000,
+      "samples": 21,
+      "latency_us": {
+        "median": 9.714287757873535,
+        "p10": 8.586064338684082,
+        "p90": 12.973872184753418
+      },
+      "peak_memory_delta_bytes": 1536,
+      "operator": "vector_add",
+      "shape": [
+        257
+      ],
+      "dtype": "float32",
+      "effective_bytes": 3084,
+      "effective_gb_per_s": 0.3174705214492318
+    },
+    {
+      "name": "vector_add_n65536",
+      "status": "success",
+      "inner_iterations": 1000,
+      "samples": 21,
+      "latency_us": {
+        "median": 9.28707218170166,
+        "p10": 8.299839973449707,
+        "p90": 15.582847595214844
+      },
+      "peak_memory_delta_bytes": 262144,
+      "operator": "vector_add",
+      "shape": [
+        65536
+      ],
+      "dtype": "float32",
+      "effective_bytes": 786432,
+      "effective_gb_per_s": 84.68029370435052
+    },
+    {
+      "name": "vector_add_n1048576",
+      "status": "success",
+      "inner_iterations": 100,
+      "samples": 21,
+      "latency_us": {
+        "median": 11.421120166778564,
+        "p10": 10.430400371551514,
+        "p90": 18.902080059051514
+      },
+      "peak_memory_delta_bytes": 4194304,
+      "operator": "vector_add",
+      "shape": [
+        1048576
+      ],
+      "dtype": "float32",
+      "effective_bytes": 12582912,
+      "effective_gb_per_s": 1101.7231073884348
+    },
+    {
+      "name": "relu_add_separate_n257",
+      "status": "success",
+      "inner_iterations": 2000,
+      "samples": 21,
+      "latency_us": {
+        "median": 16.98736000061035,
+        "p10": 16.254528045654297,
+        "p90": 24.014495849609375
+      },
+      "peak_memory_delta_bytes": 3072,
+      "operator": "relu_add",
+      "implementation": "pytorch_eager",
+      "shape": [
+        257
+      ]
+    },
+    {
+      "name": "relu_add_separate_n65536",
+      "status": "success",
+      "inner_iterations": 1000,
+      "samples": 21,
+      "latency_us": {
+        "median": 16.548320770263672,
+        "p10": 15.998592376708984,
+        "p90": 17.49679946899414
+      },
+      "peak_memory_delta_bytes": 524288,
+      "operator": "relu_add",
+      "implementation": "pytorch_eager",
+      "shape": [
+        65536
+      ]
+    },
+    {
+      "name": "relu_add_separate_n1048576",
+      "status": "success",
+      "inner_iterations": 100,
+      "samples": 21,
+      "latency_us": {
+        "median": 24.120960235595703,
+        "p10": 21.943678855895996,
+        "p90": 45.07999897003174
+      },
+      "peak_memory_delta_bytes": 8388608,
+      "operator": "relu_add",
+      "implementation": "pytorch_eager",
+      "shape": [
+        1048576
+      ]
+    },
+    {
+      "name": "softmax_1x17",
+      "status": "success",
+      "inner_iterations": 2000,
+      "samples": 21,
+      "latency_us": {
+        "median": 8.402640342712402,
+        "p10": 7.960864067077637,
+        "p90": 14.008768081665039
+      },
+      "peak_memory_delta_bytes": 512,
+      "operator": "softmax",
+      "shape": [
+        1,
+        17
+      ],
+      "dtype": "float32",
+      "effective_bytes": 136,
+      "effective_gb_per_s": 0.01618538869368039
+    },
+    {
+      "name": "softmax_32x127",
+      "status": "success",
+      "inner_iterations": 1000,
+      "samples": 21,
+      "latency_us": {
+        "median": 10.127903938293457,
+        "p10": 9.5315523147583,
+        "p90": 13.256447792053223
+      },
+      "peak_memory_delta_bytes": 16384,
+      "operator": "softmax",
+      "shape": [
+        32,
+        127
+      ],
+      "dtype": "float32",
+      "effective_bytes": 32512,
+      "effective_gb_per_s": 3.210141031953572
+    },
+    {
+      "name": "softmax_256x1024",
+      "status": "success",
+      "inner_iterations": 200,
+      "samples": 21,
+      "latency_us": {
+        "median": 15.74336051940918,
+        "p10": 14.803199768066406,
+        "p90": 18.670560121536255
+      },
+      "peak_memory_delta_bytes": 1048576,
+      "operator": "softmax",
+      "shape": [
+        256,
+        1024
+      ],
+      "dtype": "float32",
+      "effective_bytes": 2097152,
+      "effective_gb_per_s": 133.20866262412838
+    },
+    {
+      "name": "layer_norm_1x17",
+      "status": "success",
+      "inner_iterations": 2000,
+      "samples": 21,
+      "latency_us": {
+        "median": 16.86390495300293,
+        "p10": 15.75932788848877,
+        "p90": 21.4201602935791
+      },
+      "peak_memory_delta_bytes": 1536,
+      "operator": "layer_norm",
+      "shape": [
+        1,
+        17
+      ],
+      "dtype": "float32"
+    },
+    {
+      "name": "layer_norm_32x127",
+      "status": "success",
+      "inner_iterations": 1000,
+      "samples": 21,
+      "latency_us": {
+        "median": 19.289791107177734,
+        "p10": 16.117664337158203,
+        "p90": 25.3721923828125
+      },
+      "peak_memory_delta_bytes": 17408,
+      "operator": "layer_norm",
+      "shape": [
+        32,
+        127
+      ],
+      "dtype": "float32"
+    },
+    {
+      "name": "layer_norm_256x1024",
+      "status": "success",
+      "inner_iterations": 200,
+      "samples": 21,
+      "latency_us": {
+        "median": 12.736480236053467,
+        "p10": 10.444960594177246,
+        "p90": 17.1835196018219
+      },
+      "peak_memory_delta_bytes": 1050624,
+      "operator": "layer_norm",
+      "shape": [
+        256,
+        1024
+      ],
+      "dtype": "float32"
+    },
+    {
+      "name": "matmul_17x31x23",
+      "status": "success",
+      "inner_iterations": 1000,
+      "samples": 21,
+      "latency_us": {
+        "median": 17.285856246948242,
+        "p10": 16.37468719482422,
+        "p90": 25.179136276245117
+      },
+      "peak_memory_delta_bytes": 1536,
+      "operator": "matmul",
+      "shape": [
+        17,
+        31,
+        23
+      ],
+      "dtype": "float16",
+      "flops": 24242,
+      "tflops": 0.0014024182345193253
+    },
+    {
+      "name": "matmul_128x128x128",
+      "status": "success",
+      "inner_iterations": 500,
+      "samples": 21,
+      "latency_us": {
+        "median": 10.446144104003906,
+        "p10": 10.016960144042969,
+        "p90": 11.465408325195312
+      },
+      "peak_memory_delta_bytes": 32768,
+      "operator": "matmul",
+      "shape": [
+        128,
+        128,
+        128
+      ],
+      "dtype": "float16",
+      "flops": 4194304,
+      "tflops": 0.40151695766788853
+    },
+    {
+      "name": "matmul_512x512x512",
+      "status": "success",
+      "inner_iterations": 100,
+      "samples": 21,
+      "latency_us": {
+        "median": 15.267200469970703,
+        "p10": 14.748799800872803,
+        "p90": 16.648000478744507
+      },
+      "peak_memory_delta_bytes": 524288,
+      "operator": "matmul",
+      "shape": [
+        512,
+        512,
+        512
+      ],
+      "dtype": "float16",
+      "flops": 268435456,
+      "tflops": 17.58249369476676
+    },
+    {
+      "name": "matmul_509x509x509",
+      "status": "success",
+      "inner_iterations": 100,
+      "samples": 21,
+      "latency_us": {
+        "median": 29.41472053527832,
+        "p10": 27.6092791557312,
+        "p90": 30.97248077392578
+      },
+      "peak_memory_delta_bytes": 518656,
+      "operator": "matmul",
+      "shape": [
+        509,
+        509,
+        509
+      ],
+      "dtype": "float16",
+      "flops": 263744458,
+      "tflops": 8.966410463892734
+    },
+    {
+      "name": "explicit_attention_h2_s64_d32_causalFalse",
+      "status": "success",
+      "inner_iterations": 200,
+      "samples": 21,
+      "latency_us": {
+        "median": 38.532960414886475,
+        "p10": 35.62463998794556,
+        "p90": 62.2492790222168
+      },
+      "peak_memory_delta_bytes": 40960,
+      "operator": "attention",
+      "implementation": "pytorch_explicit",
+      "shape": [
+        1,
+        2,
+        64,
+        32
+      ],
+      "dtype": "float16",
+      "causal": false,
+      "flops": 1048576,
+      "tflops": 0.027212443287770404
+    },
+    {
+      "name": "sdpa_h2_s64_d32_causalFalse",
+      "status": "success",
+      "inner_iterations": 200,
+      "samples": 21,
+      "latency_us": {
+        "median": 11.547839641571045,
+        "p10": 10.228159427642822,
+        "p90": 13.300319910049438
+      },
+      "peak_memory_delta_bytes": 9728,
+      "operator": "attention",
+      "implementation": "pytorch_sdpa",
+      "shape": [
+        1,
+        2,
+        64,
+        32
+      ],
+      "dtype": "float16",
+      "causal": false,
+      "flops": 1048576,
+      "tflops": 0.09080278498371533
+    },
+    {
+      "name": "explicit_attention_h8_s128_d64_causalFalse",
+      "status": "success",
+      "inner_iterations": 100,
+      "samples": 21,
+      "latency_us": {
+        "median": 40.225281715393066,
+        "p10": 35.81824064254761,
+        "p90": 79.52672004699707
+      },
+      "peak_memory_delta_bytes": 655360,
+      "operator": "attention",
+      "implementation": "pytorch_explicit",
+      "shape": [
+        1,
+        8,
+        128,
+        64
+      ],
+      "dtype": "float16",
+      "causal": false,
+      "flops": 33554432,
+      "tflops": 0.8341627595652034
+    },
+    {
+      "name": "sdpa_h8_s128_d64_causalFalse",
+      "status": "success",
+      "inner_iterations": 100,
+      "samples": 21,
+      "latency_us": {
+        "median": 13.733760118484497,
+        "p10": 12.240959405899048,
+        "p90": 18.666239976882935
+      },
+      "peak_memory_delta_bytes": 136192,
+      "operator": "attention",
+      "implementation": "pytorch_sdpa",
+      "shape": [
+        1,
+        8,
+        128,
+        64
+      ],
+      "dtype": "float16",
+      "causal": false,
+      "flops": 33554432,
+      "tflops": 2.443207956926416
+    },
+    {
+      "name": "explicit_attention_h8_s128_d64_causalTrue",
+      "status": "success",
+      "inner_iterations": 100,
+      "samples": 21,
+      "latency_us": {
+        "median": 69.08512115478516,
+        "p10": 61.92063808441162,
+        "p90": 102.4886417388916
+      },
+      "peak_memory_delta_bytes": 655360,
+      "operator": "attention",
+      "implementation": "pytorch_explicit",
+      "shape": [
+        1,
+        8,
+        128,
+        64
+      ],
+      "dtype": "float16",
+      "causal": true,
+      "flops": 33554432,
+      "tflops": 0.48569694080468245
+    },
+    {
+      "name": "sdpa_h8_s128_d64_causalTrue",
+      "status": "success",
+      "inner_iterations": 100,
+      "samples": 21,
+      "latency_us": {
+        "median": 12.5164794921875,
+        "p10": 11.168960332870483,
+        "p90": 17.38752007484436
+      },
+      "peak_memory_delta_bytes": 136192,
+      "operator": "attention",
+      "implementation": "pytorch_sdpa",
+      "shape": [
+        1,
+        8,
+        128,
+        64
+      ],
+      "dtype": "float16",
+      "causal": true,
+      "flops": 33554432,
+      "tflops": 2.6808202754571613
+    },
+    {
+      "name": "explicit_attention_h8_s257_d64_causalFalse",
+      "status": "success",
+      "inner_iterations": 50,
+      "samples": 21,
+      "latency_us": {
+        "median": 59.23776149749756,
+        "p10": 52.47424125671387,
+        "p90": 67.93471813201904
+      },
+      "peak_memory_delta_bytes": 2377728,
+      "operator": "attention",
+      "implementation": "pytorch_explicit",
+      "shape": [
+        1,
+        8,
+        257,
+        64
+      ],
+      "dtype": "float16",
+      "causal": false,
+      "flops": 135268352,
+      "tflops": 2.2834818295035384
+    },
+    {
+      "name": "sdpa_h8_s257_d64_causalFalse",
+      "status": "success",
+      "inner_iterations": 50,
+      "samples": 21,
+      "latency_us": {
+        "median": 17.594879865646362,
+        "p10": 16.888959407806396,
+        "p90": 19.298559427261353
+      },
+      "peak_memory_delta_bytes": 272896,
+      "operator": "attention",
+      "implementation": "pytorch_sdpa",
+      "shape": [
+        1,
+        8,
+        257,
+        64
+      ],
+      "dtype": "float16",
+      "causal": false,
+      "flops": 135268352,
+      "tflops": 7.68793836803107
+    }
+  ]
+}

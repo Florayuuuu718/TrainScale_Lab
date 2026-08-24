@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-24T01:45:27.496429+08:00",
+  "git_commit": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "git_dirty": true,
+  "repository_root": "/home/shunzi/projects/TrainScale_Lab-sm120-validation",
+  "performance_location_ok": true,
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.11.16",
+    "python_executable": "/home/shunzi/projects/TrainScale_Lab/.venv/bin/python",
+    "torch": "2.12.1+cu129",
+    "torch_cuda_runtime": "12.9",
+    "triton_package": "3.7.1",
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_bytes": 8546484224,
+    "driver": "610.88"
+  },
+  "protocol": {
+    "correctness_precondition": "Run check_environment.py and test_triton_ops.py before this profiler.",
+    "warmup_calls": 10,
+    "iterations": 20,
+    "scope": "representative forward cases"
+  },
+  "cases": {
+    "vector_add_pytorch": {
+      "name": "vector_add_pytorch",
+      "iterations": 20,
+      "device_rows": [
+        {
+          "name": "aten::add",
+          "count": 20,
+          "device_time_total_us": 126.70200000000068,
+          "cpu_time_total_us": 3487.974000000001,
+          "device_memory_usage_bytes": 83886080
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul> >(int, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul>)",
+          "count": 20,
+          "device_time_total_us": 117.09700000000066,
+          "cpu_time_total_us": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "Activity Buffer Request",
+          "count": 1,
+          "device_time_total_us": 9.605000000000018,
+          "cpu_time_total_us": 3039.172,
+          "device_memory_usage_bytes": 0
+        }
+      ],
+      "trace": "02_gpu_kernels/results/raw/triton_profiler_sm120_cu129/vector_add_pytorch_trace.json",
+      "aggregation_note": "Rows come from key_averages and can be nested; do not sum them as GPU wall time."
+    },
+    "vector_add_triton": {
+      "name": "vector_add_triton",
+      "iterations": 20,
+      "device_rows": [
+        {
+          "name": "_vector_add_kernel",
+          "count": 20,
+          "device_time_total_us": 219.26699999999892,
+          "cpu_time_total_us": 0,
+          "device_memory_usage_bytes": 0
+        }
+      ],
+      "trace": "02_gpu_kernels/results/raw/triton_profiler_sm120_cu129/vector_add_triton_trace.json",
+      "aggregation_note": "Rows come from key_averages and can be nested; do not sum them as GPU wall time."
+    },
+    "relu_add_pytorch": {
+      "name": "relu_add_pytorch",
+      "iterations": 20,
+      "device_rows": [
+        {
+          "name": "aten::add",
+          "count": 20,
+          "device_time_total_us": 124.23000000000047,
+          "cpu_time_total_us": 3627.855000000001,
+          "device_memory_usage_bytes": 83886080
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul> >(int, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul>)",
+          "count": 20,
+          "device_time_total_us": 115.01800000000048,
+          "cpu_time_total_us": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "aten::relu",
+          "count": 20,
+          "device_time_total_us": 99.98500000000195,
+          "cpu_time_total_us": 384.22800000000234,
+          "device_memory_usage_bytes": 83886080
+        },
+        {
+          "name": "aten::clamp_min",
+          "count": 20,
+          "device_time_total_us": 99.98500000000195,
+          "cpu_time_total_us": 337.33700000000135,
+          "device_memory_usage_bytes": 83886080
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::launch_clamp_scalar(at::TensorIteratorBase&, c10::Scalar, c10::Scalar, at::native::detail::ClampLimits)::{lambda()#1}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::(anonymous namespace)::launch_clamp_scalar(at::TensorIteratorBase&, c10::Scalar, c10::Scalar, at::native::detail::ClampLimits)::{lambda()#1}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+          "count": 20,
+          "device_time_total_us": 99.98500000000195,
+          "cpu_time_total_us": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "Activity Buffer Request",
+          "count": 1,
+          "device_time_total_us": 9.211999999999989,
+          "cpu_time_total_us": 3119.34,
+          "device_memory_usage_bytes": 0
+        }
+      ],
+      "trace": "02_gpu_kernels/results/raw/triton_profiler_sm120_cu129/relu_add_pytorch_trace.json",
+      "aggregation_note": "Rows come from key_averages and can be nested; do not sum them as GPU wall time."
+    },
+    "relu_add_triton": {
+      "name": "relu_add_triton",
+      "iterations": 20,
+      "device_rows": [
+        {
+          "name": "_relu_add_kernel",
+          "count": 20,
+          "device_time_total_us": 219.89199999999983,
+          "cpu_time_total_us": 0,
+          "device_memory_usage_bytes": 0
+        }
+      ],
+      "trace": "02_gpu_kernels/results/raw/triton_profiler_sm120_cu129/relu_add_triton_trace.json",
+      "aggregation_note": "Rows come from key_averages and can be nested; do not sum them as GPU wall time."
+    },
+    "matmul_pytorch": {
+      "name": "matmul_pytorch",
+      "iterations": 20,
+      "device_rows": [
+        {
+          "name": "aten::matmul",
+          "count": 20,
+          "device_time_total_us": 246.77099999999928,
+          "cpu_time_total_us": 3819.7409999999977,
+          "device_memory_usage_bytes": 10485760
+        },
+        {
+          "name": "aten::mm",
+          "count": 20,
+          "device_time_total_us": 246.77099999999928,
+          "cpu_time_total_us": 3788.4410000000007,
+          "device_memory_usage_bytes": 10485760
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_f16_s16816gemm_relu_f16_64x64_32x6_nn_align8>(cutlass_80_tensorop_f16_s16816gemm_relu_f16_64x64_32x6_nn_align8::Params)",
+          "count": 20,
+          "device_time_total_us": 228.39399999999932,
+          "cpu_time_total_us": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "Activity Buffer Request",
+          "count": 1,
+          "device_time_total_us": 18.376999999999953,
+          "cpu_time_total_us": 3053.1290000000004,
+          "device_memory_usage_bytes": 0
+        }
+      ],
+      "trace": "02_gpu_kernels/results/raw/triton_profiler_sm120_cu129/matmul_pytorch_trace.json",
+      "aggregation_note": "Rows come from key_averages and can be nested; do not sum them as GPU wall time."
+    },
+    "matmul_triton": {
+      "name": "matmul_triton",
+      "iterations": 20,
+      "device_rows": [
+        {
+          "name": "_matmul_kernel",
+          "count": 20,
+          "device_time_total_us": 459.4319999999989,
+          "cpu_time_total_us": 0,
+          "device_memory_usage_bytes": 0
+        }
+      ],
+      "trace": "02_gpu_kernels/results/raw/triton_profiler_sm120_cu129/matmul_triton_trace.json",
+      "aggregation_note": "Rows come from key_averages and can be nested; do not sum them as GPU wall time."
+    },
+    "attention_pytorch_sdpa": {
+      "name": "attention_pytorch_sdpa",
+      "iterations": 20,
+      "device_rows": [
+        {
+          "name": "aten::scaled_dot_product_attention",
+          "count": 20,
+          "device_time_total_us": 117.07500000000209,
+          "cpu_time_total_us": 3973.5939999999996,
+          "device_memory_usage_bytes": 2621440
+        },
+        {
+          "name": "aten::_scaled_dot_product_flash_attention",
+          "count": 20,
+          "device_time_total_us": 117.07500000000209,
+          "cpu_time_total_us": 3887.743000000002,
+          "device_memory_usage_bytes": 2723840
+        },
+        {
+          "name": "aten::_flash_attention_forward",
+          "count": 20,
+          "device_time_total_us": 117.07500000000209,
+          "cpu_time_total_us": 3734.83,
+          "device_memory_usage_bytes": 2723840
+        },
+        {
+          "name": "void pytorch_flash::flash_fwd_kernel<Flash_fwd_kernel_traits<64, 128, 128, 4, false, false, cutlass::half_t, Flash_kernel_traits<64, 128, 128, 4, cutlass::half_t> >, false, false, false, false, true, true, false, false>(pytorch_flash::Flash_fwd_params)",
+          "count": 20,
+          "device_time_total_us": 108.3030000000017,
+          "cpu_time_total_us": 0,
+          "device_memory_usage_bytes": 0
+        },
+        {
+          "name": "Activity Buffer Request",
+          "count": 1,
+          "device_time_total_us": 8.77200000000039,
+          "cpu_time_total_us": 2947.99,
+          "device_memory_usage_bytes": 0
+        }
+      ],
+      "trace": "02_gpu_kernels/results/raw/triton_profiler_sm120_cu129/attention_pytorch_sdpa_trace.json",
+      "aggregation_note": "Rows come from key_averages and can be nested; do not sum them as GPU wall time."
+    },
+    "attention_triton": {
+      "name": "attention_triton",
+      "iterations": 20,
+      "device_rows": [
+        {
+          "name": "_attention_forward_kernel",
+          "count": 20,
+          "device_time_total_us": 1690.0040000000001,
+          "cpu_time_total_us": 0,
+          "device_memory_usage_bytes": 0
+        }
+      ],
+      "trace": "02_gpu_kernels/results/raw/triton_profiler_sm120_cu129/attention_triton_trace.json",
+      "aggregation_note": "Rows come from key_averages and can be nested; do not sum them as GPU wall time."
+    }
+  }
+}

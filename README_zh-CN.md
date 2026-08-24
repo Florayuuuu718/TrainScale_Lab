@@ -13,13 +13,13 @@ TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Tr
 | 跳转位置 | 内容 |
 |---|---|
 | [01 · PyTorch Training](01_pytorch_training/README.md) | 01 模块完整教学与复现顺序 |
+| [02 · GPU Kernels](02_gpu_kernels/README.md) | 可运行 Triton 算子、验收清单与九项实验报告 |
 | [训练源码](01_pytorch_training/trainscale_training) | 数据、模型、引擎、checkpoint、benchmark 与 profiler |
 | [实验配置](01_pytorch_training/configs/README.md) | TOML 实验配方 |
 | [正确性测试](01_pytorch_training/tests/README.md) | 10 个测试的逐项解释 |
 | [实验报告](01_pytorch_training/experiments/README.md) | 成功实验、理论分析与排障提示 |
 | [结果目录](01_pytorch_training/results/README.md) | 精简 JSON 总表与 SVG 曲线 |
 | [文档导航](docs/README.md) | 概念、环境和仓库基建 |
-| [技术路线](技术路线.md) | 决策、实施日志与后续阶段 |
 | [01 验收清单](docs/01-issues.md) | 01 模块的准备工作与实现状态 |
 
 ## 新手从这里开始
@@ -51,7 +51,9 @@ uv sync --extra cpu --extra dev
 
 虚拟环境隔离、uv 缓存复用、CPU/GPU wheel 选择、CUDA 验证以及何时需要 `nvcc`，详见 [环境搭建指导](docs/getting-started/environment.md)。
 
-01 已在 Windows CPU 与 Ubuntu GPU 两条路线完成本地验收并封存；GitHub 仓库创建、首次 push 和远端 CI 仍需外部操作。02 尚未开始。
+01 与 02 均已通过 Windows CPU 和 Ubuntu GPU 本地验收并封存。RTX 5060（SM 12.0）上的 02 默认 cu129/Triton 环境最终通过 15 项 GPU 测试；归档证据覆盖 14 组 PyTorch/Triton forward case、41 条 PyTorch/Triton/CUDA kernel 路径、LayerNorm 前反向、MatMul 有限调参与代表性 Profiler。[02 机器可读验收记录](02_gpu_kernels/results/module02_acceptance_sm120.json)把静态检查与真实 GPU 执行分开保存。
+
+02 默认继续使用仓库根 `.venv`，大型实验前先运行[崩溃隔离环境探针](02_gpu_kernels/ENVIRONMENT.md)。若 Triton 失败，先更新 Windows NVIDIA 驱动并重启 WSL；同一探针仍失败时，才建立文档中的仓库外 cu130 nightly 诊断环境。系统 CUDA Toolkit 只在 CUDA C++ 章节需要，PyTorch/Triton 主线不要求预装。
 
 ## 你会学到什么
 
@@ -88,16 +90,16 @@ FSDP2 / Tensor Parallel
 | 阶段 | 要构建的东西 | 核心问题 | 最终证据 |
 |---|---|---|---|
 | [01](01_pytorch_training/README.md) | PyTorch 单卡训练框架 | 一次可靠训练需要哪些系统组件？ | loss/accuracy、吞吐、显存、断点恢复一致性 |
-| 02 | GPU Kernel Lab | 算子为什么快或慢？ | 正确性测试、延迟、带宽、加速比 |
+| [02](02_gpu_kernels/README.md) | GPU Kernel Lab | 算子为什么快或慢？ | 正确性、延迟、带宽/TFLOPS、profiler 证据 |
 | 03 | Distributed Training Lab | 多 GPU 为什么不能线性加速？ | 1/2/4/8 GPU scaling 曲线 |
 | 04 | NCCL Performance Lab | 通信何时受延迟或带宽限制？ | message size–bandwidth 曲线 |
 | 05 | TinyCollective | AllReduce 内部究竟发生了什么？ | Naive/Ring/NCCL 对照实验 |
 | 06 | Mini Training Engine | 如何隐藏通信并控制显存？ | 消融实验、timeline、吞吐提升 |
 | 07 | FSDP2 / TP 扩展 | 模型放不下一张卡时如何切分？ | 峰值显存、正确性与扩展效率 |
 
-## 计划中的仓库结构
+## 仓库结构
 
-七个模块目录均已建立；目前可运行的是：[01 模块](01_pytorch_training/README.md) · [01 源码](01_pytorch_training/trainscale_training) · [文档](docs/README.md) · [CPU CI](.github/workflows/cpu-ci.yml)。其余目录的 README 明确记录范围和当前状态。
+七个模块目录均已建立；01 与 02 已封存。各后续目录的 README 明确记录范围和当前状态。
 
 ```text
 trainscale-lab/
@@ -109,7 +111,6 @@ trainscale-lab/
 ├── 06_training_engine/        # 最终的迷你分布式训练引擎
 ├── 07_parallelism/            # FSDP2、TP 与组合并行
 ├── benchmarks/                # 统一 benchmark 入口与结果 schema
-├── docs/                      # 原理说明、实验记录与故障排查
 ├── docs/                      # 跨模块概念、环境与实验记录
 └── README.md
 ```

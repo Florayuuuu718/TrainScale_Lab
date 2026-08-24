@@ -13,13 +13,13 @@ TrainScale Lab is a hands-on open-source project for learners interested in **ML
 | Destination | What it contains |
 |---|---|
 | [01 · PyTorch Training](01_pytorch_training/README.md) | Complete module 01 tutorial and reproduction order |
+| [02 · GPU Kernels](02_gpu_kernels/README.md) | Runnable Triton kernels, acceptance checklist, and nine experiment reports |
 | [Source code](01_pytorch_training/trainscale_training) | Data, models, engine, checkpoint, benchmarks, and profiler |
 | [Configurations](01_pytorch_training/configs/README.md) | TOML experiment recipes |
 | [Correctness tests](01_pytorch_training/tests/README.md) | Explanation of all 10 tests |
 | [Experiment reports](01_pytorch_training/experiments/README.md) | Successful experiments, theory, and troubleshooting |
 | [Tracked results](01_pytorch_training/results/README.md) | Compact JSON summaries and SVG curves |
 | [Documentation map](docs/README.md) | Concepts, environment, and repository foundation |
-| [Technical roadmap](技术路线.md) | Decisions, execution logs, and later stages |
 | [Module 01 acceptance checklist](docs/01-issues.md) | Foundation and implementation status for module 01 |
 
 ## Start Here
@@ -51,7 +51,9 @@ For the full NVIDIA route, run `uv sync --extra cu129 --extra dev --python 3.11`
 
 See the [environment guide](docs/getting-started/environment.md) for virtual-environment isolation, uv cache reuse, CPU/GPU wheel selection, CUDA verification, and when `nvcc` becomes necessary.
 
-Module 01 is sealed after local Windows CPU and Ubuntu GPU acceptance. Creating the GitHub repository, making the first push, and observing the remote CPU CI remain external steps; module 02 has not started.
+Modules 01 and 02 are sealed after local Windows CPU and Ubuntu GPU acceptance. On the RTX 5060 (SM 12.0), module 02's stable cu129/Triton environment passes all 15 final GPU tests. Its archived evidence includes 14 PyTorch/Triton forward cases, 41 PyTorch/Triton/CUDA kernel paths, LayerNorm forward/backward, finite MatMul tuning, and representative profiling. The machine-readable [module 02 acceptance record](02_gpu_kernels/results/module02_acceptance_sm120.json) separates static checks from real GPU execution.
+
+For module 02, keep the stable root `.venv` by default and run the [crash-isolated environment probe](02_gpu_kernels/ENVIRONMENT.md) before any large experiment. If Triton fails, update the Windows NVIDIA driver and restart WSL first; only create the documented external cu130 nightly environment if the same probe still fails. A system CUDA Toolkit is required only for the CUDA C++ chapter, not for PyTorch or Triton.
 
 ## What You Will Learn
 
@@ -88,16 +90,16 @@ FSDP2 / Tensor Parallel
 | Stage | What you build | Central question | Evidence produced |
 |---|---|---|---|
 | [01](01_pytorch_training/README.md) | Single-GPU PyTorch trainer | What makes a training run reliable? | Loss/accuracy, throughput, memory, resume consistency |
-| 02 | GPU Kernel Lab | Why is an operator fast or slow? | Correctness tests, latency, bandwidth, speedup |
+| [02](02_gpu_kernels/README.md) | GPU Kernel Lab | Why is an operator fast or slow? | Correctness, latency, bandwidth/TFLOPS, profiler evidence |
 | 03 | Distributed Training Lab | Why does multi-GPU training not scale linearly? | 1/2/4/8-GPU scaling curves |
 | 04 | NCCL Performance Lab | When is communication latency- or bandwidth-bound? | Message-size–bandwidth curves |
 | 05 | TinyCollective | What actually happens inside AllReduce? | Naive/Ring/NCCL comparison |
 | 06 | Mini Training Engine | How can communication be hidden and memory controlled? | Ablations, timelines, throughput improvements |
 | 07 | FSDP2 / TP extension | How should a model be partitioned when it no longer fits? | Peak memory, correctness, scaling efficiency |
 
-## Planned Repository Layout
+## Repository Layout
 
-All seven module directories now exist. The runnable module is [01](01_pytorch_training/README.md), with its [source](01_pytorch_training/trainscale_training), [documentation](docs/README.md), and [CPU CI](.github/workflows/cpu-ci.yml). Each later directory has a README that states its scope and current status.
+All seven module directories now exist. Modules 01 and 02 are sealed; each later directory has a README that states its scope and current status.
 
 ```text
 trainscale-lab/
@@ -109,7 +111,6 @@ trainscale-lab/
 ├── 06_training_engine/        # Final miniature distributed engine
 ├── 07_parallelism/            # FSDP2, TP, and composed parallelism
 ├── benchmarks/                # Shared benchmark entry points and schemas
-├── docs/                      # Concepts, experiments, and troubleshooting
 ├── docs/                      # Cross-module concepts, setup, and experiments
 └── README.md
 ```

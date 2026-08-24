@@ -1,0 +1,49 @@
+[[case]]
+id = "vector_add_ragged_fp32"
+operator = "vector_add"
+shape = [4097]
+dtype = "float32"
+layout = "contiguous"
+inner = 1
+
+[[case]]
+id = "vector_add_prime_fp16"
+operator = "vector_add"
+shape = [257]
+dtype = "float16"
+layout = "contiguous"
+inner = 1
+
+[[case]]
+id = "softmax_ragged_large_values"
+operator = "softmax"
+shape = [8, 509]
+dtype = "float32"
+layout = "contiguous"
+inner = 1
+
+[[case]]
+id = "layer_norm_backward_ragged"
+operator = "layer_norm_backward"
+shape = [8, 127]
+dtype = "float32"
+layout = "contiguous"
+inner = 1
+eps = 0.00001
+
+[[case]]
+id = "matmul_ragged_fp16"
+operator = "matmul"
+shape = [17, 31, 23]
+dtype = "float16"
+layout = "contiguous"
+inner = 1
+
+[[case]]
+id = "attention_causal_ragged"
+operator = "attention"
+shape = [2, 33, 32]
+dtype = "float16"
+layout = "contiguous"
+inner = 1
+causal = true

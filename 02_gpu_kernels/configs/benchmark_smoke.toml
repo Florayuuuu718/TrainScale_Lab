@@ -1,0 +1,9 @@
+[suite]
+case_ids = [
+  "vector_add_n1048576",
+  "relu_add_n1048576",
+  "softmax_256x1024",
+  "layer_norm_256x1024",
+  "matmul_512x512x512",
+  "attention_h8_s128_d64",
+]

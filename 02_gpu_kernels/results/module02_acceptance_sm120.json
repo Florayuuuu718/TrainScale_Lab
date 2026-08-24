@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "accepted_at": "2026-08-24",
+  "status": "passed",
+  "scope": "Module 02 release acceptance on the recorded Windows and WSL2 SM 12.0 environment",
+  "git_head_at_acceptance": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "worktree_note": "Module 02 implementation and documentation were uncommitted at acceptance; formal inputs are content-addressed by module02_summary_sm120.json.",
+  "environment": {
+    "host": "Windows with WSL2 Ubuntu",
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "compute_capability": [12, 0],
+    "windows_driver": "610.88",
+    "python": "3.11",
+    "pytorch": "2.12.1+cu129",
+    "triton": "3.7.1",
+    "cuda_toolkit": "13.0.88",
+    "nvcc_arch": "sm_120"
+  },
+  "windows_cpu_validation": {
+    "ruff": {
+      "command": ".venv\\Scripts\\ruff check .",
+      "status": "passed"
+    },
+    "mypy": {
+      "command": ".venv\\Scripts\\mypy",
+      "status": "passed",
+      "source_files_checked": 15
+    },
+    "pytest": {
+      "setup_command": "New-Item -ItemType Directory -Path .pytest-tmp -Force",
+      "command": ".venv\\Scripts\\pytest -q -p no:cacheprovider --basetemp .pytest-tmp/acceptance-20260824-rerun",
+      "status": "passed",
+      "passed": 26,
+      "skipped": 1
+    },
+    "result_json_parse": {
+      "status": "passed",
+      "artifacts_checked": 10
+    }
+  },
+  "environmental_failures_observed": [
+    {
+      "attempt": ".venv\\Scripts\\mypy 01_pytorch_training 02_gpu_kernels",
+      "result": "PermissionError while recursively scanning the ignored CIFAR-10 data directory",
+      "resolution": "Run mypy without positional directories so pyproject.toml supplies the frozen source set.",
+      "code_failure": false
+    },
+    {
+      "attempt": ".venv\\Scripts\\pytest -q",
+      "result": "PermissionError in the user Temp pytest directory on this Windows host",
+      "resolution": "Use the ignored repository-local .pytest-tmp parent, disable cacheprovider, and pass an explicit fresh --basetemp child.",
+      "code_failure": false
+    }
+  ],
+  "wsl_gpu_validation": {
+    "environment_probe": {
+      "command": ".venv/bin/python 02_gpu_kernels/benchmarks/check_environment.py --require-nvcc --nvcc-flag=-U_GNU_SOURCE --nvcc-flag=-D_DEFAULT_SOURCE",
+      "status": "passed",
+      "checks": {
+        "cuda_eager": true,
+        "torch_compile": true,
+        "triton_single_input": true,
+        "triton_vector_add": true,
+        "cuda_toolkit_compile_and_run": true
+      }
+    },
+    "config_smoke_benchmark": {
+      "command": ".venv/bin/python 02_gpu_kernels/benchmarks/run_triton_comparison.py --suite smoke --samples 3 --warmup 1",
+      "status": "passed",
+      "successful_paths": 12
+    },
+    "beginner_operator_selection": {
+      "command": ".venv/bin/python 02_gpu_kernels/benchmarks/run_triton_comparison.py --suite full --operator vector_add --samples 2 --warmup 1",
+      "status": "passed",
+      "selected_cases": 2,
+      "successful_paths": 4,
+      "result_viewer": "passed"
+    },
+    "gpu_pytest": {
+      "command": "TRAINSCALE_RUN_SM120_TRITON=1 PYTHONPATH=02_gpu_kernels .venv/bin/python -m pytest -p no:cacheprovider -q 02_gpu_kernels/tests/test_triton_ops.py",
+      "status": "passed",
+      "passed": 15
+    }
+  },
+  "formal_results": {
+    "summary": "02_gpu_kernels/results/module02_summary_sm120.json",
+    "summary_sha256": "3baf82834fb7018703c5bc42047f966f57b8be09c7ef8ebf22cc952393ced4a6",
+    "all_required_results_passed": true,
+    "pytorch_triton_forward_cases": 14,
+    "cuda_triton_variant_successful_paths": 41,
+    "layer_norm_phase_comparisons": 8,
+    "matmul_candidates_per_shape": 4,
+    "profiler_cases": 8
+  },
+  "known_boundaries": [
+    "The performance numbers describe one RTX 5060 Laptop GPU and must not be ranked across different hardware.",
+    "The CUDA C++ path is a standalone executable and does not claim PyTorch C++ extension ABI compatibility.",
+    "CUDA 13.0 on Ubuntu 26.04 required -U_GNU_SOURCE -D_DEFAULT_SOURCE; new installations should prefer the documented Ubuntu 24.04 route.",
+    "The finite Triton tuning candidates are educational samples, not an exhaustive autotuner search.",
+    "Attention backward, persistent kernels, TMA, multi-GPU kernels, and automatic performance regression gates are explicitly non-blocking extensions."
+  ]
+}

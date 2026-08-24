@@ -1,0 +1,116 @@
+[[case]]
+id = "vector_add_n257"
+operator = "vector_add"
+shape = [257]
+dtype = "float32"
+layout = "contiguous"
+inner = 1000
+
+[[case]]
+id = "vector_add_n1048576"
+operator = "vector_add"
+shape = [1048576]
+dtype = "float32"
+layout = "contiguous"
+inner = 50
+
+[[case]]
+id = "relu_add_n257"
+operator = "relu_add"
+shape = [257]
+dtype = "float32"
+layout = "contiguous"
+inner = 1000
+
+[[case]]
+id = "relu_add_n1048576"
+operator = "relu_add"
+shape = [1048576]
+dtype = "float32"
+layout = "contiguous"
+inner = 50
+
+[[case]]
+id = "softmax_32x127"
+operator = "softmax"
+shape = [32, 127]
+dtype = "float32"
+layout = "contiguous"
+inner = 500
+
+[[case]]
+id = "softmax_256x1024"
+operator = "softmax"
+shape = [256, 1024]
+dtype = "float32"
+layout = "contiguous"
+inner = 100
+
+[[case]]
+id = "layer_norm_32x127"
+operator = "layer_norm"
+shape = [32, 127]
+dtype = "float32"
+layout = "contiguous"
+inner = 500
+eps = 0.00001
+
+[[case]]
+id = "layer_norm_256x1024"
+operator = "layer_norm"
+shape = [256, 1024]
+dtype = "float32"
+layout = "contiguous"
+inner = 100
+eps = 0.00001
+
+[[case]]
+id = "matmul_17x31x23"
+operator = "matmul"
+shape = [17, 31, 23]
+dtype = "float16"
+layout = "contiguous"
+inner = 500
+
+[[case]]
+id = "matmul_512x512x512"
+operator = "matmul"
+shape = [512, 512, 512]
+dtype = "float16"
+layout = "contiguous"
+inner = 50
+
+[[case]]
+id = "matmul_509x509x509"
+operator = "matmul"
+shape = [509, 509, 509]
+dtype = "float16"
+layout = "contiguous"
+inner = 50
+
+[[case]]
+id = "attention_h2_s64_d32"
+operator = "attention"
+shape = [2, 64, 32]
+dtype = "float16"
+layout = "contiguous"
+inner = 100
+causal = false
+
+[[case]]
+id = "attention_h8_s128_d64"
+operator = "attention"
+shape = [8, 128, 64]
+dtype = "float16"
+layout = "contiguous"
+inner = 50
+causal = false
+
+[[case]]
+id = "attention_h8_s128_d64_causal"
+operator = "attention"
+shape = [8, 128, 64]
+dtype = "float16"
+layout = "contiguous"
+inner = 50
+causal = true

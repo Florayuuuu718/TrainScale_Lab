@@ -32,7 +32,7 @@ packages = ["01_pytorch_training/trainscale_training"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
-testpaths = ["01_pytorch_training/tests"]
+testpaths = ["01_pytorch_training/tests", "02_gpu_kernels/tests"]
 
 [tool.ruff]
 target-version = "py311"

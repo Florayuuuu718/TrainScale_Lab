@@ -1,0 +1,15 @@
+[[case]]
+id = "matmul_512x512x512"
+operator = "matmul"
+shape = [512, 512, 512]
+dtype = "float16"
+layout = "contiguous"
+inner = 50
+
+[[case]]
+id = "matmul_509x509x509"
+operator = "matmul"
+shape = [509, 509, 509]
+dtype = "float16"
+layout = "contiguous"
+inner = 50

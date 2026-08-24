@@ -12,6 +12,8 @@
 
 不要先在 Windows 中创建 CUDA 环境，再把同一个 `.venv` 复制给 Ubuntu。Windows 与 Linux 应分别创建环境；性能实验的 Linux 仓库应位于 `/home/<用户名>/...`。
 
+进入 02 时也不要预先创建两套 WSL Python 环境：默认 stable 根 `.venv` 先跑[真实 kernel 环境探针](../../02_gpu_kernels/ENVIRONMENT.md)，只有更新驱动后仍失败才建立隔离 nightly 兜底；CUDA Toolkit 则等 CUDA C++ 实验再装。
+
 ## 学习顺序
 
 1. 选择原生 Windows、WSL2 Ubuntu 或原生 Linux，并创建各自的项目专属 `.venv`；

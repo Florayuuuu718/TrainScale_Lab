@@ -2,7 +2,7 @@
 
 这是一篇给第一次接触 WSL 的学习者准备的完整教程。它不要求你先理解虚拟机、CUDA Toolkit 或 Linux 驱动；请按顺序执行，每一步都先看清楚标题中的“在哪里运行”。
 
-完成后，你会得到两套互不干扰的环境：
+完成后，你会得到 Windows 宿主层和 WSL2 Linux 学习层。若两边都运行 Python，它们必须各建自己的 `.venv`；下面的完整 GPU 路线只使用 Ubuntu 根环境：
 
 ```text
 Windows
@@ -40,9 +40,9 @@ WSL 是 Windows Subsystem for Linux。WSL2 在 Windows 中运行一个真实 Lin
 - 本项目的安装与实验命令已经在 Ubuntu 上验证；
 - 新手可以把注意力放在训练系统，而不是发行版差异。
 
-项目实测环境是 Ubuntu 26.04 LTS，但这不是硬性要求。使用 `wsl --install -d Ubuntu` 获得的受支持 Ubuntu 即可；请记录自己的实际版本，不要为了完全复制版本号而自行更换一个已经能工作的发行版。
+只做 PyTorch/Triton 时，项目已在 Ubuntu 26.04 LTS 实测通过。若从零安装并计划完成 CUDA C++，推荐 Ubuntu 24.04 LTS：CUDA Toolkit 13.0 的官方 Linux 支持表列出了 Ubuntu 24.04/22.04，没有列出 26.04。已经能工作的 26.04 不必重装；它可完成 PyTorch/Triton，本项目也记录了 standalone CUDA smoke 的兼容参数，但那不是 NVIDIA 的正式支持承诺。
 
-项目正式 GPU 基线是 Python 3.11、PyTorch 2.12.1+cu129 和 Triton 3.7.1。这组依赖已在 WSL2 中通过训练、AMP、`torch.compile` 和 CUDA Profiler 验收；学习者应直接使用锁文件创建环境，不必先复现开发阶段使用旧依赖遇到的问题。
+项目正式 GPU 基线是 Python 3.11、PyTorch 2.12.1+cu129 和 Triton 3.7.1。这组依赖已在 WSL2 + RTX 5060（SM 12.0）+ Windows driver 610.88 中通过训练、AMP、`torch.compile`、最终 15 项 Triton GPU 测试和 CUDA Profiler 验收；学习者应直接使用锁文件创建环境，不必先复现开发阶段使用旧驱动遇到的问题。
 
 ## 3. 安装前需要什么
 
@@ -193,9 +193,11 @@ uv --version
 
 cd ~/projects/TrainScale_Lab
 uv sync --extra cu129 --extra dev --python 3.11
+.venv/bin/python 02_gpu_kernels/benchmarks/check_environment.py
+uv pip check --python .venv/bin/python
 ```
 
-`uv sync` 会读取仓库中的 `pyproject.toml` 和 `uv.lock`，下载 Python 3.11，并在项目根目录创建 Linux 专用的 `.venv`。不需要先在系统中手工安装 Python 3.11。
+`uv sync` 会读取仓库中的 `pyproject.toml` 和 `uv.lock`，下载 Python 3.11，并在项目根目录创建 Linux 专用的 `.venv`。不需要先在系统中手工安装 Python 3.11。紧随其后的探针会在隔离子进程中真正 launch eager、`torch.compile`、Triton Softmax 与 Vector Add；`uv pip check` 再检查 Python 包依赖是否自洽。
 
 如果没有 NVIDIA GPU，改为：
 
@@ -254,19 +256,32 @@ GPU 路线应看到 Python 路径位于当前仓库 `.venv`、PyTorch 带 `+cu12
 
 `torch.cuda.is_available()` 只证明 PyTorch 能发现 CUDA；这个命令完成 forward、backward 和 optimizer step，才证明基础 CUDA 训练链可用。
 
-### 第 5 层：Triton 与 `torch.compile`
+### 第 5 层：先跑小型 Triton/`torch.compile` 探针
 
 ```bash
-.venv/bin/python -c "import triton; print(triton.__version__)"
+.venv/bin/python 02_gpu_kernels/benchmarks/check_environment.py
+TRAINSCALE_RUN_SM120_TRITON=1 \
+  .venv/bin/python -m pytest -q 02_gpu_kernels/tests/test_triton_ops.py
+```
 
+导入 Triton 只证明 Python 包存在。小型探针和最终 15 项测试实际运行 JIT/launch、ragged mask、forward/backward 与错误边界，能在几秒内发现兼容性问题，不必先下载 CIFAR-10 或跑长 benchmark。SM 12.0 GPU 测试要求显式变量，是因为旧驱动下发生过进程级段错误；只有探针先通过才开启。
+
+若探针失败，按固定顺序处理：
+
+1. 在 Windows 更新 NVIDIA 驱动；
+2. 在普通 PowerShell 执行 `wsl --shutdown`；
+3. 重新打开 Ubuntu，在同一个根 `.venv` 重跑探针；
+4. 仍失败时，才按 [02 环境指南](../../02_gpu_kernels/ENVIRONMENT.md)建立仓库外 cu130 nightly 环境做诊断，不改 `uv.lock`。
+
+探针通过后，如需复现 01 的完整 CNN compile 实验，再运行：
+
+```bash
 .venv/bin/python -m trainscale_training.benchmark_modes \
   --config 01_pytorch_training/configs/cifar10_modes_wsl.toml \
   --output 01_pytorch_training/results/cifar10_modes_wsl.json
 ```
 
-导入 Triton 只证明 Python 包存在。完整 benchmark 中的 compile 变体能完成 CNN forward/backward，才说明 Inductor/Triton 和 C/C++ host launcher 都能工作。首次编译会明显慢于后续 epoch，这是需要记录的冷启动成本，不是安装失败。
-
-这个命令使用完整 CIFAR-10 并运行多组实验，耗时和首次下载都较大；先完成前四层，再把它作为实验 04 补充部分运行。
+首次编译明显慢于稳态是正常 JIT 成本；应分开记录，而不是把它当安装失败。
 
 ### 第 6 层：CUDA Profiler
 
@@ -314,6 +329,8 @@ source .venv/bin/activate
 | Python 路径含 `Scripts` | 错用了 Windows `.venv` | 在 Ubuntu 仓库根目录重新 `uv sync`，Linux 环境使用 `.venv/bin` |
 | 项目路径以 `/mnt/` 开头 | 正从 Windows 文件系统运行 | 在 `~/projects` 重新 clone 或复制源码 |
 | 首次 compile 很慢 | Inductor 正在生成和编译代码 | 分开记录首 epoch 与 steady-state，不要立即判断失败 |
+| Triton launch 段错误/无 Python traceback | driver、SM 架构与 JIT 加载链不兼容 | 用隔离探针确认；先更新 Windows 驱动并 `wsl --shutdown`，仍失败才建 nightly 诊断环境 |
+| CUDA 13.0 在 Ubuntu 26.04 报 `rsqrt/rsqrtf` 声明冲突 | Toolkit 13.0 未正式支持该发行版/glibc 组合 | 新安装用 Ubuntu 24.04；已有 26.04 按 [CUDA smoke 说明](../../02_gpu_kernels/cuda/README.md)使用已验证兼容参数，不修改系统头文件 |
 | `CUPTI_ERROR_INVALID_DEVICE` | 当前用户态工具链与 GPU 不兼容 | 确认使用锁定的 2.12.1+cu129；不要在 WSL 安装 Linux display driver |
 | CIFAR-10 首次运行很久 | 正在下载、解压并创建 workers | 等待完成；之后数据会复用，不把 `data/` 提交 Git |
 
@@ -323,16 +340,18 @@ source .venv/bin/activate
 - Windows 驱动、WSL GPU 映射、PyTorch CUDA runtime、CUDA Toolkit 分别属于哪一层；
 - 为什么推荐 Ubuntu，以及为什么项目应位于 `/home/...` 而不是 `/mnt/...`；
 - 为什么 Windows 与 Ubuntu 必须各有自己的 `.venv`；
+- 为什么项目默认只维护一个 WSL stable `.venv`，而 nightly 和 Toolkit 都是按失败/章节引入；
 - 为什么 `nvidia-smi`、`torch.cuda.is_available()`、CUDA 训练、Triton import、compile 和 CUPTI trace 是六层不同的验收；
 - 出现问题时应该定位哪一层，而不是无目的地重装所有 CUDA 组件。
 
-完成前四层后，可以回到 [01 路 PyTorch Training](../../01_pytorch_training/README.md) 按实验顺序学习；需要 compile 时阅读[实验 04 补充](../../01_pytorch_training/experiments/04_cont_amp_compile_wsl.md)，需要 Profiler 时阅读[实验 06 补充](../../01_pytorch_training/experiments/06_cont_cuda_profiler_wsl.md)。
+完成前五层后，可以回到 [01 · PyTorch Training](../../01_pytorch_training/README.md) 按实验顺序学习；进入算子实验先读 [02 环境指南](../../02_gpu_kernels/ENVIRONMENT.md)。需要 compile 时阅读[实验 04 补充](../../01_pytorch_training/experiments/04_cont_amp_compile_wsl.md)，需要 Profiler 时阅读[实验 06 补充](../../01_pytorch_training/experiments/06_cont_cuda_profiler_wsl.md)。
 
 ## 参考资料
 
 - [Microsoft：安装 WSL](https://learn.microsoft.com/windows/wsl/install)
 - [Microsoft：WSL 基本命令](https://learn.microsoft.com/windows/wsl/basic-commands)
 - [NVIDIA：CUDA on WSL User Guide](https://docs.nvidia.com/cuda/wsl-user-guide/)
+- [NVIDIA：CUDA 13.0 Linux Installation Guide / OS support matrix](https://docs.nvidia.com/cuda/archive/13.0.0/cuda-installation-guide-linux/index.html)
 - [PyTorch：torch.compile](https://docs.pytorch.org/docs/stable/generated/torch.compile)
 - [PyTorch：Profiler](https://docs.pytorch.org/docs/stable/profiler.html)
 - [Triton：安装说明](https://triton-lang.org/main/getting-started/installation.html)

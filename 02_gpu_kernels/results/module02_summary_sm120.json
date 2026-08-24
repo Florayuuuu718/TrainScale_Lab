@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-24T14:34:57.582657+08:00",
+  "scope": "Module 02 formal acceptance summary on the recorded SM 12.0 environment",
+  "environment": {
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "memory_mib": 8151,
+    "windows_driver": "610.88"
+  },
+  "required_passes": {
+    "forward_14_cases": true,
+    "cuda_four_way_9_cases": true,
+    "layer_norm_forward_backward_8_comparisons": true,
+    "matmul_2_shapes_4_candidates": true
+  },
+  "all_required_results_passed": true,
+  "counts": {
+    "pytorch_triton_forward_cases": 14,
+    "cuda_four_way_cases": 9,
+    "cuda_triton_variant_successful_paths": 41,
+    "layer_norm_phase_comparisons": 8,
+    "matmul_candidates_per_shape": 4,
+    "profiler_cases": 8
+  },
+  "cuda_four_way_winners": [
+    {
+      "case_id": "vector_add_n257_fp32",
+      "fastest_implementation": "cuda_baseline",
+      "median_us": 10.0390081406,
+      "all_medians_us": {
+        "pytorch": 10.61564826965332,
+        "triton": 16.505279541015625,
+        "cuda_baseline": 10.0390081406,
+        "cuda_optimized": 13.2556800842
+      }
+    },
+    {
+      "case_id": "vector_add_n4097_fp16",
+      "fastest_implementation": "pytorch",
+      "median_us": 8.55174446105957,
+      "all_medians_us": {
+        "pytorch": 8.55174446105957,
+        "triton": 16.042816162109375,
+        "cuda_baseline": 9.50944042206,
+        "cuda_optimized": 8.71263980865
+      }
+    },
+    {
+      "case_id": "vector_add_n4097_bf16",
+      "fastest_implementation": "cuda_baseline",
+      "median_us": 8.65952014923,
+      "all_medians_us": {
+        "pytorch": 15.00716781616211,
+        "triton": 15.435839653015137,
+        "cuda_baseline": 8.65952014923,
+        "cuda_optimized": 9.16819190979
+      }
+    },
+    {
+      "case_id": "vector_add_n1048576_fp32",
+      "fastest_implementation": "cuda_optimized",
+      "median_us": 11.8406410217,
+      "all_medians_us": {
+        "pytorch": 16.945279836654663,
+        "triton": 16.741119623184204,
+        "cuda_baseline": 14.5023994446,
+        "cuda_optimized": 11.8406410217
+      }
+    },
+    {
+      "case_id": "softmax_1x17",
+      "fastest_implementation": "cuda_baseline",
+      "median_us": 8.67750358582,
+      "all_medians_us": {
+        "pytorch": 10.221471786499023,
+        "triton_baseline": 17.527103424072266,
+        "triton": 16.51740837097168,
+        "cuda_baseline": 8.67750358582,
+        "cuda_optimized": 8.72083187103
+      }
+    },
+    {
+      "case_id": "softmax_8x127",
+      "fastest_implementation": "cuda_optimized",
+      "median_us": 9.02764797211,
+      "all_medians_us": {
+        "pytorch": 11.820799827575684,
+        "triton_baseline": 13.887359619140625,
+        "triton": 16.79961585998535,
+        "cuda_baseline": 11.9084796906,
+        "cuda_optimized": 9.02764797211
+      }
+    },
+    {
+      "case_id": "softmax_32x509",
+      "fastest_implementation": "pytorch",
+      "median_us": 8.765919804573059,
+      "all_medians_us": {
+        "pytorch": 8.765919804573059,
+        "triton_baseline": 14.270559549331665,
+        "triton": 14.683200120925903,
+        "cuda_baseline": 25.0244808197,
+        "cuda_optimized": 10.9510402679
+      }
+    },
+    {
+      "case_id": "softmax_256x1024",
+      "fastest_implementation": "pytorch",
+      "median_us": 9.444479942321777,
+      "all_medians_us": {
+        "pytorch": 9.444479942321777,
+        "triton_baseline": 16.507519483566284,
+        "triton": 15.121920108795166,
+        "cuda_baseline": 61.5379180908,
+        "cuda_optimized": 12.0767993927
+      }
+    },
+    {
+      "case_id": "softmax_32x4097",
+      "fastest_implementation": "pytorch",
+      "median_us": 9.759359955787659,
+      "all_medians_us": {
+        "pytorch": 9.759359955787659,
+        "triton_baseline": 16.895999908447266,
+        "triton": 18.25600028038025,
+        "cuda_baseline": 180.995834351,
+        "cuda_optimized": 10.8339195251
+      }
+    }
+  ],
+  "layer_norm_comparisons": [
+    {
+      "case_id": "layer_norm_8x127_fp32_eps1e5",
+      "phase": "forward",
+      "status": "success",
+      "pytorch_median_us": 17.338720560073853,
+      "triton_median_us": 17.964320182800293,
+      "triton_speedup_over_pytorch": 0.9651754357325799
+    },
+    {
+      "case_id": "layer_norm_8x127_fp32_eps1e5",
+      "phase": "backward",
+      "status": "success",
+      "pytorch_median_us": 18.60543966293335,
+      "triton_median_us": 31.97824001312256,
+      "triton_speedup_over_pytorch": 0.5818156238522958
+    },
+    {
+      "case_id": "layer_norm_32x509_fp16_eps1e5",
+      "phase": "forward",
+      "status": "success",
+      "pytorch_median_us": 18.481279611587524,
+      "triton_median_us": 20.81120014190674,
+      "triton_speedup_over_pytorch": 0.8880448741815932
+    },
+    {
+      "case_id": "layer_norm_32x509_fp16_eps1e5",
+      "phase": "backward",
+      "status": "success",
+      "pytorch_median_us": 17.418880462646484,
+      "triton_median_us": 31.331520080566406,
+      "triton_speedup_over_pytorch": 0.5559538898162386
+    },
+    {
+      "case_id": "layer_norm_32x509_fp16_eps1e3",
+      "phase": "forward",
+      "status": "success",
+      "pytorch_median_us": 27.30623960494995,
+      "triton_median_us": 19.73919987678528,
+      "triton_speedup_over_pytorch": 1.3833508843012454
+    },
+    {
+      "case_id": "layer_norm_32x509_fp16_eps1e3",
+      "phase": "backward",
+      "status": "success",
+      "pytorch_median_us": 19.662400484085083,
+      "triton_median_us": 31.19136095046997,
+      "triton_speedup_over_pytorch": 0.6303796912006439
+    },
+    {
+      "case_id": "layer_norm_256x1024_fp32_eps1e5",
+      "phase": "forward",
+      "status": "success",
+      "pytorch_median_us": 9.838079810142517,
+      "triton_median_us": 21.021440029144287,
+      "triton_speedup_over_pytorch": 0.4680021823672844
+    },
+    {
+      "case_id": "layer_norm_256x1024_fp32_eps1e5",
+      "phase": "backward",
+      "status": "success",
+      "pytorch_median_us": 30.428800582885742,
+      "triton_median_us": 35.6492805480957,
+      "triton_speedup_over_pytorch": 0.8535600190257184
+    }
+  ],
+  "matmul_selections": [
+    {
+      "case_id": "matmul_512x512x512",
+      "status": "success",
+      "selected_candidate": "m64_n64_k32_g8_w8",
+      "selected_config": {
+        "group_m": 8,
+        "block_n": 64,
+        "block_k": 32,
+        "num_warps": 8,
+        "block_m": 64
+      },
+      "selected_median_us": 22.49727964401245,
+      "pytorch_median_us": 14.650239944458008,
+      "selected_speedup_over_pytorch": 0.6512005085182422,
+      "candidate_ranking": [
+        {
+          "candidate": "m64_n64_k32_g8_w8",
+          "median_us": 22.49727964401245
+        },
+        {
+          "candidate": "m64_n32_k32_g8_w4",
+          "median_us": 23.047680854797363
+        },
+        {
+          "candidate": "m32_n64_k32_g8_w4",
+          "median_us": 24.262399673461914
+        },
+        {
+          "candidate": "m32_n32_k32_g8_w4",
+          "median_us": 26.881279945373535
+        }
+      ]
+    },
+    {
+      "case_id": "matmul_509x509x509",
+      "status": "success",
+      "selected_candidate": "m32_n64_k32_g8_w4",
+      "selected_config": {
+        "block_k": 32,
+        "group_m": 8,
+        "block_m": 32,
+        "block_n": 64,
+        "num_warps": 4
+      },
+      "selected_median_us": 25.267839431762695,
+      "pytorch_median_us": 31.89824104309082,
+      "selected_speedup_over_pytorch": 1.2624047706664403,
+      "candidate_ranking": [
+        {
+          "candidate": "m32_n64_k32_g8_w4",
+          "median_us": 25.267839431762695
+        },
+        {
+          "candidate": "m64_n64_k32_g8_w8",
+          "median_us": 25.606400966644287
+        },
+        {
+          "candidate": "m64_n32_k32_g8_w4",
+          "median_us": 26.37631893157959
+        },
+        {
+          "candidate": "m32_n32_k32_g8_w4",
+          "median_us": 30.047359466552734
+        }
+      ]
+    }
+  ],
+  "source_artifacts": {
+    "environment": {
+      "path": "02_gpu_kernels/results/sm120_environment_validation.json",
+      "sha256": "c61876a26d0f2656177ed8a0da4390744722493a36df816e9d5f25629a2d26cd"
+    },
+    "forward": {
+      "path": "02_gpu_kernels/results/triton_comparison_sm120_cu129.json",
+      "sha256": "00cf6a9ef85c5f538ae922e32c424d54e44ca41abc0a1af67bb16fbbc0fee93d"
+    },
+    "profiler": {
+      "path": "02_gpu_kernels/results/triton_profiler_sm120_cu129.json",
+      "sha256": "16c571a1b31576db42877a7dc4a47529ef459efbfa682f3861d5381136ed977f"
+    },
+    "cuda_comparison": {
+      "path": "02_gpu_kernels/results/cuda_triton_comparison_sm120_cu129_cuda130.json",
+      "sha256": "50539e823f7930f389f08b767a194989c17766893c963099818254873c28445a"
+    },
+    "layer_norm_training": {
+      "path": "02_gpu_kernels/results/layer_norm_training_sm120_cu129.json",
+      "sha256": "ccb26072e58ad34df75db1736c7e0621a66104a62b4efad7bf36387a9692c811"
+    },
+    "matmul_autotune": {
+      "path": "02_gpu_kernels/results/matmul_autotune_sm120_cu129.json",
+      "sha256": "90041a8ee53cee43292a29aab7e65b110fbcec5acc236f29386acdede013a682"
+    }
+  },
+  "boundary": "These are single-machine educational results, not cross-hardware performance claims."
+}

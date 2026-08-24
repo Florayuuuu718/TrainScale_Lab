@@ -1,0 +1,71 @@
+[[case]]
+id = "vector_add_n257_fp32"
+operator = "vector_add"
+shape = [257]
+dtype = "float32"
+layout = "contiguous"
+inner = 1000
+
+[[case]]
+id = "vector_add_n4097_fp16"
+operator = "vector_add"
+shape = [4097]
+dtype = "float16"
+layout = "contiguous"
+inner = 500
+
+[[case]]
+id = "vector_add_n4097_bf16"
+operator = "vector_add"
+shape = [4097]
+dtype = "bfloat16"
+layout = "contiguous"
+inner = 500
+
+[[case]]
+id = "vector_add_n1048576_fp32"
+operator = "vector_add"
+shape = [1048576]
+dtype = "float32"
+layout = "contiguous"
+inner = 50
+
+[[case]]
+id = "softmax_1x17"
+operator = "softmax"
+shape = [1, 17]
+dtype = "float32"
+layout = "contiguous"
+inner = 1000
+
+[[case]]
+id = "softmax_8x127"
+operator = "softmax"
+shape = [8, 127]
+dtype = "float32"
+layout = "contiguous"
+inner = 500
+
+[[case]]
+id = "softmax_32x509"
+operator = "softmax"
+shape = [32, 509]
+dtype = "float32"
+layout = "contiguous"
+inner = 200
+
+[[case]]
+id = "softmax_256x1024"
+operator = "softmax"
+shape = [256, 1024]
+dtype = "float32"
+layout = "contiguous"
+inner = 50
+
+[[case]]
+id = "softmax_32x4097"
+operator = "softmax"
+shape = [32, 4097]
+dtype = "float32"
+layout = "contiguous"
+inner = 50

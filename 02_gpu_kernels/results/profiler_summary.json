@@ -1,0 +1,67 @@
+{
+  "vector_add": {
+    "name": "vector_add_1m",
+    "iterations": 20,
+    "device_rows": [
+      {
+        "name": "aten::add",
+        "count": 20,
+        "device_time_total_us": 131.70000000000164,
+        "cpu_time_total_us": 3795.1690000000003,
+        "device_memory_usage_bytes": 83886080
+      },
+      {
+        "name": "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul> >(int, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul>)",
+        "count": 20,
+        "device_time_total_us": 121.75000000000136,
+        "cpu_time_total_us": 0,
+        "device_memory_usage_bytes": 0
+      },
+      {
+        "name": "Activity Buffer Request",
+        "count": 1,
+        "device_time_total_us": 9.950000000000273,
+        "cpu_time_total_us": 3332.1000000000004,
+        "device_memory_usage_bytes": 0
+      }
+    ],
+    "trace": "02_gpu_kernels/results/raw/vector_add_1m_trace.json",
+    "aggregation_note": "Rows come from key_averages and can be nested; summed row time is not GPU wall time."
+  },
+  "matmul": {
+    "name": "matmul_512",
+    "iterations": 20,
+    "device_rows": [
+      {
+        "name": "aten::matmul",
+        "count": 20,
+        "device_time_total_us": 250.1389999999992,
+        "cpu_time_total_us": 3905.470000000001,
+        "device_memory_usage_bytes": 10485760
+      },
+      {
+        "name": "aten::mm",
+        "count": 20,
+        "device_time_total_us": 250.1389999999992,
+        "cpu_time_total_us": 3852.7360000000012,
+        "device_memory_usage_bytes": 10485760
+      },
+      {
+        "name": "void cutlass::Kernel2<cutlass_80_tensorop_f16_s16816gemm_relu_f16_64x64_32x6_nn_align8>(cutlass_80_tensorop_f16_s16816gemm_relu_f16_64x64_32x6_nn_align8::Params)",
+        "count": 20,
+        "device_time_total_us": 231.58899999999903,
+        "cpu_time_total_us": 0,
+        "device_memory_usage_bytes": 0
+      },
+      {
+        "name": "Activity Buffer Request",
+        "count": 1,
+        "device_time_total_us": 18.550000000000182,
+        "cpu_time_total_us": 3161.819,
+        "device_memory_usage_bytes": 0
+      }
+    ],
+    "trace": "02_gpu_kernels/results/raw/matmul_512_trace.json",
+    "aggregation_note": "Rows come from key_averages and can be nested; summed row time is not GPU wall time."
+  }
+}

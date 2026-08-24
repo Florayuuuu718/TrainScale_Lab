@@ -1,0 +1,622 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-24T14:28:47.340408+08:00",
+  "scope": "finite MatMul tile/warp search",
+  "git_commit": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "git_dirty": true,
+  "repository_root": "/home/shunzi/projects/TrainScale_Lab-sm120-validation",
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.11.16",
+    "torch": "2.12.1+cu129",
+    "torch_cuda_runtime": "12.9",
+    "triton": "3.7.1",
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "driver": "610.88"
+  },
+  "protocol": {
+    "search_type": "exhaustive finite teaching search",
+    "process_isolation": "one subprocess per case and candidate",
+    "selection_rule": "lowest steady-state median among correctness-passing candidates",
+    "correctness_reference": "FP32 matmul for PyTorch and every Triton candidate",
+    "samples": 21,
+    "warmup_calls": 10
+  },
+  "cases": {
+    "matmul_512x512x512": {
+      "operator": "matmul",
+      "shape": [
+        512,
+        512,
+        512
+      ],
+      "dtype": "float16",
+      "layout": "contiguous",
+      "inner": 50
+    },
+    "matmul_509x509x509": {
+      "operator": "matmul",
+      "shape": [
+        509,
+        509,
+        509
+      ],
+      "dtype": "float16",
+      "layout": "contiguous",
+      "inner": 50
+    }
+  },
+  "candidates": {
+    "m32_n32_k32_g8_w4": {
+      "block_k": 32,
+      "block_n": 32,
+      "group_m": 8,
+      "block_m": 32,
+      "num_warps": 4
+    },
+    "m64_n32_k32_g8_w4": {
+      "block_k": 32,
+      "block_n": 32,
+      "group_m": 8,
+      "block_m": 64,
+      "num_warps": 4
+    },
+    "m32_n64_k32_g8_w4": {
+      "block_k": 32,
+      "block_n": 64,
+      "group_m": 8,
+      "block_m": 32,
+      "num_warps": 4
+    },
+    "m64_n64_k32_g8_w8": {
+      "block_k": 32,
+      "block_n": 64,
+      "group_m": 8,
+      "block_m": 64,
+      "num_warps": 8
+    }
+  },
+  "results": [
+    {
+      "case_id": "matmul_512x512x512",
+      "implementation": "pytorch",
+      "candidate": null,
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 242.6815249999663,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.03125,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 14.650239944458008,
+          "p10": 13.709440231323242,
+          "p90": 16.762239933013916
+        }
+      },
+      "metrics": {
+        "flops": 268435456,
+        "tflops": 18.322939215855342
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "matmul_512x512x512",
+      "implementation": "m32_n32_k32_g8_w4",
+      "candidate": {
+        "block_n": 32,
+        "num_warps": 4,
+        "block_m": 32,
+        "block_k": 32,
+        "group_m": 8
+      },
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 928.8732450000339,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.03125,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 26.881279945373535,
+          "p10": 26.24000072479248,
+          "p90": 28.4006404876709
+        }
+      },
+      "metrics": {
+        "flops": 268435456,
+        "tflops": 9.985962593503652
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpsxcb38ku/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpsxcb38ku/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "matmul_512x512x512",
+      "implementation": "m64_n32_k32_g8_w4",
+      "candidate": {
+        "group_m": 8,
+        "block_m": 64,
+        "num_warps": 4,
+        "block_n": 32,
+        "block_k": 32
+      },
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 871.6937720000146,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.03125,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 23.047680854797363,
+          "p10": 21.825919151306152,
+          "p90": 25.02847909927368
+        }
+      },
+      "metrics": {
+        "flops": 268435456,
+        "tflops": 11.646961691771487
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpe6rytylh/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpe6rytylh/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "matmul_512x512x512",
+      "implementation": "m32_n64_k32_g8_w4",
+      "candidate": {
+        "group_m": 8,
+        "block_m": 32,
+        "block_k": 32,
+        "num_warps": 4,
+        "block_n": 64
+      },
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 914.1935860000103,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.03125,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 24.262399673461914,
+          "p10": 21.8886399269104,
+          "p90": 39.78816032409668
+        }
+      },
+      "metrics": {
+        "flops": 268435456,
+        "tflops": 11.063846099840376
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpco4knufv/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpco4knufv/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "matmul_512x512x512",
+      "implementation": "m64_n64_k32_g8_w8",
+      "candidate": {
+        "group_m": 8,
+        "block_n": 64,
+        "block_k": 32,
+        "num_warps": 8,
+        "block_m": 64
+      },
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          512,
+          512,
+          512
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 888.27426499995,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.03125,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 22.49727964401245,
+          "p10": 21.14367961883545,
+          "p90": 24.325120449066162
+        }
+      },
+      "metrics": {
+        "flops": 268435456,
+        "tflops": 11.93190733491384
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpwdp50y_f/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpwdp50y_f/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "matmul_509x509x509",
+      "implementation": "pytorch",
+      "candidate": null,
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          509,
+          509,
+          509
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 135.9718009999824,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.0695343017578125,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 31.89824104309082,
+          "p10": 27.334399223327637,
+          "p90": 37.15264081954956
+        }
+      },
+      "metrics": {
+        "flops": 263744458,
+        "tflops": 8.268307260068411
+      },
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "case_id": "matmul_509x509x509",
+      "implementation": "m32_n32_k32_g8_w4",
+      "candidate": {
+        "num_warps": 4,
+        "block_m": 32,
+        "block_k": 32,
+        "group_m": 8,
+        "block_n": 32
+      },
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          509,
+          509,
+          509
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 843.1850650000001,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.03116607666015625,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 30.047359466552734,
+          "p10": 27.662079334259033,
+          "p90": 31.821439266204834
+        }
+      },
+      "metrics": {
+        "flops": 263744458,
+        "tflops": 8.77762514518414
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpaby2x1v3/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpaby2x1v3/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "matmul_509x509x509",
+      "implementation": "m64_n32_k32_g8_w4",
+      "candidate": {
+        "block_k": 32,
+        "group_m": 8,
+        "block_m": 64,
+        "num_warps": 4,
+        "block_n": 32
+      },
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          509,
+          509,
+          509
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 898.271101999967,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.03116607666015625,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 26.37631893157959,
+          "p10": 25.855998992919922,
+          "p90": 28.064639568328857
+        }
+      },
+      "metrics": {
+        "flops": 263744458,
+        "tflops": 9.999289843444625
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpb18p7rm2/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpb18p7rm2/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "matmul_509x509x509",
+      "implementation": "m32_n64_k32_g8_w4",
+      "candidate": {
+        "block_k": 32,
+        "group_m": 8,
+        "block_m": 32,
+        "block_n": 64,
+        "num_warps": 4
+      },
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          509,
+          509,
+          509
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 881.5648010000245,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.03116607666015625,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 25.267839431762695,
+          "p10": 24.064640998840332,
+          "p90": 28.36479902267456
+        }
+      },
+      "metrics": {
+        "flops": 263744458,
+        "tflops": 10.437950530446326
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmpf5enrppm/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmpf5enrppm/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    },
+    {
+      "case_id": "matmul_509x509x509",
+      "implementation": "m64_n64_k32_g8_w8",
+      "candidate": {
+        "block_k": 32,
+        "block_m": 64,
+        "block_n": 64,
+        "num_warps": 8,
+        "group_m": 8
+      },
+      "status": "success",
+      "case": {
+        "operator": "matmul",
+        "shape": [
+          509,
+          509,
+          509
+        ],
+        "dtype": "float16",
+        "layout": "contiguous",
+        "inner": 50
+      },
+      "cold_start_ms": 835.453503999986,
+      "correctness": {
+        "status": "passed",
+        "atol": 0.025,
+        "rtol": 0.02,
+        "max_absolute_error": 0.03116607666015625,
+        "reference": "fp32_matmul"
+      },
+      "steady_state": {
+        "timer": "torch.cuda.Event",
+        "inner_iterations": 50,
+        "samples": 21,
+        "warmup_calls": 10,
+        "latency_us": {
+          "median": 25.606400966644287,
+          "p10": 24.403200149536133,
+          "p90": 28.840320110321045
+        }
+      },
+      "metrics": {
+        "flops": 263744458,
+        "tflops": 10.299942516074864
+      },
+      "returncode": 0,
+      "stderr": "In file included from /home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/Python.h:12,\n                 from /tmp/tmp4ttee4v1/cuda_utils.c:9:\n/home/shunzi/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/include/python3.11/pyconfig.h:1796:9: warning: \u2018_POSIX_C_SOURCE\u2019 redefined\n 1796 | #define _POSIX_C_SOURCE 200809L\n      |         ^~~~~~~~~~~~~~~\nIn file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,\n                 from /usr/include/stdlib.h:26,\n                 from /home/shunzi/projects/TrainScale_Lab/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,\n                 from /tmp/tmp4ttee4v1/cuda_utils.c:1:\n/usr/include/features.h:319:10: note: this is the location of the previous definition\n  319 | # define _POSIX_C_SOURCE        202405L\n      |          ^~~~~~~~~~~~~~~\n"
+    }
+  ],
+  "selections": [
+    {
+      "case_id": "matmul_512x512x512",
+      "status": "success",
+      "selected_candidate": "m64_n64_k32_g8_w8",
+      "selected_config": {
+        "group_m": 8,
+        "block_n": 64,
+        "block_k": 32,
+        "num_warps": 8,
+        "block_m": 64
+      },
+      "selected_median_us": 22.49727964401245,
+      "pytorch_median_us": 14.650239944458008,
+      "selected_speedup_over_pytorch": 0.6512005085182422,
+      "candidate_ranking": [
+        {
+          "candidate": "m64_n64_k32_g8_w8",
+          "median_us": 22.49727964401245
+        },
+        {
+          "candidate": "m64_n32_k32_g8_w4",
+          "median_us": 23.047680854797363
+        },
+        {
+          "candidate": "m32_n64_k32_g8_w4",
+          "median_us": 24.262399673461914
+        },
+        {
+          "candidate": "m32_n32_k32_g8_w4",
+          "median_us": 26.881279945373535
+        }
+      ]
+    },
+    {
+      "case_id": "matmul_509x509x509",
+      "status": "success",
+      "selected_candidate": "m32_n64_k32_g8_w4",
+      "selected_config": {
+        "block_k": 32,
+        "group_m": 8,
+        "block_m": 32,
+        "block_n": 64,
+        "num_warps": 4
+      },
+      "selected_median_us": 25.267839431762695,
+      "pytorch_median_us": 31.89824104309082,
+      "selected_speedup_over_pytorch": 1.2624047706664403,
+      "candidate_ranking": [
+        {
+          "candidate": "m32_n64_k32_g8_w4",
+          "median_us": 25.267839431762695
+        },
+        {
+          "candidate": "m64_n64_k32_g8_w8",
+          "median_us": 25.606400966644287
+        },
+        {
+          "candidate": "m64_n32_k32_g8_w4",
+          "median_us": 26.37631893157959
+        },
+        {
+          "candidate": "m32_n32_k32_g8_w4",
+          "median_us": 30.047359466552734
+        }
+      ]
+    }
+  ],
+  "all_candidates_passed": true
+}

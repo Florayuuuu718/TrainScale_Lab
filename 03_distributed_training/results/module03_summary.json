@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-24T16:03:00.998946+08:00",
+  "scope": "Module 03 local acceptance with explicit multi-GPU hardware boundary",
+  "gates": {
+    "environment_sm120.json": true,
+    "gloo_semantics_cpu.json": true,
+    "sampler_sharding_cpu.json": true,
+    "gradient_equivalence_cpu.json": true,
+    "checkpoint_resume_cpu.json": true,
+    "scaling_cpu.json": true,
+    "scaling_nccl_sm120.json": true,
+    "ddp_profile_cpu.json": true
+  },
+  "all_executable_gates_passed": true,
+  "source_artifacts": {
+    "environment_sm120.json": {
+      "sha256": "2d94c2036071aefbaac89fcd4476a68289bea01d596f0877e5636e5502f50453",
+      "scope": "environment"
+    },
+    "gloo_semantics_cpu.json": {
+      "sha256": "3dcd780d361a06db5e94754710a6a921d12f1772da14c7c0b6d01a6ba47e0b20",
+      "scope": "semantics"
+    },
+    "sampler_sharding_cpu.json": {
+      "sha256": "00fb309bbded326c74e7a9b263c9035c1498f2d03d8bf7ddbf5d9051cf2516ba",
+      "scope": "sampler"
+    },
+    "gradient_equivalence_cpu.json": {
+      "sha256": "013840a1b556e27d6acefbc82c90d2fe15ecff98efce0abbc7b13de6ec1f7906",
+      "scope": "gradient"
+    },
+    "checkpoint_resume_cpu.json": {
+      "sha256": "a0fb117a763e5b41eea6d4fb220d48841823886aef1a1c46e95e436fab4e4d7b",
+      "scope": "checkpoint"
+    },
+    "scaling_cpu.json": {
+      "sha256": "e34c3f1ebe46595f6dd9053432900bea6c3d3a0e36f31caae906a449c1b42474",
+      "scope": "cpu/gloo DDP strong and weak scaling"
+    },
+    "scaling_nccl_sm120.json": {
+      "sha256": "994811b62ab1ab048a5afbe2f662fdc7175ca46d8ce54a871cb4cd9b9386bd03",
+      "scope": "cuda/nccl DDP strong and weak scaling"
+    },
+    "ddp_profile_cpu.json": {
+      "sha256": "daf7933e6cef365fdde45824778d28d4492f65699ba5b96dcdd2ba3003f5db15",
+      "scope": "CPU/Gloo DDP communication profile"
+    }
+  },
+  "boundary": "This machine has one GPU. 2/4/8-GPU records are unavailable, not zero-throughput measurements; CPU/Gloo results teach semantics and host contention."
+}

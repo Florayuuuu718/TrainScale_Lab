@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "accepted_at": "2026-08-24",
+  "status": "passed_with_multi_gpu_hardware_boundary",
+  "scope": "Module 03 local release acceptance on Windows and WSL2",
+  "windows_git_head": "a3cb2599be710cbefcc0d367955d0b7df8fe7eb1",
+  "formal_run_parent_commit": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "worktree_note": "Module 03 was uncommitted during formal runs; every formal source is content-addressed by module03_summary.json.",
+  "windows_validation": {
+    "ruff": "passed",
+    "mypy": {
+      "status": "passed",
+      "configured_source_files": 15
+    },
+    "pytest": {
+      "status": "passed",
+      "passed": 35,
+      "skipped": 2,
+      "skip_reasons": [
+        "Triton GPU tests run in WSL",
+        "Module 03 real torchrun integration runs on Linux"
+      ]
+    }
+  },
+  "wsl_validation": {
+    "module03_pytest": {
+      "status": "passed",
+      "passed": 10,
+      "includes_two_rank_gloo_integration": true
+    },
+    "gpu_smoke": {
+      "status": "passed",
+      "backend": "nccl",
+      "successful_world_sizes": [1],
+      "unavailable_world_sizes": [2],
+      "reason": "one visible GPU"
+    }
+  },
+  "formal_results": {
+    "summary": "03_distributed_training/results/module03_summary.json",
+    "summary_sha256": "f4afc6c0578013329ee0c05edc6d7d97f54fdcf5b393488e6ffa266526ff153e",
+    "all_executable_gates_passed": true,
+    "cpu_scaling_successful_cases": 6,
+    "nccl_successful_cases": 2,
+    "nccl_unavailable_cases": 6,
+    "profiled_ranks": 2
+  },
+  "boundary": "This acceptance proves the one-host teaching path and one-GPU NCCL baseline. It does not claim measured 2/4/8-GPU scaling."
+}

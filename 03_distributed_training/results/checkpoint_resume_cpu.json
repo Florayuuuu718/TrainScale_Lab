@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-24T16:01:21.491214+08:00",
+  "scope": "checkpoint",
+  "git_commit": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "git_dirty": true,
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.11.16",
+    "torch": "2.12.1+cu129",
+    "gloo_available": true,
+    "cpu_count": 16
+  },
+  "config": {
+    "seed": 20260824,
+    "dataset_size": 256,
+    "input_dim": 16,
+    "hidden_dim": 32,
+    "num_classes": 4,
+    "global_batch_size": 64,
+    "epochs": 4,
+    "learning_rate": 0.1
+  },
+  "result": {
+    "status": "success",
+    "world_size": 2,
+    "continuous_vs_resumed_parameter_max_error": 0.0,
+    "rank_parameter_max_difference": 0.0,
+    "checkpoint_writer_counts": {
+      "continuous": 1,
+      "partial": 1,
+      "resumed": 1
+    },
+    "continuous_history": [
+      {
+        "epoch": 0,
+        "global_mean_loss": 1.4240591526031494
+      },
+      {
+        "epoch": 1,
+        "global_mean_loss": 1.3818228244781494
+      },
+      {
+        "epoch": 2,
+        "global_mean_loss": 1.3427610397338867
+      },
+      {
+        "epoch": 3,
+        "global_mean_loss": 1.307046890258789
+      }
+    ],
+    "partial_history": [
+      {
+        "epoch": 0,
+        "global_mean_loss": 1.4240591526031494
+      },
+      {
+        "epoch": 1,
+        "global_mean_loss": 1.3818228244781494
+      }
+    ],
+    "resumed_history": [
+      {
+        "epoch": 2,
+        "global_mean_loss": 1.3427610397338867
+      },
+      {
+        "epoch": 3,
+        "global_mean_loss": 1.307046890258789
+      }
+    ],
+    "resume_start_epoch": 2
+  },
+  "all_checks_passed": true
+}

@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-24T16:02:29.620193+08:00",
+  "scope": "CPU/Gloo DDP communication profile",
+  "git_commit": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "git_dirty": true,
+  "world_size": 2,
+  "profile_steps": 5,
+  "ranks": [
+    {
+      "rank": 0,
+      "world_size": 2,
+      "profile_steps": 5,
+      "distributed_rows": [
+        {
+          "name": "gloo:all_reduce",
+          "count": 5,
+          "cpu_time_total_us": 2863.3599999999997
+        },
+        {
+          "name": "DistributedDataParallel.forward",
+          "count": 5,
+          "cpu_time_total_us": 1057.3639999999996
+        },
+        {
+          "name": "c10d::allreduce_",
+          "count": 5,
+          "cpu_time_total_us": 294.06799999999885
+        },
+        {
+          "name": "torch::distributed::reducer::mul_out",
+          "count": 20,
+          "cpu_time_total_us": 216.64199999999732
+        },
+        {
+          "name": "torch.distributed.ddp.reducer::copy_bucket_to_grad",
+          "count": 20,
+          "cpu_time_total_us": 104.77700000000004
+        }
+      ],
+      "trace": "/home/shunzi/projects/TrainScale_Lab-sm120-validation/03_distributed_training/results/raw/ddp_profile_cpu/rank_0_trace.json",
+      "status": "success",
+      "worker_mode": "profile",
+      "mode": "profile"
+    },
+    {
+      "rank": 1,
+      "world_size": 2,
+      "profile_steps": 5,
+      "distributed_rows": [
+        {
+          "name": "gloo:all_reduce",
+          "count": 5,
+          "cpu_time_total_us": 3159.883
+        },
+        {
+          "name": "DistributedDataParallel.forward",
+          "count": 5,
+          "cpu_time_total_us": 973.717
+        },
+        {
+          "name": "c10d::allreduce_",
+          "count": 5,
+          "cpu_time_total_us": 335.3159999999989
+        },
+        {
+          "name": "torch::distributed::reducer::mul_out",
+          "count": 20,
+          "cpu_time_total_us": 246.79999999999995
+        },
+        {
+          "name": "torch.distributed.ddp.reducer::copy_bucket_to_grad",
+          "count": 20,
+          "cpu_time_total_us": 87.36299999999937
+        }
+      ],
+      "trace": "/home/shunzi/projects/TrainScale_Lab-sm120-validation/03_distributed_training/results/raw/ddp_profile_cpu/rank_1_trace.json",
+      "status": "success",
+      "worker_mode": "profile",
+      "mode": "profile"
+    }
+  ],
+  "all_checks_passed": true,
+  "aggregation_note": "Profiler key_averages rows can be nested; do not sum them as wall time."
+}

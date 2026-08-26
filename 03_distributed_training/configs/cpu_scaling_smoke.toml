@@ -1,0 +1,15 @@
+[benchmark]
+device = "cpu"
+backend = "gloo"
+world_sizes = [1, 2]
+modes = ["strong", "weak"]
+seed = 20260824
+input_dim = 64
+hidden_dim = 128
+num_classes = 16
+global_batch_size = 64
+per_rank_batch_size = 32
+warmup_steps = 1
+measured_steps = 3
+learning_rate = 0.01
+

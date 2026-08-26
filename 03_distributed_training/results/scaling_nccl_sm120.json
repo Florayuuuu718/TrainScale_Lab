@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-24T16:02:24.200066+08:00",
+  "scope": "cuda/nccl DDP strong and weak scaling",
+  "git_commit": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "git_dirty": true,
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.11.16",
+    "torch": "2.12.1+cu129",
+    "torch_cuda_runtime": "12.9",
+    "cuda_device_count": 1,
+    "gpu_names": [
+      "NVIDIA GeForce RTX 5060 Laptop GPU"
+    ]
+  },
+  "config": {
+    "device": "cuda",
+    "backend": "nccl",
+    "world_sizes": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "modes": [
+      "strong",
+      "weak"
+    ],
+    "seed": 20260824,
+    "input_dim": 1024,
+    "hidden_dim": 2048,
+    "num_classes": 256,
+    "global_batch_size": 256,
+    "per_rank_batch_size": 128,
+    "warmup_steps": 5,
+    "measured_steps": 20,
+    "learning_rate": 0.01
+  },
+  "records": [
+    {
+      "world_size": 1,
+      "mode": "strong",
+      "backend": "nccl",
+      "device": "cuda",
+      "local_batch_size": 256,
+      "global_batch_size": 256,
+      "warmup_steps": 5,
+      "measured_steps": 20,
+      "max_rank_elapsed_seconds": 0.029814762994647026,
+      "global_samples_per_second": 171727.00654770425,
+      "peak_memory_allocated_bytes": 112237568,
+      "status": "success",
+      "worker_mode": "benchmark",
+      "speedup_over_1": 1.0,
+      "scaling_efficiency": 1.0
+    },
+    {
+      "status": "unavailable",
+      "mode": "strong",
+      "world_size": 2,
+      "required_cuda_devices": 2,
+      "available_cuda_devices": 1,
+      "reason": "torchrun GPU jobs require one visible GPU per local process"
+    },
+    {
+      "status": "unavailable",
+      "mode": "strong",
+      "world_size": 4,
+      "required_cuda_devices": 4,
+      "available_cuda_devices": 1,
+      "reason": "torchrun GPU jobs require one visible GPU per local process"
+    },
+    {
+      "status": "unavailable",
+      "mode": "strong",
+      "world_size": 8,
+      "required_cuda_devices": 8,
+      "available_cuda_devices": 1,
+      "reason": "torchrun GPU jobs require one visible GPU per local process"
+    },
+    {
+      "world_size": 1,
+      "mode": "weak",
+      "backend": "nccl",
+      "device": "cuda",
+      "local_batch_size": 128,
+      "global_batch_size": 128,
+      "warmup_steps": 5,
+      "measured_steps": 20,
+      "max_rank_elapsed_seconds": 0.02170293591916561,
+      "global_samples_per_second": 117956.39122443768,
+      "peak_memory_allocated_bytes": 110663680,
+      "status": "success",
+      "worker_mode": "benchmark",
+      "speedup_over_1": 1.0,
+      "scaling_efficiency": 1.0
+    },
+    {
+      "status": "unavailable",
+      "mode": "weak",
+      "world_size": 2,
+      "required_cuda_devices": 2,
+      "available_cuda_devices": 1,
+      "reason": "torchrun GPU jobs require one visible GPU per local process"
+    },
+    {
+      "status": "unavailable",
+      "mode": "weak",
+      "world_size": 4,
+      "required_cuda_devices": 4,
+      "available_cuda_devices": 1,
+      "reason": "torchrun GPU jobs require one visible GPU per local process"
+    },
+    {
+      "status": "unavailable",
+      "mode": "weak",
+      "world_size": 8,
+      "required_cuda_devices": 8,
+      "available_cuda_devices": 1,
+      "reason": "torchrun GPU jobs require one visible GPU per local process"
+    }
+  ],
+  "all_executable_cases_passed": true,
+  "unavailable_case_count": 6,
+  "boundary": "CPU ranks share one host and are a semantics/overhead experiment, not a GPU scaling proxy. Unavailable CUDA world sizes contain no fabricated throughput."
+}

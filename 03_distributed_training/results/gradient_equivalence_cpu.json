@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-24T16:01:06.309685+08:00",
+  "scope": "gradient",
+  "git_commit": "a37e6df674c21cf47c9de1acd09d4d6a5017c0dc",
+  "git_dirty": true,
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.11.16",
+    "torch": "2.12.1+cu129",
+    "gloo_available": true,
+    "cpu_count": 16
+  },
+  "config": {
+    "seed": 20260824,
+    "dataset_size": 256,
+    "input_dim": 16,
+    "hidden_dim": 32,
+    "num_classes": 4,
+    "global_batch_size": 64,
+    "epochs": 4,
+    "learning_rate": 0.1
+  },
+  "result": {
+    "status": "success",
+    "world_size": 4,
+    "rank_parameter_max_difference": 0.0,
+    "gradient_max_error_vs_global_batch": 1.1175870895385742e-08,
+    "parameter_max_error_vs_global_batch": 1.4901161193847656e-08,
+    "ranks": [
+      {
+        "rank": 0,
+        "world_size": 4,
+        "local_batch_size": 16,
+        "local_loss": 1.5206208229064941,
+        "gradient_max_error_vs_global_batch": 1.1175870895385742e-08,
+        "parameter_max_error_vs_global_batch": 1.4901161193847656e-08,
+        "status": "success",
+        "worker_mode": "gradient",
+        "mode": "gradient"
+      },
+      {
+        "rank": 1,
+        "world_size": 4,
+        "local_batch_size": 16,
+        "local_loss": 1.367209792137146,
+        "gradient_max_error_vs_global_batch": null,
+        "parameter_max_error_vs_global_batch": null,
+        "status": "success",
+        "worker_mode": "gradient",
+        "mode": "gradient"
+      },
+      {
+        "rank": 2,
+        "world_size": 4,
+        "local_batch_size": 16,
+        "local_loss": 1.4205037355422974,
+        "gradient_max_error_vs_global_batch": null,
+        "parameter_max_error_vs_global_batch": null,
+        "status": "success",
+        "worker_mode": "gradient",
+        "mode": "gradient"
+      },
+      {
+        "rank": 3,
+        "world_size": 4,
+        "local_batch_size": 16,
+        "local_loss": 1.5400724411010742,
+        "gradient_max_error_vs_global_batch": null,
+        "parameter_max_error_vs_global_batch": null,
+        "status": "success",
+        "worker_mode": "gradient",
+        "mode": "gradient"
+      }
+    ],
+    "launcher": {
+      "command": [
+        "/home/shunzi/projects/TrainScale_Lab/.venv/bin/python",
+        "-m",
+        "torch.distributed.run",
+        "--standalone",
+        "--nnodes=1",
+        "--nproc-per-node=4",
+        "/home/shunzi/projects/TrainScale_Lab-sm120-validation/03_distributed_training/trainscale_distributed/worker.py",
+        "--rank-directory",
+        "/tmp/trainscale-03-gradient-iz6rgq5a/gradient",
+        "--mode",
+        "gradient",
+        "--backend",
+        "gloo",
+        "--device",
+        "cpu",
+        "--seed",
+        "20260824",
+        "--dataset-size",
+        "256",
+        "--input-dim",
+        "16",
+        "--hidden-dim",
+        "32",
+        "--num-classes",
+        "4",
+        "--global-batch-size",
+        "64",
+        "--learning-rate",
+        "0.1"
+      ],
+      "returncode": 0,
+      "stderr_tail": "\n*****************************************\nSetting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. \n*****************************************\n"
+    }
+  },
+  "all_checks_passed": true
+}

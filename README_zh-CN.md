@@ -14,6 +14,7 @@ TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Tr
 |---|---|
 | [01 · PyTorch Training](01_pytorch_training/README.md) | 01 模块完整教学与复现顺序 |
 | [02 · GPU Kernels](02_gpu_kernels/README.md) | 可运行 Triton 算子、验收清单与九项实验报告 |
+| [03 · Distributed Training](03_distributed_training/README.md) | 可运行 Gloo/DDP 教程、scaling 契约与七项实验报告 |
 | [训练源码](01_pytorch_training/trainscale_training) | 数据、模型、引擎、checkpoint、benchmark 与 profiler |
 | [实验配置](01_pytorch_training/configs/README.md) | TOML 实验配方 |
 | [正确性测试](01_pytorch_training/tests/README.md) | 10 个测试的逐项解释 |
@@ -55,6 +56,8 @@ uv sync --extra cpu --extra dev
 
 02 默认继续使用仓库根 `.venv`，大型实验前先运行[崩溃隔离环境探针](02_gpu_kernels/ENVIRONMENT.md)。若 Triton 失败，先更新 Windows NVIDIA 驱动并重启 WSL；同一探针仍失败时，才建立文档中的仓库外 cu130 nightly 诊断环境。系统 CUDA Toolkit 只在 CUDA C++ 章节需要，PyTorch/Triton 主线不要求预装。
 
+03 的本机可执行路线也已完成：2/4 rank CPU/Gloo 语义、分片、梯度等价、checkpoint/resume、scaling 和 Profiler 全部通过，同一张 RTX 5060 上的单 GPU NCCL/DDP 基线也已运行。由于本机只有一张 GPU，2/4/8 GPU case 被诚实记录为 `unavailable`，没有伪造测量值；冻结配置可直接带到真实多 GPU 机器继续采集。
+
 ## 你会学到什么
 
 完成主线后，你将能够：
@@ -91,7 +94,7 @@ FSDP2 / Tensor Parallel
 |---|---|---|---|
 | [01](01_pytorch_training/README.md) | PyTorch 单卡训练框架 | 一次可靠训练需要哪些系统组件？ | loss/accuracy、吞吐、显存、断点恢复一致性 |
 | [02](02_gpu_kernels/README.md) | GPU Kernel Lab | 算子为什么快或慢？ | 正确性、延迟、带宽/TFLOPS、profiler 证据 |
-| 03 | Distributed Training Lab | 多 GPU 为什么不能线性加速？ | 1/2/4/8 GPU scaling 曲线 |
+| [03](03_distributed_training/README.md) | Distributed Training Lab | 分布式训练为什么不能线性加速？ | DDP 正确性、CPU scaling、单 GPU NCCL 与多 GPU硬件边界 |
 | 04 | NCCL Performance Lab | 通信何时受延迟或带宽限制？ | message size–bandwidth 曲线 |
 | 05 | TinyCollective | AllReduce 内部究竟发生了什么？ | Naive/Ring/NCCL 对照实验 |
 | 06 | Mini Training Engine | 如何隐藏通信并控制显存？ | 消融实验、timeline、吞吐提升 |
@@ -99,7 +102,7 @@ FSDP2 / Tensor Parallel
 
 ## 仓库结构
 
-七个模块目录均已建立；01 与 02 已封存。各后续目录的 README 明确记录范围和当前状态。
+七个模块目录均已建立；01 与 02 已封存，03 的本机可执行路线已完成并明确保留多 GPU 硬件边界。各后续目录的 README 明确记录范围和当前状态。
 
 ```text
 trainscale-lab/

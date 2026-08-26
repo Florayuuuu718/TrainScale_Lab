@@ -8,7 +8,8 @@
 |---|---|---|
 | 01 | 仓库基建、可复现的单卡训练、恢复与性能实验 | 已封存：本地完整验收通过 |
 | [02](../02_gpu_kernels/README.md) | CUDA/Triton 自定义算子 | 已封存：CUDA/Triton、前反向、Profiler 与发布验收通过 |
-| 03–07 | 分布式训练、collective、训练引擎与组合并行 | 尚未开始 |
+| [03](../03_distributed_training/README.md) | DDP、数据分片、checkpoint 与 scaling | 本机可执行路线完成；2/4/8 GPU 实测待多 GPU硬件 |
+| 04–07 | collective、训练引擎与组合并行 | 尚未开始 |
 
 01 不追求真实数据集的最高准确率。我们用 synthetic 隔离验证数学链路，再用 CIFAR-10 子集验证真实图像管道和 CNN，并对 checkpoint、AMP、累积、workers、compile 与 Profiler 给出实测证据。
 
@@ -27,6 +28,8 @@
 9. [02 环境指南](../02_gpu_kernels/ENVIRONMENT.md)：先跑环境探针；默认只用 stable 根环境，失败才进入隔离兜底。
 10. [02 · GPU Kernels](../02_gpu_kernels/README.md)：读范围和 benchmark 契约，再按实验顺序复现。
 11. [02 验收清单](02-issues.md)：查看进入 03 前必须关闭的 12 项工作。
+12. [03 · Distributed Training](../03_distributed_training/README.md)：从两 rank Gloo 开始，再进入 NCCL/scaling。
+13. [03 验收清单](03-issues.md)：区分本机已完成项与多 GPU 硬件扩展。
 
 ## 文档类型
 
@@ -37,11 +40,12 @@
 | `docs/experiments/` | 已冻结实验的过程与实测结果 | 学会提出假设、控制变量和解释结果 |
 | `01_pytorch_training/` | 01 模块入口、配置、测试和实验导航 | 把概念映射到代码与命令 |
 | `02_gpu_kernels/` | 02 环境、实现、测试、benchmark 与实测报告 | 把算子机制映射到正确性与性能证据 |
-| `03_distributed_training/`–`07_parallelism/` | 后续模块边界与状态 | 保持 01–07 单一导航 |
+| `03_distributed_training/` | DDP 源码、配置、测试、实验与结果 | 把多进程语义映射到正确性和 scaling 证据 |
+| `04_nccl_benchmark/`–`07_parallelism/` | 后续模块边界与状态 | 保持 01–07 单一导航 |
 
 ## 阅读约定
 
 - 命令默认从仓库根目录执行，Windows 使用 PowerShell。
 - “预期输出”用于判断流程是否正确，数值可能因硬件和随机种子不同略有变化。
 - `01_pytorch_training/results/` 的小型摘要和图表进入 Git；其 `raw/`、`data/` 和 `.venv/` 不提交。
-- 02 的本机实测、历史失败和跨机器限制分开标注；03–07 不会伪装成可运行功能。
+- 02/03 的本机实测、历史失败和硬件限制分开标注；04–07 不会伪装成可运行功能。

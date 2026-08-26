@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-24T16:02:30.776526+08:00",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "python": "3.11.16",
+  "torch": "2.12.1+cu129",
+  "torch_cuda_runtime": "12.9",
+  "distributed_available": true,
+  "gloo_available": true,
+  "nccl_available": true,
+  "cuda_available": true,
+  "cuda_device_count": 1,
+  "gpu_names": [
+    "NVIDIA GeForce RTX 5060 Laptop GPU"
+  ],
+  "driver": "610.88"
+}

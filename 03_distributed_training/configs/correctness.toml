@@ -1,0 +1,10 @@
+[experiment]
+seed = 20260824
+dataset_size = 256
+input_dim = 16
+hidden_dim = 32
+num_classes = 4
+global_batch_size = 64
+epochs = 4
+learning_rate = 0.1
+

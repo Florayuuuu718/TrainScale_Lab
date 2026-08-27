@@ -13,8 +13,9 @@ from pathlib import Path
 MODULE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(MODULE_ROOT))
 
-from benchmarks.launcher import launch  # noqa: E402
 from trainscale_distributed.contract import load_correctness_config  # noqa: E402
+
+from benchmarks.launcher import launch  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:
@@ -94,4 +95,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

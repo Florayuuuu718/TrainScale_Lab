@@ -15,11 +15,12 @@ from typing import Any
 MODULE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(MODULE_ROOT))
 
-from benchmarks.launcher import launch  # noqa: E402
 from trainscale_distributed.contract import (  # noqa: E402
     add_scaling_metrics,
     load_benchmark_config,
 )
+
+from benchmarks.launcher import launch  # noqa: E402
 
 
 def environment_manifest() -> dict[str, Any]:

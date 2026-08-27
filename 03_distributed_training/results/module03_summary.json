@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-24T16:03:00.998946+08:00",
-  "scope": "Module 03 local acceptance with explicit multi-GPU hardware boundary",
+  "generated_at": "2026-08-27T11:00:40.237672+08:00",
+  "scope": "Module 03 local correctness plus cloud 1/2/4-GPU acceptance",
   "gates": {
     "environment_sm120.json": true,
     "gloo_semantics_cpu.json": true,
@@ -10,6 +10,7 @@
     "checkpoint_resume_cpu.json": true,
     "scaling_cpu.json": true,
     "scaling_nccl_sm120.json": true,
+    "scaling_nccl_4x4090d.json": true,
     "ddp_profile_cpu.json": true
   },
   "all_executable_gates_passed": true,
@@ -42,10 +43,14 @@
       "sha256": "994811b62ab1ab048a5afbe2f662fdc7175ca46d8ce54a871cb4cd9b9386bd03",
       "scope": "cuda/nccl DDP strong and weak scaling"
     },
+    "scaling_nccl_4x4090d.json": {
+      "sha256": "6c226c8e711c66442c1b33a9bfcfd76145eda2a1552025656534a819fa428615",
+      "scope": "AutoDL single-node 4x RTX 4090 D NCCL strong and weak scaling"
+    },
     "ddp_profile_cpu.json": {
       "sha256": "daf7933e6cef365fdde45824778d28d4492f65699ba5b96dcdd2ba3003f5db15",
       "scope": "CPU/Gloo DDP communication profile"
     }
   },
-  "boundary": "This machine has one GPU. 2/4/8-GPU records are unavailable, not zero-throughput measurements; CPU/Gloo results teach semantics and host contention."
+  "boundary": "Local one-GPU and cloud 1/2/4-GPU results are separate artifacts because their software and hardware differ. Eight-GPU records remain unavailable, not zero throughput measurements."
 }

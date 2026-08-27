@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-27T10:47:07.031444+08:00",
+  "scope": "AutoDL single-node 4x RTX 4090 D NCCL strong and weak scaling",
+  "aggregation": {
+    "method": "median of three independent runs per mode/world-size case",
+    "speedup_note": "speedup and efficiency are recomputed from median throughput",
+    "source_run_count": 3
+  },
+  "source_git_commit": "d2b2882270a7e5ad8de6f666572497d2b3921703",
+  "source_git_dirty": false,
+  "downloaded_archive_sha256": "63b0bb1efc17313cfd9df381afe67281d9daa2eb634a4fe570861ca7f3077e54",
+  "source_artifacts": {
+    "environment.json": {
+      "sha256": "028dc6267c5f52b411e23cf9b02cfc3f84e7d34fcee85cca1e3b6437fcf3ab79",
+      "bytes": 568
+    },
+    "gpu-list.txt": {
+      "sha256": "358f77cabf1c2e996fee903b4e324df90c1c834bf4fd850c68e22b69252f7822",
+      "bytes": 328
+    },
+    "gpu-topology.txt": {
+      "sha256": "d68fbc4b390646f5bc7b25492bc0556aac9b4026bfb11ffda2fbac155b15a905",
+      "bytes": 931
+    },
+    "nvidia-smi.txt": {
+      "sha256": "167fbefa7eac494ad21a38be42c7800264e5b7228e362c611e4aa245468561f9",
+      "bytes": 2793
+    },
+    "gpu_smoke.json": {
+      "sha256": "3db2c6ae7ab784d42adb3e34928d160fab5e7a70a630bb62501b998febda5ba1",
+      "bytes": 3284
+    },
+    "gpu_formal_run1.json": {
+      "sha256": "ef86b6d26ca2fb03316ab2ba1fd4992bba2d54601b6542e9cca968f4f9fb5ccd",
+      "bytes": 4859
+    },
+    "gpu_formal_run2.json": {
+      "sha256": "38f8afea8c036d825c032dd999f0149b73afab0ec108ff52b59f7e14e75ec8eb",
+      "bytes": 4858
+    },
+    "gpu_formal_run3.json": {
+      "sha256": "d39ccae64523318c157b848f054c6412c1d60166eb3da63cc28de7434869895b",
+      "bytes": 4857
+    }
+  },
+  "environment": {
+    "schema_version": 1,
+    "timestamp": "2026-08-26T20:58:50.550272+08:00",
+    "platform": "Linux-5.15.0-94-generic-x86_64-with-glibc2.35",
+    "python": "3.12.3",
+    "torch": "2.8.0+cu128",
+    "torch_cuda_runtime": "12.8",
+    "distributed_available": true,
+    "gloo_available": true,
+    "nccl_available": true,
+    "cuda_available": true,
+    "cuda_device_count": 4,
+    "gpu_names": [
+      "NVIDIA GeForce RTX 4090 D",
+      "NVIDIA GeForce RTX 4090 D",
+      "NVIDIA GeForce RTX 4090 D",
+      "NVIDIA GeForce RTX 4090 D"
+    ],
+    "driver": "580.76.05\n580.76.05\n580.76.05\n580.76.05"
+  },
+  "topology": {
+    "gpu_row_count": 4,
+    "contains_nvlink": false,
+    "contains_cross_numa_sys_path": true,
+    "numa_affinities": [
+      "0",
+      "1"
+    ],
+    "interpretation": "GPU0/1 and GPU2/3 form two NUMA-local pairs; cross-pair paths traverse SYS. No NVLink path was reported."
+  },
+  "config": {
+    "device": "cuda",
+    "backend": "nccl",
+    "world_sizes": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "modes": [
+      "strong",
+      "weak"
+    ],
+    "seed": 20260824,
+    "input_dim": 1024,
+    "hidden_dim": 2048,
+    "num_classes": 256,
+    "global_batch_size": 256,
+    "per_rank_batch_size": 128,
+    "warmup_steps": 5,
+    "measured_steps": 20,
+    "learning_rate": 0.01
+  },
+  "records": [
+    {
+      "mode": "strong",
+      "world_size": 1,
+      "backend": "nccl",
+      "device": "cuda",
+      "local_batch_size": 256,
+      "global_batch_size": 256,
+      "warmup_steps": 5,
+      "measured_steps": 20,
+      "status": "success",
+      "worker_mode": "benchmark",
+      "repeat_count": 3,
+      "global_samples_per_second": 252630.9245693165,
+      "throughput_samples_per_second": [
+        239476.27316742367,
+        277901.19403389475,
+        252630.9245693165
+      ],
+      "throughput_min_samples_per_second": 239476.27316742367,
+      "throughput_max_samples_per_second": 277901.19403389475,
+      "throughput_relative_range": 0.15209903907044484,
+      "max_rank_elapsed_seconds": 0.020266719162464142,
+      "elapsed_samples_seconds": [
+        0.0213799886405468,
+        0.018423814326524734,
+        0.020266719162464142
+      ],
+      "peak_memory_allocated_bytes": 62168576,
+      "peak_memory_samples_bytes": [
+        62168576,
+        62168576,
+        62168576
+      ],
+      "speedup_over_1": 1.0,
+      "scaling_efficiency": 1.0
+    },
+    {
+      "mode": "strong",
+      "world_size": 2,
+      "backend": "nccl",
+      "device": "cuda",
+      "local_batch_size": 128,
+      "global_batch_size": 256,
+      "warmup_steps": 5,
+      "measured_steps": 20,
+      "status": "success",
+      "worker_mode": "benchmark",
+      "repeat_count": 3,
+      "global_samples_per_second": 151684.84526405603,
+      "throughput_samples_per_second": [
+        136756.3750528363,
+        151684.84526405603,
+        152289.19019074633
+      ],
+      "throughput_min_samples_per_second": 136756.3750528363,
+      "throughput_max_samples_per_second": 152289.19019074633,
+      "throughput_relative_range": 0.10240189196798274,
+      "max_rank_elapsed_seconds": 0.033754196017980576,
+      "elapsed_samples_seconds": [
+        0.03743883967399597,
+        0.033754196017980576,
+        0.03362024575471878
+      ],
+      "peak_memory_allocated_bytes": 60594688,
+      "peak_memory_samples_bytes": [
+        60594688,
+        60594688,
+        60594688
+      ],
+      "speedup_over_1": 0.6004207344079009,
+      "scaling_efficiency": 0.30021036720395045
+    },
+    {
+      "mode": "strong",
+      "world_size": 4,
+      "backend": "nccl",
+      "device": "cuda",
+      "local_batch_size": 64,
+      "global_batch_size": 256,
+      "warmup_steps": 5,
+      "measured_steps": 20,
+      "status": "success",
+      "worker_mode": "benchmark",
+      "repeat_count": 3,
+      "global_samples_per_second": 128908.26834283708,
+      "throughput_samples_per_second": [
+        128605.57656141777,
+        130401.53472693128,
+        128908.26834283708
+      ],
+      "throughput_min_samples_per_second": 128605.57656141777,
+      "throughput_max_samples_per_second": 130401.53472693128,
+      "throughput_relative_range": 0.013932063385857327,
+      "max_rank_elapsed_seconds": 0.03971816599369049,
+      "elapsed_samples_seconds": [
+        0.039811648428440094,
+        0.03926334157586098,
+        0.03971816599369049
+      ],
+      "peak_memory_allocated_bytes": 59807744,
+      "peak_memory_samples_bytes": [
+        49312768,
+        59807744,
+        59807744
+      ],
+      "speedup_over_1": 0.5102632172312199,
+      "scaling_efficiency": 0.12756580430780498
+    },
+    {
+      "status": "unavailable",
+      "mode": "strong",
+      "world_size": 8,
+      "required_cuda_devices": 8,
+      "available_cuda_devices": 4,
+      "reason": "torchrun GPU jobs require one visible GPU per local process",
+      "repeat_count": 3
+    },
+    {
+      "mode": "weak",
+      "world_size": 1,
+      "backend": "nccl",
+      "device": "cuda",
+      "local_batch_size": 128,
+      "global_batch_size": 128,
+      "warmup_steps": 5,
+      "measured_steps": 20,
+      "status": "success",
+      "worker_mode": "benchmark",
+      "repeat_count": 3,
+      "global_samples_per_second": 126560.79962281942,
+      "throughput_samples_per_second": [
+        106325.69475597743,
+        129380.09993144986,
+        126560.79962281942
+      ],
+      "throughput_min_samples_per_second": 106325.69475597743,
+      "throughput_max_samples_per_second": 129380.09993144986,
+      "throughput_relative_range": 0.18216071045837193,
+      "max_rank_elapsed_seconds": 0.020227432250976562,
+      "elapsed_samples_seconds": [
+        0.02407696470618248,
+        0.019786659628152847,
+        0.020227432250976562
+      ],
+      "peak_memory_allocated_bytes": 60594688,
+      "peak_memory_samples_bytes": [
+        60594688,
+        60594688,
+        60594688
+      ],
+      "speedup_over_1": 1.0,
+      "scaling_efficiency": 1.0
+    },
+    {
+      "mode": "weak",
+      "world_size": 2,
+      "backend": "nccl",
+      "device": "cuda",
+      "local_batch_size": 128,
+      "global_batch_size": 256,
+      "warmup_steps": 5,
+      "measured_steps": 20,
+      "status": "success",
+      "worker_mode": "benchmark",
+      "repeat_count": 3,
+      "global_samples_per_second": 145138.21655623167,
+      "throughput_samples_per_second": [
+        145138.21655623167,
+        151214.7203458073,
+        139044.7816553375
+      ],
+      "throughput_min_samples_per_second": 139044.7816553375,
+      "throughput_max_samples_per_second": 151214.7203458073,
+      "throughput_relative_range": 0.08385068370848239,
+      "max_rank_elapsed_seconds": 0.03527671843767166,
+      "elapsed_samples_seconds": [
+        0.03527671843767166,
+        0.03385913744568825,
+        0.036822669208049774
+      ],
+      "peak_memory_allocated_bytes": 60594688,
+      "peak_memory_samples_bytes": [
+        50099712,
+        60594688,
+        60594688
+      ],
+      "speedup_over_1": 1.1467865009448206,
+      "scaling_efficiency": 0.5733932504724103
+    },
+    {
+      "mode": "weak",
+      "world_size": 4,
+      "backend": "nccl",
+      "device": "cuda",
+      "local_batch_size": 128,
+      "global_batch_size": 512,
+      "warmup_steps": 5,
+      "measured_steps": 20,
+      "status": "success",
+      "worker_mode": "benchmark",
+      "repeat_count": 3,
+      "global_samples_per_second": 255353.59649161107,
+      "throughput_samples_per_second": [
+        256193.84364339348,
+        253733.9756460421,
+        255353.59649161107
+      ],
+      "throughput_min_samples_per_second": 253733.9756460421,
+      "throughput_max_samples_per_second": 256193.84364339348,
+      "throughput_relative_range": 0.00963318328446651,
+      "max_rank_elapsed_seconds": 0.04010125622153282,
+      "elapsed_samples_seconds": [
+        0.039969734847545624,
+        0.04035722836852074,
+        0.04010125622153282
+      ],
+      "peak_memory_allocated_bytes": 60594688,
+      "peak_memory_samples_bytes": [
+        60594688,
+        50099712,
+        60594688
+      ],
+      "speedup_over_1": 2.017635770733308,
+      "scaling_efficiency": 0.504408942683327
+    },
+    {
+      "status": "unavailable",
+      "mode": "weak",
+      "world_size": 8,
+      "required_cuda_devices": 8,
+      "available_cuda_devices": 4,
+      "reason": "torchrun GPU jobs require one visible GPU per local process",
+      "repeat_count": 3
+    }
+  ],
+  "successful_case_count": 6,
+  "unavailable_case_count": 2,
+  "all_executable_cases_passed": true,
+  "boundary": "This is a short synthetic-model, single-node scaling experiment. It proves real 1/2/4-GPU NCCL execution, not production-model linear scaling. Eight-GPU cases remain unavailable because the rented instance exposed four GPUs."
+}

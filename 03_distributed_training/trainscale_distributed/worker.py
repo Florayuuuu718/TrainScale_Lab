@@ -72,8 +72,9 @@ def run_semantics(args: argparse.Namespace, device: torch.device) -> dict[str, A
 
 def run_sampler(args: argparse.Namespace, device: torch.device) -> dict[str, Any]:
     del device
-    sampler = DistributedSampler(
-        list(range(args.dataset_size)),
+    dataset = TensorDataset(torch.arange(args.dataset_size))
+    sampler: DistributedSampler[Any] = DistributedSampler(
+        dataset,
         num_replicas=dist.get_world_size(),
         rank=dist.get_rank(),
         shuffle=True,
@@ -161,7 +162,7 @@ def run_train(args: argparse.Namespace, device: torch.device) -> dict[str, Any]:
         args.dataset_size, args.input_dim, args.num_classes, args.seed + 11
     )
     dataset = TensorDataset(features, labels)
-    sampler = DistributedSampler(
+    sampler: DistributedSampler[Any] = DistributedSampler(
         dataset,
         num_replicas=world_size,
         rank=rank,

@@ -14,7 +14,7 @@ TrainScale Lab is a hands-on open-source project for learners interested in **ML
 |---|---|
 | [01 · PyTorch Training](01_pytorch_training/README.md) | Complete module 01 tutorial and reproduction order |
 | [02 · GPU Kernels](02_gpu_kernels/README.md) | Runnable Triton kernels, acceptance checklist, and nine experiment reports |
-| [03 · Distributed Training](03_distributed_training/README.md) | Runnable Gloo/DDP tutorial, scaling protocol, and seven experiment reports |
+| [03 · Distributed Training](03_distributed_training/README.md) | Runnable Gloo/DDP tutorial, cloud 4-GPU protocol, and eight experiment reports |
 | [Source code](01_pytorch_training/trainscale_training) | Data, models, engine, checkpoint, benchmarks, and profiler |
 | [Configurations](01_pytorch_training/configs/README.md) | TOML experiment recipes |
 | [Correctness tests](01_pytorch_training/tests/README.md) | Explanation of all 10 tests |
@@ -56,7 +56,7 @@ Modules 01 and 02 are sealed after local Windows CPU and Ubuntu GPU acceptance. 
 
 For module 02, keep the stable root `.venv` by default and run the [crash-isolated environment probe](02_gpu_kernels/ENVIRONMENT.md) before any large experiment. If Triton fails, update the Windows NVIDIA driver and restart WSL first; only create the documented external cu130 nightly environment if the same probe still fails. A system CUDA Toolkit is required only for the CUDA C++ chapter, not for PyTorch or Triton.
 
-Module 03's locally executable track is also complete: 2/4-rank CPU/Gloo semantics, sharding, gradient equivalence, checkpoint/resume, scaling, and profiling pass, and the one-GPU NCCL/DDP baseline runs on the same RTX 5060. Because this host exposes only one GPU, 2/4/8-GPU cases are archived as `unavailable` rather than fabricated measurements; the same frozen config is ready for a real multi-GPU host.
+Module 03 is complete: local 2/4-rank CPU/Gloo correctness, scaling, profiling, and the one-GPU NCCL baseline pass. The same frozen config was then run three times on an AutoDL single-node 4×RTX 4090D instance. Real 1/2/4-GPU strong/weak results, topology, raw repetitions, median aggregation, download checksum, and the cloud shutdown workflow are archived; only the unmeasured 8-GPU cases remain `unavailable`.
 
 ## What You Will Learn
 
@@ -94,7 +94,7 @@ FSDP2 / Tensor Parallel
 |---|---|---|---|
 | [01](01_pytorch_training/README.md) | Single-GPU PyTorch trainer | What makes a training run reliable? | Loss/accuracy, throughput, memory, resume consistency |
 | [02](02_gpu_kernels/README.md) | GPU Kernel Lab | Why is an operator fast or slow? | Correctness, latency, bandwidth/TFLOPS, profiler evidence |
-| [03](03_distributed_training/README.md) | Distributed Training Lab | Why does distributed training not scale linearly? | DDP correctness, CPU scaling, one-GPU NCCL, explicit multi-GPU boundary |
+| [03](03_distributed_training/README.md) | Distributed Training Lab | Why does distributed training not scale linearly? | DDP correctness, CPU scaling, local NCCL, real cloud 1/2/4-GPU evidence |
 | 04 | NCCL Performance Lab | When is communication latency- or bandwidth-bound? | Message-size–bandwidth curves |
 | 05 | TinyCollective | What actually happens inside AllReduce? | Naive/Ring/NCCL comparison |
 | 06 | Mini Training Engine | How can communication be hidden and memory controlled? | Ablations, timelines, throughput improvements |
@@ -102,7 +102,7 @@ FSDP2 / Tensor Parallel
 
 ## Repository Layout
 
-All seven module directories now exist. Modules 01 and 02 are sealed, and module 03's locally executable track is complete with an explicit multi-GPU hardware boundary. Each later directory has a README that states its scope and current status.
+All seven module directories now exist. Modules 01–03 are sealed; module 03 includes both local correctness and real cloud 1/2/4-GPU scaling, with 8 GPUs retained as an explicit optional boundary. Each later directory has a README that states its scope and current status.
 
 ```text
 trainscale-lab/

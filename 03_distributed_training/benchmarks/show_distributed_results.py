@@ -81,10 +81,10 @@ def summarize(payload: dict[str, Any]) -> list[str]:
             )
         return lines
     if "ranks" in payload:
-        rows = []
+        profile_rows: list[tuple[Any, ...]] = []
         for rank in payload["ranks"]:
             top = rank.get("distributed_rows", [{}])[0]
-            rows.append(
+            profile_rows.append(
                 (
                     rank["rank"],
                     len(rank.get("distributed_rows", [])),
@@ -92,7 +92,7 @@ def summarize(payload: dict[str, Any]) -> list[str]:
                     top.get("cpu_time_total_us", "-"),
                 )
             )
-        lines.extend(render(("rank", "comm_rows", "top_row", "cpu_total_us"), rows))
+        lines.extend(render(("rank", "comm_rows", "top_row", "cpu_total_us"), profile_rows))
         return lines
     raise ValueError("unsupported module 03 result schema")
 

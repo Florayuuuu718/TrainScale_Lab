@@ -24,16 +24,35 @@ from trainscale_distributed.contract import (  # noqa: E402
 
 def environment_manifest() -> dict[str, Any]:
     import torch
+    import torch.distributed as dist
+
+    nccl_version = torch.cuda.nccl.version() if dist.is_nccl_available() else None
+    if isinstance(nccl_version, tuple):
+        nccl_version = list(nccl_version)
 
     return {
         "platform": platform.platform(),
         "python": platform.python_version(),
         "torch": torch.__version__,
         "torch_cuda_runtime": torch.version.cuda,
+        "nccl_available": dist.is_nccl_available(),
+        "nccl_version": nccl_version,
         "cuda_device_count": torch.cuda.device_count(),
         "gpu_names": [
             torch.cuda.get_device_name(index) for index in range(torch.cuda.device_count())
         ],
+        "gpu_compute_capabilities": [
+            list(torch.cuda.get_device_capability(index))
+            for index in range(torch.cuda.device_count())
+        ],
+        "driver_versions": (
+            subprocess.check_output(
+                ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
+                text=True,
+            ).splitlines()
+            if torch.cuda.is_available()
+            else []
+        ),
     }
 
 

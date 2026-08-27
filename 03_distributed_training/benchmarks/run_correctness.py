@@ -153,7 +153,9 @@ def run_gradient(
         worker_args=["--mode", "gradient", *base_worker_args(config)],
         timeout_seconds=timeout,
     )
-    rank_zero = next((rank for rank in job["ranks"] if rank["rank"] == 0), {})
+    rank_zero: dict[str, Any] = next(
+        (rank for rank in job["ranks"] if rank["rank"] == 0), {}
+    )
     vectors = [rank["parameter_vector"] for rank in job["ranks"]]
     consistency = maximum_vector_difference(vectors)
     gradient_error = rank_zero.get("gradient_max_error_vs_global_batch", float("inf"))

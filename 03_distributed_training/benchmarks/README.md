@@ -7,6 +7,7 @@
 | `run_scaling.py` | 读取 TOML，运行 strong/weak scaling 或记录 unavailable |
 | `run_profile.py` | 采集两个 Gloo rank 的 DDP/AllReduce CPU trace |
 | `show_distributed_results.py` | 将 JSON 打印为小白可读表格 |
+| `aggregate_scaling_runs.py` | 验证三次云端运行并生成中位数、离散程度与源文件哈希 |
 | `summarize_module03.py` | 校验正式结果并记录源文件 SHA-256 |
 
 `launcher.py` 使用当前 `sys.executable` 调用 `torch.distributed.run`，为每个 job

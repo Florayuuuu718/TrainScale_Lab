@@ -43,7 +43,11 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.mypy]
 python_version = "3.11"
-files = ["01_pytorch_training/trainscale_training"]
+files = [
+  "01_pytorch_training/trainscale_training",
+  "03_distributed_training/trainscale_distributed",
+  "03_distributed_training/benchmarks",
+]
 check_untyped_defs = true
 warn_unused_ignores = true
 

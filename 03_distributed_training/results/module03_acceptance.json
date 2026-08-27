@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "accepted_at": "2026-08-27",
+  "status": "passed_with_real_cloud_1_2_4_gpu_evidence",
+  "scope": "Module 03 final local correctness and cloud single-node multi-GPU acceptance",
+  "repository_head_before_final_changes": "d2b2882270a7e5ad8de6f666572497d2b3921703",
+  "provenance_note": "The cloud runs used the clean recorded commit. Aggregation code, evidence archival, tests, and tutorial changes are the final uncommitted worktree changes described by this acceptance file.",
+  "local_validation": {
+    "ruff": "passed",
+    "mypy": {
+      "status": "passed",
+      "source_files": 27,
+      "scope": "configured module 01 and module 03 sources"
+    },
+    "pytest": {
+      "status": "passed",
+      "passed": 37,
+      "skipped": 2,
+      "skip_reasons": [
+        "Triton GPU tests run in the Linux CUDA environment",
+        "Module 03 real torchrun integration runs on Linux"
+      ]
+    }
+  },
+  "linux_validation": {
+    "status": "passed",
+    "current_module03_pytest_passed": 12,
+    "includes_two_rank_gloo_integration": true,
+    "historical_local_nccl_world_one": "passed",
+    "historical_source": "module03_acceptance_sm120.json"
+  },
+  "cloud_validation": {
+    "provider": "AutoDL",
+    "source_git_commit": "d2b2882270a7e5ad8de6f666572497d2b3921703",
+    "source_git_dirty": false,
+    "environment": {
+      "platform": "Linux-5.15.0-94-generic-x86_64-with-glibc2.35",
+      "python": "3.12.3",
+      "torch": "2.8.0+cu128",
+      "torch_cuda_runtime": "12.8",
+      "driver": "580.76.05",
+      "gpu": "NVIDIA GeForce RTX 4090 D",
+      "gpu_count": 4,
+      "nccl_available": true
+    },
+    "topology": {
+      "nvlink": false,
+      "numa_domains": 2,
+      "gpu_local_pairs": [
+        [0, 1],
+        [2, 3]
+      ],
+      "cross_pair_path": "SYS"
+    },
+    "downloaded_archive_sha256": "63b0bb1efc17313cfd9df381afe67281d9daa2eb634a4fe570861ca7f3077e54",
+    "smoke_successful_cases": 4,
+    "formal_run_count": 3,
+    "successful_repetition_cases": 18,
+    "aggregated_successful_cases": 6,
+    "aggregated_unavailable_cases": 2,
+    "unavailable_world_sizes": [8],
+    "all_executable_cases_passed": true,
+    "median_results": {
+      "strong_world_4_speedup": 0.5102632172312199,
+      "strong_world_4_efficiency": 0.12756580430780498,
+      "weak_world_4_speedup": 2.017635770733308,
+      "weak_world_4_efficiency": 0.504408942683327
+    }
+  },
+  "formal_results": {
+    "cloud_scaling": "03_distributed_training/results/scaling_nccl_4x4090d.json",
+    "cloud_scaling_sha256": "6c226c8e711c66442c1b33a9bfcfd76145eda2a1552025656534a819fa428615",
+    "summary": "03_distributed_training/results/module03_summary.json",
+    "summary_sha256": "93dc5ccba67a1797834fd344f3e54d16b3a7f54377652f4faaefa4a69d4ec847",
+    "all_executable_gates_passed": true
+  },
+  "boundary": "Module 03 proves local DDP correctness and real single-node 1/2/4-GPU NCCL execution. The short synthetic benchmark is not a production performance ranking; eight-GPU, NVLink, multi-node, and large-model experiments remain optional extensions."
+}

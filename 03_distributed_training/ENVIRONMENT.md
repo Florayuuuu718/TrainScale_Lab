@@ -2,7 +2,7 @@
 
 ## 先说结论
 
-03 不需要新建第二个 Python 环境。继续使用 01/02 的根 `.venv`：CPU 多进程用
+本地 03 不需要新建第二个 Python 环境。继续使用 01/02 的根 `.venv`：CPU 多进程用
 Gloo；GPU DDP 用 NCCL。`torchrun` 是启动多个 Python worker 的工具，不是新的
 通信后端。系统 CUDA Toolkit/`nvcc` 也不是 DDP 前置条件；PyTorch cu129 wheel
 和 Windows 显卡驱动已经提供本模块所需的 CUDA/NCCL 用户态能力。
@@ -95,10 +95,23 @@ runner 自动比较配置要求和 `torch.cuda.device_count()`：可执行的 wo
 启动；超过设备数的 case 写 `unavailable`。如果机器只有 2 张 GPU，会运行 1/2，
 把 4/8 保留为不可用，而不是失败或 0 throughput。
 
+租用云 GPU 前不要只看显存。当前 runner 使用 `--standalone --nnodes=1`，必须租
+同一实例中的多张 GPU，而不是多台独立单卡实例。还要保存 `nvidia-smi topo -m`，
+因为 PCIe、NVLink 和 NUMA 路径会直接影响 AllReduce。
+
+云端有两条明确路线：
+
+1. **严格复现**：继续使用 Python 3.11、PyTorch 2.12.1+cu129 根环境；适合比较
+   软件优化，但首次需下载数 GB CUDA wheel。
+2. **硬件 scaling**：验证基础镜像现有 PyTorch/CUDA/NCCL 后，使用同一解释器完成
+   所有 world size；相对 speedup 有效，但绝对吞吐不得与根环境当成同软件栈比较。
+
+完整选型、私有仓库 bundle、smoke、三次正式测量、SHA-256 下载校验与关机步骤见
+[实验 07：云端四卡](experiments/07_cloud_4gpu.md)。
+
 ## 参考资料
 
 - [PyTorch：torchrun](https://docs.pytorch.org/docs/stable/elastic/run)
 - [PyTorch：DistributedDataParallel](https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html)
 - [PyTorch：DDP tutorial](https://docs.pytorch.org/tutorials/intermediate/ddp_tutorial.html)
 - [PyTorch：multi-GPU DDP tutorial](https://docs.pytorch.org/tutorials/beginner/ddp_series_multigpu.html)
-

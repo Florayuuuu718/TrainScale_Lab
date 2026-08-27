@@ -9,8 +9,8 @@
 5. [CPU strong/weak scaling](04_cpu_scaling.md)
 6. [NCCL 单/多 GPU scaling](05_nccl_scaling.md)
 7. [DDP communication Profiler](06_ddp_profiler.md)
+8. [云端 4 GPU：从租用到关机](07_cloud_4gpu.md)
 
 每份都包含为什么做、名词、一般预期、源码入口、终端命令、预期输出、实际结果、
 理论解释和有限结论。第一次写 `results/raw/tutorial/`；只有固定配置、完整环境和
 正确性门均通过后，才把摘要归档为正式结果。
-

@@ -18,6 +18,7 @@ DEFAULT_SOURCES = (
     "checkpoint_resume_cpu.json",
     "scaling_cpu.json",
     "scaling_nccl_sm120.json",
+    "scaling_nccl_4x4090d.json",
     "ddp_profile_cpu.json",
 )
 
@@ -51,13 +52,14 @@ def main() -> None:
     payload = {
         "schema_version": 1,
         "generated_at": datetime.now().astimezone().isoformat(),
-        "scope": "Module 03 local acceptance with explicit multi-GPU hardware boundary",
+        "scope": "Module 03 local correctness plus cloud 1/2/4-GPU acceptance",
         "gates": gates,
         "all_executable_gates_passed": all(gates.values()),
         "source_artifacts": artifacts,
         "boundary": (
-            "This machine has one GPU. 2/4/8-GPU records are unavailable, not zero-throughput "
-            "measurements; CPU/Gloo results teach semantics and host contention."
+            "Local one-GPU and cloud 1/2/4-GPU results are separate artifacts because their "
+            "software and hardware differ. Eight-GPU records remain unavailable, not zero "
+            "throughput measurements."
         ),
     }
     args.output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -68,4 +70,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

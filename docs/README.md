@@ -8,7 +8,7 @@
 |---|---|---|
 | 01 | 仓库基建、可复现的单卡训练、恢复与性能实验 | 已封存：本地完整验收通过 |
 | [02](../02_gpu_kernels/README.md) | CUDA/Triton 自定义算子 | 已封存：CUDA/Triton、前反向、Profiler 与发布验收通过 |
-| [03](../03_distributed_training/README.md) | DDP、数据分片、checkpoint 与 scaling | 本机可执行路线完成；2/4/8 GPU 实测待多 GPU硬件 |
+| [03](../03_distributed_training/README.md) | DDP、数据分片、checkpoint 与 scaling | 已封存：本地正确性、云端 1/2/4 GPU 与发布验收通过 |
 | 04–07 | collective、训练引擎与组合并行 | 尚未开始 |
 
 01 不追求真实数据集的最高准确率。我们用 synthetic 隔离验证数学链路，再用 CIFAR-10 子集验证真实图像管道和 CNN，并对 checkpoint、AMP、累积、workers、compile 与 Profiler 给出实测证据。
@@ -29,7 +29,8 @@
 10. [02 · GPU Kernels](../02_gpu_kernels/README.md)：读范围和 benchmark 契约，再按实验顺序复现。
 11. [02 验收清单](02-issues.md)：查看进入 03 前必须关闭的 12 项工作。
 12. [03 · Distributed Training](../03_distributed_training/README.md)：从两 rank Gloo 开始，再进入 NCCL/scaling。
-13. [03 验收清单](03-issues.md)：区分本机已完成项与多 GPU 硬件扩展。
+13. [03 云端四卡实验](../03_distributed_training/experiments/07_cloud_4gpu.md)：从租用、部署到结果校验和关机。
+14. [03 验收清单](03-issues.md)：查看本地与云端证据怎样共同关闭阶段验收。
 
 ## 文档类型
 

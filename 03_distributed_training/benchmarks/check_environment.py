@@ -16,6 +16,9 @@ def collect() -> dict[str, Any]:
     import torch.distributed as dist
 
     gpu_names = [torch.cuda.get_device_name(index) for index in range(torch.cuda.device_count())]
+    nccl_version = torch.cuda.nccl.version() if dist.is_nccl_available() else None
+    if isinstance(nccl_version, tuple):
+        nccl_version = list(nccl_version)
     return {
         "schema_version": 1,
         "timestamp": datetime.now().astimezone().isoformat(),
@@ -26,14 +29,19 @@ def collect() -> dict[str, Any]:
         "distributed_available": dist.is_available(),
         "gloo_available": dist.is_gloo_available(),
         "nccl_available": dist.is_nccl_available(),
+        "nccl_version": nccl_version,
         "cuda_available": torch.cuda.is_available(),
         "cuda_device_count": torch.cuda.device_count(),
         "gpu_names": gpu_names,
+        "gpu_compute_capabilities": [
+            list(torch.cuda.get_device_capability(index))
+            for index in range(torch.cuda.device_count())
+        ],
         "driver": (
             subprocess.check_output(
                 ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
                 text=True,
-            ).strip()
+            ).splitlines()
             if torch.cuda.is_available()
             else None
         ),
@@ -57,4 +65,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

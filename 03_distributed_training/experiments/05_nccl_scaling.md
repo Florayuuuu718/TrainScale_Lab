@@ -1,4 +1,4 @@
-# 实验 05：单 GPU NCCL 能证明什么，不能证明什么
+# 实验 05：先建立单 GPU NCCL 基线，再进入多 GPU
 
 ## 为什么做
 
@@ -54,7 +54,19 @@ strong world=1 的 batch 256 比 weak 的 batch 128 更能占满 GPU，因此吞
 这不是 strong scaling 优于 weak scaling，因为 world size 根本没有变化。多 GPU
 时新增计算资源，也新增梯度 AllReduce；模型越大、互连越慢，通信占比越高。
 
+## 后续四卡扩展
+
+本地门通过后，已在 AutoDL 单机 4×RTX 4090D 上复用同一正式 TOML，分别运行三次
+1/2/4 GPU strong/weak scaling。中位数显示 strong 四卡 speedup `0.510×`，weak
+四卡 speedup `2.018×`、efficiency `50.4%`。这说明工具链能够真实启动多 GPU，
+也说明小模型不会因为增加 GPU 自动线性加速。
+
+云主机选型、环境的严格/快速路线、私有仓库上传、拓扑、三次测量、下载校验与理论
+分析全部放在[实验 07：云端四卡](07_cloud_4gpu.md)。这里保留单卡基线，是为了让
+读者先学会区分“代码路径通过”和“多卡性能已经证明”。
+
 ## 结论与收尾
 
-本机证明 NCCL/CUDA DDP 基线可运行，没有证明 2/4/8 GPU speedup。换到多 GPU
-机器后直接复用同一 TOML；runner 会自动执行可见 GPU 数以内的 world size。
+本机证明 NCCL/CUDA DDP 基线可运行；后续云端补齐了 2/4 GPU 实测，8 GPU 仍因
+实例只有四卡而不可用。runner 会自动执行可见 GPU 数以内的 world size，但读者仍
+必须记录软件环境和拓扑，不能把不同机器的绝对吞吐直接混为一条性能排名。

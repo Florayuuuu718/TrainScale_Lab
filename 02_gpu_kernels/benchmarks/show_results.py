@@ -9,7 +9,7 @@ from typing import Any
 
 
 def format_number(value: Any) -> str:
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return f"{value:.3f}"
     return str(value)
 

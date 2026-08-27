@@ -78,7 +78,7 @@ def _validate_case(raw: dict[str, Any], *, source: Path) -> tuple[str, dict[str,
     if "causal" in raw and not isinstance(raw["causal"], bool):
         raise ValueError(f"{source}: causal must be true or false")
     if "eps" in raw and (
-        not isinstance(raw["eps"], (float, int))
+        not isinstance(raw["eps"], float | int)
         or not math.isfinite(raw["eps"])
         or raw["eps"] <= 0
     ):
@@ -205,7 +205,7 @@ def validate_result_record(record: dict[str, Any]) -> None:
     latency = record["steady_state"].get("latency_us", {})
     if set(latency) != {"median", "p10", "p90"}:
         raise ValueError("latency_us must contain median, p10, and p90")
-    if any(not isinstance(latency[key], (float, int)) or latency[key] <= 0 for key in latency):
+    if any(not isinstance(latency[key], float | int) or latency[key] <= 0 for key in latency):
         raise ValueError("all latency values must be positive")
     if not latency["p10"] <= latency["median"] <= latency["p90"]:
         raise ValueError("latency percentiles are not ordered")

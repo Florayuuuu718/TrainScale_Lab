@@ -4,7 +4,7 @@
   "status": "passed_with_real_cloud_1_2_4_gpu_evidence",
   "scope": "Module 03 final local correctness and cloud single-node multi-GPU acceptance",
   "repository_head_before_final_changes": "d2b2882270a7e5ad8de6f666572497d2b3921703",
-  "provenance_note": "The cloud runs used the clean recorded commit. Aggregation code, evidence archival, tests, and tutorial changes are the final uncommitted worktree changes described by this acceptance file.",
+  "provenance_note": "The cloud runs used the clean recorded commit d2b2882. Aggregation code, evidence archival, tests, and tutorial changes were subsequently committed in 9a3a376; the raw measurements were not rewritten.",
   "local_validation": {
     "ruff": "passed",
     "mypy": {

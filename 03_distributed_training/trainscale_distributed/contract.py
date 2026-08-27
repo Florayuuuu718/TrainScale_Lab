@@ -59,7 +59,7 @@ def load_correctness_config(path: Path) -> dict[str, Any]:
     raw = _read_single_table(path, "experiment")
     _require_exact_keys(raw, CORRECTNESS_KEYS, path)
     _validate_positive_ints(raw, CORRECTNESS_KEYS - {"learning_rate"}, path)
-    if not isinstance(raw["learning_rate"], (int, float)) or raw["learning_rate"] <= 0:
+    if not isinstance(raw["learning_rate"], int | float) or raw["learning_rate"] <= 0:
         raise ValueError(f"{path}: learning_rate must be positive")
     if raw["dataset_size"] % raw["global_batch_size"] != 0:
         raise ValueError(f"{path}: dataset_size must be divisible by global_batch_size")
@@ -105,7 +105,7 @@ def load_benchmark_config(path: Path) -> dict[str, Any]:
         raise ValueError(f"{path}: modes must contain strong and/or weak")
     if len(modes) != len(set(modes)):
         raise ValueError(f"{path}: modes must not contain duplicates")
-    if not isinstance(raw["learning_rate"], (int, float)) or raw["learning_rate"] <= 0:
+    if not isinstance(raw["learning_rate"], int | float) or raw["learning_rate"] <= 0:
         raise ValueError(f"{path}: learning_rate must be positive")
     for world_size in world_sizes:
         if raw["global_batch_size"] % world_size != 0:
@@ -150,4 +150,3 @@ def add_scaling_metrics(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         record["speedup_over_1"] = speedup
         record["scaling_efficiency"] = speedup / record["world_size"]
     return records
-

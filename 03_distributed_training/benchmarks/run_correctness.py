@@ -16,8 +16,9 @@ MODULE_ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY_ROOT = MODULE_ROOT.parent
 sys.path.insert(0, str(MODULE_ROOT))
 
-from benchmarks.launcher import launch  # noqa: E402
 from trainscale_distributed.contract import load_correctness_config  # noqa: E402
+
+from benchmarks.launcher import launch  # noqa: E402
 
 
 def environment_manifest() -> dict[str, Any]:

@@ -23,6 +23,7 @@ checkpoints/
 02_gpu_kernels/results/raw/
 02_gpu_kernels/cuda/build/
 03_distributed_training/results/raw/
+04_nccl_benchmark/results/raw/
 *.nsys-rep
 *.ncu-rep
 

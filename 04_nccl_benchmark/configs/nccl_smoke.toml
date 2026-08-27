@@ -1,0 +1,44 @@
+[[case]]
+id = "all_reduce_pair01_smoke"
+collective = "all_reduce"
+devices = [0, 1]
+min_bytes = 8
+max_bytes = 1048576
+step_factor = 2
+warmup_iterations = 2
+measured_iterations = 5
+dtype = "float"
+
+[[case]]
+id = "all_gather_pair01_smoke"
+collective = "all_gather"
+devices = [0, 1]
+min_bytes = 8
+max_bytes = 1048576
+step_factor = 2
+warmup_iterations = 2
+measured_iterations = 5
+dtype = "float"
+
+[[case]]
+id = "reduce_scatter_pair01_smoke"
+collective = "reduce_scatter"
+devices = [0, 1]
+min_bytes = 8
+max_bytes = 1048576
+step_factor = 2
+warmup_iterations = 2
+measured_iterations = 5
+dtype = "float"
+
+[[case]]
+id = "broadcast_pair01_smoke"
+collective = "broadcast"
+devices = [0, 1]
+min_bytes = 8
+max_bytes = 1048576
+step_factor = 2
+warmup_iterations = 2
+measured_iterations = 5
+dtype = "float"
+

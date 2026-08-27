@@ -58,6 +58,11 @@ For module 02, keep the stable root `.venv` by default and run the [crash-isolat
 
 Module 03 is complete: local 2/4-rank CPU/Gloo correctness, scaling, profiling, and the one-GPU NCCL baseline pass. The same frozen config was then run three times on an AutoDL single-node 4×RTX 4090D instance. Real 1/2/4-GPU strong/weak results, topology, raw repetitions, median aggregation, download checksum, and the cloud shutdown workflow are archived; only the unmeasured 8-GPU cases remain `unavailable`.
 
+Module 04's hardware-independent implementation is ready: the shared artifact contract, strict
+configs, pinned build helper, nccl-tests parser, three-run aggregation, DDP bridge, tutorials,
+and CPU tests are executable. Real 2/4-GPU collective curves and timelines remain explicitly
+pending multi-GPU acceptance.
+
 ## What You Will Learn
 
 After completing the main track, you should be able to:
@@ -95,10 +100,10 @@ FSDP2 / Tensor Parallel
 | [01](01_pytorch_training/README.md) | Single-GPU PyTorch trainer | What makes a training run reliable? | Loss/accuracy, throughput, memory, resume consistency |
 | [02](02_gpu_kernels/README.md) | GPU Kernel Lab | Why is an operator fast or slow? | Correctness, latency, bandwidth/TFLOPS, profiler evidence |
 | [03](03_distributed_training/README.md) | Distributed Training Lab | Why does distributed training not scale linearly? | DDP correctness, CPU scaling, local NCCL, real cloud 1/2/4-GPU evidence |
-| 04 | NCCL Performance Lab | When is communication latency- or bandwidth-bound? | Message-size–bandwidth curves |
-| 05 | TinyCollective | What actually happens inside AllReduce? | Naive/Ring/NCCL comparison |
-| 06 | Mini Training Engine | How can communication be hidden and memory controlled? | Ablations, timelines, throughput improvements |
-| 07 | FSDP2 / TP extension | How should a model be partitioned when it no longer fits? | Peak memory, correctness, scaling efficiency |
+| [04](04_nccl_benchmark/README.md) | NCCL Performance Lab | Can collective curves explain DDP scaling? | Collective curves, topology comparisons, DDP timelines |
+| [05](05_tiny_collective/README.md) | TinyCollective | What actually happens inside AllReduce? | Centralized/Ring/NCCL comparisons |
+| [06](06_training_engine/README.md) | Mini Engine + Reducer Lab | How can buckets hide communication? | Correctness ablations, timelines, throughput and memory |
+| [07](07_parallelism/README.md) | FSDP2 / TP | How should state or layers be partitioned? | Peak memory, correctness, strategy decision tree |
 
 ## Repository Layout
 
@@ -171,22 +176,27 @@ Concepts such as threads, blocks, warps, coalesced access, shared memory, regist
 
 ### 04 · NCCL Benchmark
 
-Use `nccl-tests` to benchmark AllReduce, AllGather, ReduceScatter, and Broadcast. Sweep from small to large messages, identify latency-bound and bandwidth-bound regions, and record the topology plus NCCL, CUDA, and driver versions.
+Use a pinned `nccl-tests` commit to benchmark AllReduce, AllGather, ReduceScatter, and
+Broadcast. Sweep small to large messages, then rerun a representative module 03 workload on
+the same host. Map its real gradient/bucket sizes and GPU timeline to the collective curves so
+the result explains DDP scaling instead of remaining an isolated communication score.
 
 ### 05 · TinyCollective
 
-Use `torch.distributed.send/recv` to build educational implementations of:
+Build educational P2P implementations on CPU/Gloo first, then add the GPU comparison:
 
 - Gather + Reduce + Broadcast;
 - Ring ReduceScatter + Ring AllGather;
+- world sizes 2/3/4 and non-divisible chunks;
 - correctness and performance comparisons with `torch.distributed.all_reduce`;
 - communication volume, round count, and theoretical complexity, followed by experimental validation.
 
 ### 06 · Mini Training Engine
 
-Combine the first five stages into a small, readable training engine and incrementally add:
+Reuse the training contract from module 01 and the distributed contract from module 03. The
+new work is the gradient reducer rather than another single-device framework. Incrementally add:
 
-- single-GPU and DDP execution;
+- bulk and per-parameter gradient synchronization;
 - mixed precision and gradient accumulation;
 - gradient bucketing;
 - asynchronous collectives;
@@ -198,7 +208,11 @@ Every feature should have a flag and an ablation experiment that explains both i
 
 ### 07 · FSDP2 / Tensor Parallel
 
-Introduce FSDP2 only when a model genuinely does not fit on one GPU. Learn TP/PP and DeviceMesh when FSDP2 reaches scaling limits. The focus is why a technique is chosen—not merely how to make its configuration run.
+Continue with the same Tiny Transformer from module 06. Use FSDP2 first to address state
+memory, then TP/DeviceMesh to partition individual layers, and make 2D composition conditional
+on hardware and evidence. PP, eight-GPU, and multi-node work are not default v1.0 gates. The
+focus is why a technique is chosen—not merely how to make its configuration run. See the
+[04–07 development plan](docs/04-07-development-plan.md) for dependencies and scope gates.
 
 ## Start with the Hardware You Have
 

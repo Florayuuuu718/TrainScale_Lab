@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-27",
+  "status": "passed_local_pre_multi_gpu_gates",
+  "scope": "Module 04 implementation and CPU/Linux one-GPU readiness before rental",
+  "repository_head_before_module04_changes": "32a7ba7",
+  "windows_validation": {
+    "ruff": "passed",
+    "mypy": {
+      "status": "passed",
+      "source_files": 40
+    },
+    "pytest": {
+      "status": "passed",
+      "passed": 56,
+      "skipped": 2
+    },
+    "module04_unavailable_smoke": {
+      "artifact_status": "unavailable",
+      "correctness_status": "not_run",
+      "failed_cases": 0,
+      "unavailable_cases": 4
+    }
+  },
+  "wsl_validation": {
+    "module04_pytest": {
+      "status": "passed",
+      "passed": 18
+    },
+    "environment": {
+      "platform": "Ubuntu 26.04 WSL2",
+      "torch": "2.12.1+cu129",
+      "cuda_available": true,
+      "nccl_available": true,
+      "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+      "gpu_count": 1,
+      "multi_gpu_ready": false
+    },
+    "nccl_tests_source": {
+      "tag": "v2.19.7",
+      "commit": "1a65d7f0514b8da6a61ae235d1c5f38549478e29",
+      "checkout_verified": true
+    },
+    "local_build": {
+      "status": "unsupported_local_environment",
+      "toolkit": "CUDA 13.0",
+      "compiler": "GCC 15.2.0",
+      "default_diagnostic": "glibc rsqrt/rsqrtf exception specification conflict",
+      "compatibility_flag_diagnostic": "pthread clock API declarations unavailable",
+      "decision": "Do not patch third-party source or replace the system compiler; build on the recommended Ubuntu 22.04/24.04 rental host."
+    },
+    "collective_smoke": {
+      "artifact_status": "unavailable",
+      "correctness_status": "not_run",
+      "reason": "every configured case requires two GPUs; one is visible"
+    },
+    "ddp_bridge": {
+      "artifact_status": "unavailable",
+      "correctness_status": "not_run",
+      "reason": "configured world sizes are 2 and 4; one GPU is visible"
+    }
+  },
+  "implemented": [
+    "shared artifact/status/config-hash contract",
+    "strict nccl-tests and DDP bridge TOML contracts",
+    "pinned clone/build helper with auditable NVCC flags",
+    "nccl-tests stdout parser and correctness gate",
+    "single-host collective runner with honest unavailable records",
+    "three-run consistency validation and median aggregation",
+    "module 03 payload derivation and 2/4-rank GPU profiler bridge",
+    "environment, topology, result display, tutorials, and rental workflow"
+  ],
+  "pending_multi_gpu_gates": [
+    "Ubuntu 22.04/24.04 pinned nccl-tests build",
+    "two-GPU four-collective smoke",
+    "three formal two/four-GPU collective runs",
+    "pair01/pair02/world4 topology comparison",
+    "two/four-rank DDP GPU timeline",
+    "single-variable NCCL or topology experiment",
+    "module04 summary and final acceptance"
+  ],
+  "boundary": "This record proves local code, contracts, tests, one-GPU capability detection, and honest unavailable behavior. It contains no multi-GPU performance measurements."
+}

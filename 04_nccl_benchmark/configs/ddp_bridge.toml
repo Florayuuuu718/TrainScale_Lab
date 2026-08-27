@@ -1,0 +1,12 @@
+[bridge]
+world_sizes = [2, 4]
+seed = 20260824
+input_dim = 1024
+hidden_dim = 2048
+num_classes = 256
+per_rank_batch_size = 128
+warmup_steps = 5
+profile_steps = 10
+bucket_cap_mb = 25.0
+learning_rate = 0.01
+

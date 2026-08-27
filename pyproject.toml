@@ -32,7 +32,12 @@ packages = ["01_pytorch_training/trainscale_training"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
-testpaths = ["01_pytorch_training/tests", "02_gpu_kernels/tests", "03_distributed_training/tests"]
+testpaths = [
+  "01_pytorch_training/tests",
+  "02_gpu_kernels/tests",
+  "03_distributed_training/tests",
+  "04_nccl_benchmark/tests",
+]
 
 [tool.ruff]
 target-version = "py311"
@@ -47,6 +52,9 @@ files = [
   "01_pytorch_training/trainscale_training",
   "03_distributed_training/trainscale_distributed",
   "03_distributed_training/benchmarks",
+  "04_nccl_benchmark/trainscale_nccl",
+  "04_nccl_benchmark/benchmarks",
+  "benchmarks/artifact_contract.py",
 ]
 check_untyped_defs = true
 warn_unused_ignores = true

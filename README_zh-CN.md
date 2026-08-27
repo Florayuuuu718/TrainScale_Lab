@@ -58,6 +58,10 @@ uv sync --extra cpu --extra dev
 
 03 已完成：本地 2/4 rank CPU/Gloo 正确性、scaling、Profiler 和 RTX 5060 单 GPU NCCL 基线全部通过；同一冻结配置随后在 AutoDL 单机 4×RTX 4090D 上运行三次，归档了真实 1/2/4 GPU strong/weak 结果、拓扑、原始重复值、中位数汇总、下载哈希和关机止费流程。只有未租用的 8 GPU case 继续诚实记录为 `unavailable`。
 
+04 已完成无需多 GPU 的开发部分：公共 artifact 契约、严格配置、固定版本构建助手、
+`nccl-tests` 输出解析、三次聚合、DDP bridge、教程和 CPU 测试均可运行。真实 2/4 GPU
+collective 曲线与 timeline 尚未采集，继续明确标记为待多 GPU 验收。
+
 ## 你会学到什么
 
 完成主线后，你将能够：
@@ -95,10 +99,10 @@ FSDP2 / Tensor Parallel
 | [01](01_pytorch_training/README.md) | PyTorch 单卡训练框架 | 一次可靠训练需要哪些系统组件？ | loss/accuracy、吞吐、显存、断点恢复一致性 |
 | [02](02_gpu_kernels/README.md) | GPU Kernel Lab | 算子为什么快或慢？ | 正确性、延迟、带宽/TFLOPS、profiler 证据 |
 | [03](03_distributed_training/README.md) | Distributed Training Lab | 分布式训练为什么不能线性加速？ | DDP 正确性、CPU scaling、本地 NCCL 与云端 1/2/4 GPU 实证 |
-| 04 | NCCL Performance Lab | 通信何时受延迟或带宽限制？ | message size–bandwidth 曲线 |
-| 05 | TinyCollective | AllReduce 内部究竟发生了什么？ | Naive/Ring/NCCL 对照实验 |
-| 06 | Mini Training Engine | 如何隐藏通信并控制显存？ | 消融实验、timeline、吞吐提升 |
-| 07 | FSDP2 / TP 扩展 | 模型放不下一张卡时如何切分？ | 峰值显存、正确性与扩展效率 |
+| [04](04_nccl_benchmark/README.md) | NCCL Performance Lab | 通信曲线能否解释 DDP scaling？ | collective 曲线、拓扑对照、DDP timeline |
+| [05](05_tiny_collective/README.md) | TinyCollective | AllReduce 内部究竟发生了什么？ | Centralized/Ring/NCCL 对照实验 |
+| [06](06_training_engine/README.md) | Mini Engine + Reducer Lab | 如何通过 bucket 隐藏通信？ | 正确性消融、timeline、吞吐/显存 |
+| [07](07_parallelism/README.md) | FSDP2 / TP | 状态或单层放不下时如何切分？ | 峰值显存、正确性与策略选择树 |
 
 ## 仓库结构
 
@@ -171,22 +175,27 @@ trainscale-lab/
 
 ### 04 · NCCL Benchmark
 
-使用 `nccl-tests` 测试 AllReduce、AllGather、ReduceScatter 和 Broadcast，扫描小消息到大消息，区分 latency-bound 与 bandwidth-bound 区域，并记录拓扑、NCCL/CUDA/driver 版本。
+使用固定 commit 的 `nccl-tests` 测试 AllReduce、AllGather、ReduceScatter 和
+Broadcast，扫描小消息到大消息，区分 latency-bound 与 bandwidth-bound 区域。
+还要在同一主机复跑 03 的代表性 workload，用 GPU timeline 和实际 gradient/bucket
+大小把通信曲线与 DDP scaling 现象连接起来。
 
 ### 05 · TinyCollective
 
-先用 `torch.distributed.send/recv` 实现教学版算法：
+先在 CPU/Gloo 上用 P2P 实现教学版算法，再进入 GPU 性能对照：
 
 - Gather + Reduce + Broadcast；
 - Ring ReduceScatter + Ring AllGather；
+- 覆盖 world size 2/3/4 和非整除 chunk；
 - 与 `torch.distributed.all_reduce` 比较正确性和性能；
 - 推导通信数据量、轮数和理论复杂度，再用曲线验证。
 
 ### 06 · Mini Training Engine
 
-把前五阶段组合为一个小型但可读的训练引擎，逐项加入：
+复用 01 的训练契约和 03 的分布式契约，建立小型但可读的训练引擎。重点不是再写
+一套单卡框架，而是逐项实现：
 
-- 单卡与 DDP；
+- bulk/per-parameter gradient synchronization；
 - mixed precision 与 gradient accumulation；
 - gradient bucketing；
 - asynchronous collective；
@@ -198,7 +207,10 @@ trainscale-lab/
 
 ### 07 · FSDP2 / Tensor Parallel
 
-当模型确实无法放进单卡时，再引入 FSDP2；当 FSDP2 遇到扩展瓶颈时，再学习 TP/PP 和 DeviceMesh。这里关注“为什么选择”，而不只是“配置能跑”。
+延续 06 的 Tiny Transformer：先用 FSDP2 解决状态显存，再用 TP/DeviceMesh 解决
+单层切分，最后按硬件选择是否做二维组合并行。PP、8 GPU 和多节点不是默认 v1.0
+门槛。这里关注“为什么选择”，而不只是“配置能跑”。完整依赖和范围闸门见
+[04–07 开发总纲](docs/04-07-development-plan.md)。
 
 ## 硬件不足也可以开始
 

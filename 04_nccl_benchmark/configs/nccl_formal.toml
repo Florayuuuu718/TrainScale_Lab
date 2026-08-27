@@ -1,0 +1,70 @@
+# Run this unchanged three times on one clean, frozen multi-GPU host.
+
+[[case]]
+id = "all_reduce_pair01"
+collective = "all_reduce"
+devices = [0, 1]
+min_bytes = 8
+max_bytes = 268435456
+step_factor = 2
+warmup_iterations = 5
+measured_iterations = 20
+dtype = "float"
+
+[[case]]
+id = "all_gather_pair01"
+collective = "all_gather"
+devices = [0, 1]
+min_bytes = 8
+max_bytes = 268435456
+step_factor = 2
+warmup_iterations = 5
+measured_iterations = 20
+dtype = "float"
+
+[[case]]
+id = "reduce_scatter_pair01"
+collective = "reduce_scatter"
+devices = [0, 1]
+min_bytes = 8
+max_bytes = 268435456
+step_factor = 2
+warmup_iterations = 5
+measured_iterations = 20
+dtype = "float"
+
+[[case]]
+id = "broadcast_pair01"
+collective = "broadcast"
+devices = [0, 1]
+min_bytes = 8
+max_bytes = 268435456
+step_factor = 2
+warmup_iterations = 5
+measured_iterations = 20
+dtype = "float"
+
+# These cases require four visible GPUs. pair02 must be interpreted with the
+# archived topology rather than assumed to be a cross-NUMA path.
+[[case]]
+id = "all_reduce_pair02"
+collective = "all_reduce"
+devices = [0, 2]
+min_bytes = 8
+max_bytes = 268435456
+step_factor = 2
+warmup_iterations = 5
+measured_iterations = 20
+dtype = "float"
+
+[[case]]
+id = "all_reduce_world4"
+collective = "all_reduce"
+devices = [0, 1, 2, 3]
+min_bytes = 8
+max_bytes = 268435456
+step_factor = 2
+warmup_iterations = 5
+measured_iterations = 20
+dtype = "float"
+

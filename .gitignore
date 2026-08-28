@@ -5,7 +5,7 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
-.pytest-tmp/
+.pytest-tmp*/
 .mypy_cache/
 .ruff_cache/
 .venv/
@@ -24,6 +24,9 @@ checkpoints/
 02_gpu_kernels/cuda/build/
 03_distributed_training/results/raw/
 04_nccl_benchmark/results/raw/
+04_nccl_benchmark/trainscale-module04-*/
+04_nccl_benchmark/trainscale-module04-*.tar.gz
+04_nccl_benchmark/trainscale-module04-*.tar.gz.sha256
 *.nsys-rep
 *.ncu-rep
 

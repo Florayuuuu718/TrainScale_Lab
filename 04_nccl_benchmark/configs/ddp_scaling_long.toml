@@ -1,0 +1,14 @@
+[benchmark]
+device = "cuda"
+backend = "nccl"
+world_sizes = [1, 2, 4]
+modes = ["strong", "weak"]
+seed = 20260824
+input_dim = 1024
+hidden_dim = 2048
+num_classes = 256
+global_batch_size = 256
+per_rank_batch_size = 128
+warmup_steps = 200
+measured_steps = 5000
+learning_rate = 0.01

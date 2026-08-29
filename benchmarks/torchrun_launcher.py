@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+RANK_RESULT_PATTERN = re.compile(r"rank_\d+\.json")
 
 
 def _text(value: str | bytes | None) -> str:
@@ -31,6 +34,15 @@ def torchrun_command(
         str(rank_directory),
         *worker_args,
     ]
+
+
+def rank_result_files(rank_directory: Path) -> list[Path]:
+    """Return worker result JSON files without mistaking profiler traces for ranks."""
+    return sorted(
+        path
+        for path in rank_directory.glob("rank_*.json")
+        if RANK_RESULT_PATTERN.fullmatch(path.name)
+    )
 
 
 def launch_torchrun(
@@ -74,7 +86,7 @@ def launch_torchrun(
         stderr = _text(error.stderr)
     (rank_directory / "stdout.log").write_text(stdout, encoding="utf-8")
     (rank_directory / "stderr.log").write_text(stderr, encoding="utf-8")
-    rank_files = sorted(rank_directory.glob("rank_*.json"))
+    rank_files = rank_result_files(rank_directory)
     ranks = [json.loads(path.read_text(encoding="utf-8")) for path in rank_files]
     return {
         "status": "success"

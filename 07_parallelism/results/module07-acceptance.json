@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-29T13:57:22.287186+08:00",
+  "status": "passed_local_gates",
+  "gates": {
+    "memory_model": "success",
+    "custom_tp_cpu_gloo": "success",
+    "fsdp2_cpu_gloo": "success",
+    "native_tp_cpu_gloo": "success",
+    "gpu_parallelism": "not_provided",
+    "gpu_profiles": "not_provided"
+  },
+  "local_evidence": {
+    "memory_model_record_count": 4,
+    "tp_case_count": 4,
+    "maximum_custom_tp_error": 1.1920928955078125e-07,
+    "maximum_fsdp2_error": 1.4901161193847656e-08,
+    "maximum_native_tp_error": 8.940696716308594e-08
+  },
+  "pending_gpu_gates": [
+    "2/4-GPU FSDP2 and native TP correctness preflights",
+    "DDP/FSDP2/TP throughput and peak-memory comparison",
+    "4-GPU collective traces for DDP, FSDP2, and TP",
+    "controlled single-GPU OOM transition if the configured model can expose one"
+  ],
+  "optional_not_blocking": [
+    "2D TP x DP/FSDP",
+    "pipeline parallelism",
+    "multi-node scaling"
+  ],
+  "boundary": "Local gates validate sharding math, DTensor placements, FSDP2 one-step updates, and distributed checkpoint resume. They do not prove CUDA memory savings or speedup."
+}

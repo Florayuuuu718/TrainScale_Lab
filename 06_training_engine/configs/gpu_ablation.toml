@@ -1,0 +1,14 @@
+[benchmark]
+world_sizes = [2, 4]
+strategies = ["bulk", "per_parameter", "bucket_sync", "bucket_async", "ddp"]
+model_presets = ["small", "medium"]
+bucket_cap_mb = [1.0, 10.0087890625, 25.0]
+precisions = ["fp32", "amp"]
+accumulation_steps = [1, 4]
+per_rank_batch_size = 32
+warmup_steps = 20
+measured_steps = 100
+repetitions = 3
+learning_rate = 0.01
+seed = 20260824
+timeout_seconds = 900

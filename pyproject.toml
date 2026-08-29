@@ -37,6 +37,9 @@ testpaths = [
   "02_gpu_kernels/tests",
   "03_distributed_training/tests",
   "04_nccl_benchmark/tests",
+  "05_tiny_collective/tests",
+  "06_training_engine/tests",
+  "07_parallelism/tests",
 ]
 
 [tool.ruff]
@@ -54,7 +57,14 @@ files = [
   "03_distributed_training/benchmarks",
   "04_nccl_benchmark/trainscale_nccl",
   "04_nccl_benchmark/benchmarks",
+  "05_tiny_collective/trainscale_collective",
+  "05_tiny_collective/benchmarks",
+  "06_training_engine/trainscale_engine",
+  "06_training_engine/benchmarks",
+  "07_parallelism/trainscale_parallel",
+  "07_parallelism/benchmarks",
   "benchmarks/artifact_contract.py",
+  "benchmarks/torchrun_launcher.py",
 ]
 check_untyped_defs = true
 warn_unused_ignores = true

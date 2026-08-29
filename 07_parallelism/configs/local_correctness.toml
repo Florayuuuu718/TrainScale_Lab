@@ -1,0 +1,14 @@
+[local]
+world_sizes = [2, 4]
+cases = ["tp_mlp", "tp_attention"]
+batch_size = 4
+input_dim = 8
+hidden_dim = 16
+output_dim = 8
+sequence_length = 4
+d_model = 16
+num_heads = 4
+learning_rate = 0.05
+seed = 20260824
+atol = 1e-5
+timeout_seconds = 180

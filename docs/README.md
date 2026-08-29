@@ -9,10 +9,10 @@
 | 01 | 仓库基建、可复现的单卡训练、恢复与性能实验 | 已封存：本地完整验收通过 |
 | [02](../02_gpu_kernels/README.md) | CUDA/Triton 自定义算子 | 已封存：CUDA/Triton、前反向、Profiler 与发布验收通过 |
 | [03](../03_distributed_training/README.md) | DDP、数据分片、checkpoint 与 scaling | 已封存：本地正确性、云端 1/2/4 GPU 与发布验收通过 |
-| [04](../04_nccl_benchmark/README.md) | NCCL 曲线与 DDP 通信解释 | 本地工具与测试已完成，待真实多 GPU 实验 |
-| [05](../05_tiny_collective/README.md) | centralized/ring collective 教学实现 | 规划已冻结，尚未实现 |
-| [06](../06_training_engine/README.md) | Mini Engine、gradient reducer 与 overlap | 规划已冻结，尚未实现 |
-| [07](../07_parallelism/README.md) | FSDP2、TP 与可选二维并行 | 规划已冻结，尚未实现 |
+| [04](../04_nccl_benchmark/README.md) | NCCL 曲线与 DDP 通信解释 | 本地与 4 GPU 实验已完成，补充稳定性实验待下次统一租卡 |
+| [05](../05_tiny_collective/README.md) | centralized/ring collective 教学实现 | 本地正确性已完成，GPU 对照待统一租卡 |
+| [06](../06_training_engine/README.md) | Mini Engine、gradient reducer 与 overlap | 本地正确性已完成，GPU ablation 与 timeline 待统一租卡 |
+| [07](../07_parallelism/README.md) | FSDP2、TP 与可选二维并行 | 本地 FSDP2/TP gates 已完成，GPU 显存与性能待统一租卡 |
 
 01 不追求真实数据集的最高准确率。我们用 synthetic 隔离验证数学链路，再用 CIFAR-10 子集验证真实图像管道和 CNN，并对 checkpoint、AMP、累积、workers、compile 与 Profiler 给出实测证据。
 
@@ -39,6 +39,7 @@
 17. [04 验收清单](04-issues.md)：按环境、曲线、DDP bridge 和发布验收推进。
 18. [05–07 验收清单](05-issues.md)：完成 04 后按总纲进入后续阶段，并分别查看
     [06](06-issues.md) 和 [07](07-issues.md) 的必需项与可选边界。
+19. [04–07 统一四卡租用 Runbook](04-07-rental-runbook.md)：按固定环境、失败停止、结果哈希和关机门一次完成剩余 GPU 实验。
 
 ## 文档类型
 
@@ -57,4 +58,4 @@
 - 命令默认从仓库根目录执行，Windows 使用 PowerShell。
 - “预期输出”用于判断流程是否正确，数值可能因硬件和随机种子不同略有变化。
 - `01_pytorch_training/results/` 的小型摘要和图表进入 Git；其 `raw/`、`data/` 和 `.venv/` 不提交。
-- 02/03 的本机实测、历史失败和硬件限制分开标注；04–07 目前只有冻结规划，不会伪装成可运行功能。
+- 各阶段将本地语义证据、真实 GPU 结果、历史失败和硬件限制分开标注；未执行的 GPU gate 不会伪装成已完成。

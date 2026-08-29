@@ -1,64 +1,60 @@
 # 05 · TinyCollective
 
-> 状态：规划已冻结，尚未实现。本目录是教学版 collective 算法的唯一入口。
+> 状态：CPU/Gloo 教学实现与 correctness gate 已完成；GPU/NCCL 性能对照待统一租卡实验。
 
-05 的目标不是替代 NCCL，而是用最小可读实现回答“AllReduce 内部发生了什么”。
-开发时先在 CPU/Gloo 上证明调度和数学正确，再把 GPU/NCCL 作为性能对照。
+TinyCollective 不是 NCCL 的替代品。它用最小、可读的 P2P 实现拆开 AllReduce，让初学者先实现
+centralized 与 ring，再测量 Python 调度、同步和额外内存操作造成的性能差距。
 
-## 本阶段要回答的问题
+## 已实现内容
 
-- centralized 与 ring 算法各需要多少轮、每个 rank 发送多少数据？
-- reduce-scatter 和 all-gather 怎样组合成 ring all-reduce？
-- 为什么所有 rank 的调用顺序稍有不同就可能死锁？
-- 浮点加法顺序为什么改变误差，但不一定表示算法错误？
-- 为什么教学版算法即使复杂度正确，仍可能远慢于 NCCL？
+- centralized reduce + broadcast；
+- ragged ring reduce-scatter + all-gather + all-reduce；
+- 每一步显式记录 sender、receiver、chunk 与 send/recv tag；
+- `batch_isend_irecv` handle 的一次性 `wait()` 生命周期；
+- 2/3/4 rank CPU/Gloo correctness matrix；
+- 2/4 GPU centralized、ring 与 `torch.distributed.all_reduce` 的同条件对照 runner。
 
-## 两条开发路线
+源码入口：
 
-### A · CPU/Gloo 正确性主线
+- `trainscale_collective/schedule.py`：纯调度与通信量模型；
+- `trainscale_collective/algorithms.py`：centralized/ring 实现；
+- `trainscale_collective/worker.py`：分布式 correctness 与 benchmark worker；
+- `benchmarks/run_correctness.py`：CPU/Gloo 验收；
+- `benchmarks/run_gpu_comparison.py`：GPU/NCCL 对照。
 
-完成 03 后即可开始，不必等待多 GPU：
+## 本地 correctness gate
 
-1. centralized reduce + broadcast；
-2. ring reduce-scatter；
-3. ring all-gather；
-4. 组合 ring all-reduce；
-5. 每轮 sender、receiver、chunk owner 的确定性 debug trace；
-6. 从阻塞 P2P 演进到明确管理生命周期的异步 P2P。
+```bash
+python 05_tiny_collective/benchmarks/run_correctness.py \
+  --config 05_tiny_collective/configs/cpu_correctness.toml \
+  --output 05_tiny_collective/results/raw/cpu_correctness.json
+```
 
-### B · GPU 性能对照
+当前配置覆盖 24 个 case：world size 2/3/4，元素数 5/7/16/17，以及 centralized/ring。
+5、7、17 专门验证不能被 world size 整除的 uneven chunk。本 gate 只证明调度和数学正确，
+不证明 CUDA/NCCL 可用或性能合理。
 
-依赖 04 的测量契约和真实多 GPU 环境：
+## 待统一租卡的 GPU gate
 
-- 与 `torch.distributed.all_reduce` 对照；
-- 使用相同 dtype、消息大小、world size、warm-up 和重复次数；
-- 解释 Python 调度、同步、额外复制和拓扑带来的差距。
+在 4 GPU Linux 节点、仓库干净且依赖检查通过后运行：
 
-## 正确性矩阵
+```bash
+python 05_tiny_collective/benchmarks/run_gpu_comparison.py \
+  --config 05_tiny_collective/configs/gpu_comparison.toml \
+  --raw-directory /root/trainscale-results/module05/raw \
+  --output /root/trainscale-results/module05/gpu-comparison.json
+```
 
-- world size 2/3/4；
-- FP32，以及环境支持时的 FP16/BF16；
-- 空间较小、非 2 次幂和不能被 world size 整除的元素数量；
-- in-place/out-of-place 语义；
-- SUM reference、容差和不同归约顺序；
-- tag 冲突、调用次序、异步 handle 生命周期和超时诊断。
+runner 会保留每个 job 的命令、stdout/stderr 与 rank JSON，并在总 artifact 中记录 SHA-256。
+消息矩阵包含 04 的 10,494,976-byte DDP gradient payload。正式结论只使用重复实验中位数；
+若短消息噪声较大，应如实报告，不把教学 Python ring 的慢解释成 NCCL 算法本身慢。
 
-第一版允许对非整除 chunk 显式拒绝，但不能以此完成阶段验收；正式版本应使用
-uneven chunk 或 padding/unpadding，并通过 world size 3 的测试。
+## 阶段边界
 
-## 最终证据
+- CPU/Gloo 是开发门，GPU/NCCL 是性能门，两者不可互相替代；
+- 第一版仅支持单机、SUM 和连续 tensor；
+- 不承诺故障恢复、任意拓扑优化、生产性能或多节点能力；
+- 06 可以把它作为可选教学 backend，但默认训练路径仍使用 PyTorch/NCCL。
 
-- centralized/ring 的轮数和每 rank 通信量推导；
-- debug trace 与推导一致；
-- correctness matrix 全部可执行项通过；
-- TinyCollective 与 PyTorch/NCCL 的消息大小–延迟曲线；
-- 至少一个“理论复杂度正确但实现仍慢”的 profiler 解释。
-
-## 范围边界
-
-TinyCollective 是 reference implementation，不承诺生产性能、故障恢复或任意网络
-拓扑优化。06 可以把它作为可选教学 backend，但不能把它默认包装成高性能训练通信层。
-
-CPU 正确性路线依赖 [03](../03_distributed_training/README.md)；GPU 性能路线依赖
-[04](../04_nccl_benchmark/README.md)。逐项开发与验收见
-[05 验收清单](../docs/05-issues.md)。
+推导与实验设计见 [`experiments/`](experiments/)，配置见 [`configs/`](configs/)，逐项验收见
+[`docs/05-issues.md`](../docs/05-issues.md)。

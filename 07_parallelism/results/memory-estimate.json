@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "artifact_type": "module07.memory_estimate",
+  "generated_at": "2026-08-29T13:57:21.695337+08:00",
+  "git": {
+    "commit": "f67d0bbee385c8d824a665427c8c39b8c7debe2b",
+    "dirty": true
+  },
+  "environment": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.15",
+    "torch": "2.12.1+cpu",
+    "device": "analytical"
+  },
+  "config": {
+    "model_presets": [
+      "small",
+      "medium"
+    ],
+    "world_sizes": [
+      2,
+      4
+    ],
+    "optimizer": "AdamW",
+    "dtype": "FP32",
+    "activation_model": "batch * sequence * d_model * layers * 8 tensors"
+  },
+  "config_sha256": "b79b65e45b310ef9e7fa6da6ef1bd3b518b7f15aeb7d2cc2b3d12db7596ce19d",
+  "measurement": {
+    "parameter_bytes": 4,
+    "gradient_bytes": 4,
+    "adam_state_bytes_per_parameter": 8
+  },
+  "status": "success",
+  "correctness": {
+    "status": "passed"
+  },
+  "metrics": {
+    "records": [
+      {
+        "model_preset": "small",
+        "world_size": 2,
+        "ddp": {
+          "parameter_count": 4500,
+          "parameter_bytes": 18000,
+          "gradient_bytes": 18000,
+          "optimizer_state_bytes": 36000,
+          "master_parameter_bytes": 0,
+          "persistent_state_bytes": 72000,
+          "activation_lower_bound_bytes": 65536,
+          "estimated_total_bytes": 137536
+        },
+        "fsdp2_lower_bound": {
+          "parameter_count": 4500,
+          "parameter_bytes": 9000,
+          "gradient_bytes": 9000,
+          "optimizer_state_bytes": 18000,
+          "master_parameter_bytes": 0,
+          "persistent_state_bytes": 36000,
+          "activation_lower_bound_bytes": 65536,
+          "estimated_total_bytes": 101536
+        },
+        "persistent_reduction_ratio": 0.5
+      },
+      {
+        "model_preset": "small",
+        "world_size": 4,
+        "ddp": {
+          "parameter_count": 4500,
+          "parameter_bytes": 18000,
+          "gradient_bytes": 18000,
+          "optimizer_state_bytes": 36000,
+          "master_parameter_bytes": 0,
+          "persistent_state_bytes": 72000,
+          "activation_lower_bound_bytes": 65536,
+          "estimated_total_bytes": 137536
+        },
+        "fsdp2_lower_bound": {
+          "parameter_count": 4500,
+          "parameter_bytes": 4500,
+          "gradient_bytes": 4500,
+          "optimizer_state_bytes": 9000,
+          "master_parameter_bytes": 0,
+          "persistent_state_bytes": 18000,
+          "activation_lower_bound_bytes": 65536,
+          "estimated_total_bytes": 83536
+        },
+        "persistent_reduction_ratio": 0.75
+      },
+      {
+        "model_preset": "medium",
+        "world_size": 2,
+        "ddp": {
+          "parameter_count": 867104,
+          "parameter_bytes": 3468416,
+          "gradient_bytes": 3468416,
+          "optimizer_state_bytes": 6936832,
+          "master_parameter_bytes": 0,
+          "persistent_state_bytes": 13873664,
+          "activation_lower_bound_bytes": 8388608,
+          "estimated_total_bytes": 22262272
+        },
+        "fsdp2_lower_bound": {
+          "parameter_count": 867104,
+          "parameter_bytes": 1734208,
+          "gradient_bytes": 1734208,
+          "optimizer_state_bytes": 3468416,
+          "master_parameter_bytes": 0,
+          "persistent_state_bytes": 6936832,
+          "activation_lower_bound_bytes": 8388608,
+          "estimated_total_bytes": 15325440
+        },
+        "persistent_reduction_ratio": 0.5
+      },
+      {
+        "model_preset": "medium",
+        "world_size": 4,
+        "ddp": {
+          "parameter_count": 867104,
+          "parameter_bytes": 3468416,
+          "gradient_bytes": 3468416,
+          "optimizer_state_bytes": 6936832,
+          "master_parameter_bytes": 0,
+          "persistent_state_bytes": 13873664,
+          "activation_lower_bound_bytes": 8388608,
+          "estimated_total_bytes": 22262272
+        },
+        "fsdp2_lower_bound": {
+          "parameter_count": 867104,
+          "parameter_bytes": 867104,
+          "gradient_bytes": 867104,
+          "optimizer_state_bytes": 1734208,
+          "master_parameter_bytes": 0,
+          "persistent_state_bytes": 3468416,
+          "activation_lower_bound_bytes": 8388608,
+          "estimated_total_bytes": 11857024
+        },
+        "persistent_reduction_ratio": 0.75
+      }
+    ]
+  },
+  "raw_artifacts": [],
+  "boundary": "This is a lower-bound state model; allocator, collectives, temporary full parameters, and saved activations require GPU measurement."
+}

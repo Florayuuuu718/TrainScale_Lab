@@ -1,0 +1,12 @@
+[benchmark]
+world_sizes = [2, 4]
+message_bytes = [8, 256, 4096, 65536, 1048576, 10494976, 16777216, 67108864]
+algorithms = ["centralized", "ring", "torch"]
+dtype = "float32"
+warmup_iterations = 5
+measured_iterations = 20
+repetitions = 3
+seed = 20260824
+atol = 1e-5
+rtol = 1e-5
+timeout_seconds = 600

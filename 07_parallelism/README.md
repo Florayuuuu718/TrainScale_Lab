@@ -1,57 +1,101 @@
-# 07 · FSDP2 / Tensor Parallel
+# 07 — 从 DDP 到 FSDP2 与 Tensor Parallel
 
-> 状态：规划已冻结，尚未实现。本目录是模型切分与组合并行的唯一入口。
+07 不以“成功启动某个框架配置”为完成标准，而是回答：模型为什么需要切分，应该切分训练状态还是单层计算，代价是什么？本模块复用 06 的 Tiny Transformer，先实现最小分片，再用 reference 对齐、显存分解、通信事件和吞吐实验验证选择。
 
-07 只在模型或训练状态确实形成单卡显存/扩展瓶颈后引入切分。它继续使用 06 的
-Tiny Transformer、训练口径和 artifact 契约，关注“为什么选择这种并行策略”，
-而不是收集一组能够启动的框架配置。
+## 当前状态
 
-## 07A · FSDP2：解决状态显存
+本地阶段已经可验证：
 
-1. 分解参数、梯度、optimizer state 和 activation 显存；
-2. 建立单卡 baseline 与可控 OOM case；
-3. 用 `fully_shard` 实现最小 FSDP2；
-4. 观察参数 AllGather 和梯度 ReduceScatter；
-5. 比较不同 shard placement/wrap 粒度；
-6. 使用 distributed checkpoint 保存和恢复分片状态；
-7. 验证单步数值、恢复一致性、峰值显存和吞吐。
+- 解析 DDP/FSDP2 的参数、梯度、Adam 状态和 activation 显存下界；
+- 实现可处理非整除长度的教学版张量分片、重建和分片 checkpoint；
+- 实现 MLP Colwise→Rowwise TP，以及按 head 切分的 attention；
+- 在 2/4 rank CPU/Gloo 下对齐输出、梯度分片和一步参数更新；
+- 使用真实 `fully_shard` 验证 DTensor `Shard(0)`、一步更新与 distributed checkpoint 恢复；
+- 使用真实 `parallelize_module` 验证 Colwise/Rowwise placement 和一步更新；
+- 固化 4 卡正确性前置门、性能矩阵和 profiler 计划。
 
-“单卡 OOM”必须由配置和显存估算构造，不能通过同时运行无关进程人为挤占显存。
-如果硬件不足以形成可信 OOM 对照，应记录为 `unavailable`，并保留较小规模的语义验证。
+本地证据只说明数学语义和状态恢复成立，不说明 CUDA 显存收益、NCCL 通信代价或扩展效率。后者仍需统一租卡实验。
 
-## 07B · Tensor Parallel：解决单层计算/参数切分
+## 本地验证
 
-1. 建立 DeviceMesh 与 mesh dimension 命名；
-2. 对 attention/MLP 分别实现 Colwise/Rowwise Parallel；
-3. 明确 head、hidden size 与 world size 的整除契约；
-4. 对照未切分 reference 的输出、loss、梯度和一步更新；
-5. 记录 DTensor placement、通信和局部 shape；
-6. 比较显存、吞吐和扩展效率。
+在仓库根目录运行：
 
-## 07C · 组合并行：可选正式门槛
+```powershell
+.venv\Scripts\python 07_parallelism/benchmarks/estimate_memory.py `
+  --output 07_parallelism/results/memory-estimate.json
 
-- 4 GPU 环境优先尝试 `TP=2 × DP/FSDP=2` 的二维 DeviceMesh；
-- 比较纯 DDP、纯 FSDP2、纯 TP 与 2D 组合；
-- 说明每个 mesh 维度引入的通信；
-- 硬件不足时明确记录 `unavailable`。
+.venv\Scripts\python 07_parallelism/benchmarks/run_tp_correctness.py `
+  --config 07_parallelism/configs/local_correctness.toml `
+  --raw-directory 07_parallelism/results/raw/tp-correctness `
+  --output 07_parallelism/results/tp-correctness.json
 
-07C、Pipeline Parallel、8 GPU 和多节点都不是默认 v1.0 阻塞项。只有 07A/07B 的
-结果暴露出明确需要时，才继续扩大范围。
+.venv\Scripts\python 07_parallelism/benchmarks/run_fsdp2_capability.py `
+  --raw-directory 07_parallelism/results/raw/fsdp2-capability `
+  --output 07_parallelism/results/fsdp2-capability.json
 
-## 正确性与验收证据
+.venv\Scripts\python 07_parallelism/benchmarks/run_native_tp_capability.py `
+  --raw-directory 07_parallelism/results/raw/native-tp-capability `
+  --output 07_parallelism/results/native-tp-capability.json
+```
 
-- 未切分 reference 与分片实现的输出、loss、梯度和一步更新对齐；
-- FSDP2 checkpoint/resume 后下一步一致；
-- 理论状态显存与实测峰值显存的差异得到解释；
-- 至少两个模型规模，不能只用一个“刚好能跑”的 shape；
-- 吞吐、step time、peak memory、collective/timeline 和 scaling efficiency；
-- 最终给出 DDP/FSDP2/TP/2D 的并行策略选择树。
+Windows 跳过依赖 torchrun/Gloo 的集成测试；这些命令应在 Linux CPU 环境执行。当前工作区已经留下真实 Linux CPU/Gloo 结果：自定义 TP 的 4 个条件均通过，最大误差不超过 `1.2e-7`；FSDP2 的 SGD 一步更新最大误差约 `1.5e-8`，checkpoint 恢复后下一步误差为 0；原生 TP 最大误差约 `8.9e-8`。
 
-## 范围边界
+生成本地验收摘要：
 
-不实现生产级自动并行搜索、完整 TorchTitan/Megatron 功能、多节点弹性恢复或任意
-Transformer 架构。框架仅用于提供 primitive；核心交付仍是最小实现、测量、解释和
-一次可复现优化。
+```bash
+python 07_parallelism/benchmarks/summarize_module07.py \
+  --memory 07_parallelism/results/memory-estimate.json \
+  --tp-correctness 07_parallelism/results/tp-correctness.json \
+  --fsdp2-capability 07_parallelism/results/fsdp2-capability.json \
+  --native-tp-capability 07_parallelism/results/native-tp-capability.json \
+  --output 07_parallelism/results/module07-acceptance.json
+```
 
-进入本模块前，请先完成 [06](../06_training_engine/README.md)。逐项开发与验收见
-[07 验收清单](../docs/07-issues.md)。
+摘要在未提供 GPU artifact 时必须是 `passed_local_gates`，不能是 `complete`。
+
+## 统一 4 卡实验
+
+先检查计划，不占用 GPU：
+
+```bash
+python 07_parallelism/benchmarks/run_gpu_parallelism.py \
+  --config 07_parallelism/configs/gpu_parallelism.toml \
+  --output /root/trainscale-results/module07/gpu-plan.json \
+  --dry-run
+```
+
+正式运行要求至少 4 张 CUDA GPU 和 NCCL。它先执行 2/4 卡 FSDP2 与原生 TP correctness probe；任何前置门失败都会停止性能矩阵。通过后运行 11 个条件，每个 3 个独立进程作业，报告三次中位数和相对极差：
+
+```bash
+python 07_parallelism/benchmarks/run_gpu_parallelism.py \
+  --config 07_parallelism/configs/gpu_parallelism.toml \
+  --raw-directory /root/trainscale-results/module07/gpu-raw \
+  --output /root/trainscale-results/module07/gpu-parallelism.json
+```
+
+性能结束后再采集 4 卡 DDP、layer-wrap FSDP2、TP trace：
+
+```bash
+python 07_parallelism/benchmarks/run_gpu_profiles.py \
+  --config 07_parallelism/configs/gpu_parallelism.toml \
+  --correctness-artifact /root/trainscale-results/module07/gpu-parallelism.json \
+  --raw-directory /root/trainscale-results/module07/profile-raw \
+  --output /root/trainscale-results/module07/gpu-profiles.json
+```
+
+profiler 时间只用于定位 AllReduce、AllGather、ReduceScatter，不进入正式吞吐结论。所有命令、rank JSON、日志、trace 和 DCP 文件都会记录 SHA-256。
+
+## 策略选择树
+
+1. 模型、训练状态和目标 local batch 都能放入单卡：先用 DDP，建立稳定 baseline。
+2. 参数能参与单层计算，但参数、梯度和 optimizer state 总和造成显存瓶颈：使用 FSDP2；检查 AllGather/ReduceScatter 代价，并比较 root-wrap 与 layer-wrap。
+3. 单层参数或 activation 已无法放入单卡，或数据并行使 local batch 低到不可接受：使用 TP；优先在高速机内互联上切 attention heads 和 MLP hidden dimension。
+4. 同时存在训练状态和单层计算瓶颈，且 GPU 数量足够：才考虑 TP×DP/FSDP 的 2D mesh。它是扩展项，不阻塞 07 v1.0。
+
+单卡 OOM 对照必须由模型配置和显存容量自然触发，不能通过无关进程抢占显存制造。本轮若没有合适模型规模，应如实记录 `unavailable`，保留显存曲线与理论转折点，不强造 OOM。
+
+## 实现边界
+
+07 不实现生产级自动并行搜索、完整 Megatron/TorchTitan、多节点弹性恢复、pipeline parallel 或任意 Transformer 自动改写。框架只提供 primitive；交付重点仍是最小实现、测量、瓶颈解释和一次可复现的策略比较。
+
+逐项状态见 [07 验收清单](../docs/07-issues.md)，实验设计与结果解释见 [实验记录](experiments/README.md)。

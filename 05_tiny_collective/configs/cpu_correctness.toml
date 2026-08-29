@@ -1,0 +1,10 @@
+[correctness]
+world_sizes = [2, 3, 4]
+element_counts = [5, 7, 16, 17]
+algorithms = ["centralized", "ring"]
+dtype = "float32"
+seed = 20260824
+atol = 1e-6
+rtol = 1e-6
+timeout_seconds = 120
+

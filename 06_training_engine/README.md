@@ -1,65 +1,96 @@
 # 06 · Mini Training Engine + Gradient Reducer Lab
 
-> 状态：规划已冻结，尚未实现。本目录是迷你分布式训练引擎和 reducer 实验的唯一入口。
+> 状态：本地 CPU/Gloo 实现与 correctness gate 已完成；CUDA/NCCL 消融和 overlap timeline
+> 待统一租卡实验。
 
-06 不重新发明 01 的单卡训练循环，也不重复 03 的 DDP 教程。它复用已经证明的
-训练、分布式和证据契约，集中实现 PyTorch DDP 隐藏起来的梯度同步调度：何时发起
-collective、怎样分 bucket，以及通信怎样与 backward 重叠。
+06 不重写 01 的通用训练循环，也不把 03 的 DDP 再包装一次。它用同一个 Tiny Transformer
+逐步实现 bulk、per-parameter、bucketed synchronous 和 bucketed asynchronous gradient
+reducer，再与 PyTorch DDP 比较。
 
-## 本阶段要回答的问题
+## 已实现内容
 
-- bulk、per-parameter 和 bucketed gradient synchronization 有什么代价？
-- autograd hook 何时触发，怎样保证每个梯度只同步一次？
-- 异步 collective 何时真正与 backward 重叠？
-- AMP、gradient accumulation 和 `no_sync` 怎样改变同步边界？
-- 自己的 reducer 与 PyTorch DDP 相比缺少哪些能力？
+- 供 06/07 复用的 small/medium Tiny Transformer；
+- deterministic reverse-order bucket ownership、offset、flat buffer 和 plan digest；
+- bulk、per-parameter hook、bucket sync、bucket async reducer；
+- accumulation 非同步 micro-step、AMP scale/unscale、gradient clipping 和 optimizer 边界；
+- unused/None gradient、异步 handle wait 和跨 rank bucket-plan 预检；
+- 复用 01 checkpoint schema 的稳定 adapter；
+- CPU/Gloo global-batch reference correctness runner；
+- 2/4 GPU targeted ablation 与 4 GPU CUDA profiler runner。
 
-## 复用边界
+源码入口：
 
-- 从 01 复用配置、seed、AMP、累积、指标和 checkpoint 语义；
-- 从 03 复用 rank/process group、sampler、launcher、最慢 rank 计时和 scaling 口径；
-- 从 04 选择有意义的 bucket size 和消息区间；
-- 从 05 复用通信量推导；TinyCollective 只作为可选 reference backend。
+- `trainscale_engine/model.py`：Tiny Transformer 与模型规模；
+- `trainscale_engine/bucket.py`：bucket plan 和 digest；
+- `trainscale_engine/reducer.py`：四种手写 reducer；
+- `trainscale_engine/engine.py`：accumulation、AMP、clip、step 生命周期；
+- `trainscale_engine/worker.py`：torchrun correctness/benchmark/profile worker。
 
-01–03 已封存的代码和结果不为统一目录结构而重写。06 开始建立供 06/07 使用的
-共享包或稳定适配层，避免继续复制训练循环、launcher 和 artifact 代码。
+## 本地 gate
 
-## 开发顺序
+```bash
+python 06_training_engine/benchmarks/run_single_device_baseline.py \
+  --config 06_training_engine/configs/local_baseline.toml \
+  --output 06_training_engine/results/raw/local-baseline.json
 
-1. 建立可扩缩的 Tiny Transformer 和单卡数值 baseline；
-2. 实现 backward 完成后一次 bulk AllReduce reference；
-3. 实现 per-parameter hook 同步；
-4. 实现 deterministic bucket assignment 与 bucket view；
-5. 实现 bucket AllReduce；
-6. 实现 async bucket 和 handle 生命周期管理；
-7. 用 timeline 证明 backward/communication overlap；
-8. 加入 AMP、accumulation、`no_sync` 和 unused/None gradient 边界；
-9. 与 PyTorch DDP 做正确性、吞吐、显存和 timeline 对照；
-10. 完成 checkpoint/resume、消融汇总和 acceptance。
+python 06_training_engine/benchmarks/run_reducer_correctness.py \
+  --config 06_training_engine/configs/local_correctness.toml \
+  --raw-directory 06_training_engine/results/raw/local-correctness \
+  --output 06_training_engine/results/raw/local-correctness.json
 
-## 必须测试的不变量
+python 06_training_engine/benchmarks/summarize_module06.py \
+  --baseline 06_training_engine/results/raw/local-baseline.json \
+  --correctness 06_training_engine/results/raw/local-correctness.json \
+  --output 06_training_engine/results/raw/module06-local-acceptance.json
+```
 
-- 同一 global batch 下，单卡 reference、手写 reducer 和 DDP 的梯度/更新在容差内一致；
-- 每个参数属于且只属于一个 bucket，bucket offset 不重叠；
-- optimizer step 前所有异步 handle 已完成；
-- accumulation 的非同步 micro-step 不发起 gradient collective；
-- AMP unscale、overflow/skip 与 collective 顺序明确；
-- 任一 rank 的 bucket 顺序不一致时快速失败，而不是静默挂死；
-- checkpoint 恢复后的下一步与连续训练一致。
+矩阵是五种策略 × accumulation 1/2，共 10 个 2-rank Gloo case，并启用一个故意未参与
+forward 的参数。每个 rank 的同步梯度和 optimizer update 都与单进程 global-batch reference
+比较。CPU gate 证明数学与状态机，不证明 NCCL 性能或真实 CUDA overlap。
 
-## 验收实验
+## 统一租卡 gate
 
-- bulk、per-parameter、bucket、bucket+overlap、PyTorch DDP；
-- 至少两种模型规模、三种 bucket size；
-- FP32 与 AMP，accumulation off/on；
-- samples/s、step time p50/p95、peak memory、collective 次数和通信占比；
-- timeline 中可见的 overlap 区间；
-- 每次只改变一个 reducer/precision/accumulation 变量。
+先检查 20 个单变量条件，不启动 GPU：
 
-## 范围边界
+```bash
+python 06_training_engine/benchmarks/run_gpu_ablation.py \
+  --config 06_training_engine/configs/gpu_ablation.toml \
+  --output /tmp/module06-plan.json \
+  --dry-run
+```
 
-本模块不追求完整 callback 生态、弹性容错、任意模型自动并行或生产级 reducer。
-优化没有带来加速也可以通过验收，但必须保留正确性、可信测量和瓶颈解释。
+正式性能与 timeline：
 
-进入本模块前，应完成 04 的通信测量和 05 的算法正确性主线。逐项开发与验收见
-[06 验收清单](../docs/06-issues.md)。
+```bash
+python 06_training_engine/benchmarks/run_gpu_ablation.py \
+  --config 06_training_engine/configs/gpu_ablation.toml \
+  --raw-directory /root/trainscale-results/module06/ablation-raw \
+  --output /root/trainscale-results/module06/ablation.json
+
+python 06_training_engine/benchmarks/run_overlap_profile.py \
+  --config 06_training_engine/configs/gpu_ablation.toml \
+  --raw-directory /root/trainscale-results/module06/profile-raw \
+  --output /root/trainscale-results/module06/overlap-profile.json
+
+python 06_training_engine/benchmarks/run_amp_overflow_probe.py \
+  --config 06_training_engine/configs/gpu_ablation.toml \
+  --raw-directory /root/trainscale-results/module06/amp-overflow-raw \
+  --output /root/trainscale-results/module06/amp-overflow.json
+```
+
+性能矩阵采用 targeted one-factor ablation：20 个条件 × 3 次，而不是 720 个组合。AMP
+overflow probe 另测 2/4 卡的 bucket-async 与 DDP，验证 scale 下降、step skip 和参数不变。Profiler
+只比较 bucket sync、bucket async、DDP。所有命令、日志、rank JSON、Chrome trace 都持久保存并
+写入 SHA-256。
+
+## 解释边界
+
+- async collective 在 backward 结束前 launch 只是 overlap candidate；只有 CUDA/NCCL timeline
+  中通信区间与 backward kernel 真正重叠，才能宣称 overlap；
+- per-parameter 理论上最早发起通信，但 collective 数量和启动开销可能使它最慢；
+- bucket cap 过小增加启动开销，过大推迟首个 collective，最优值依赖模型和链路；
+- 自研 reducer 不支持稀疏梯度、动态图、跨 rank 动态 unused 分歧和生产级故障恢复；
+- 优化没有加速仍可验收，但必须保留正确性、变异度和 profiler 证据。
+
+实验说明见 [`experiments/`](experiments/)，逐项状态见
+[`docs/06-issues.md`](../docs/06-issues.md)。

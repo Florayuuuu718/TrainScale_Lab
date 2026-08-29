@@ -10,6 +10,8 @@
 
 真实 FSDP2 探针复用了 06 的 small Tiny Transformer。参数 placement 为 `Shard(0)`；SGD momentum 一步更新相对全局 reference 的最大误差约 `1.5e-8`；保存 DCP 后，连续执行下一步与恢复后执行下一步的误差为 0。该结果验证 API 语义与恢复路径，不是显存或吞吐结果。
 
+PyTorch 2.8 的 CPU/Gloo 实测暴露出默认 reduce-scatter 梯度缩放与 reference 不一致，因此探针和正式 FSDP2 benchmark 都显式把 gradient divide factor 设置为 data-parallel world size。该设置固定的是“各 rank loss 均为 local mean 时取全局平均梯度”的实验契约，不能用放宽误差替代。
+
 原生 `parallelize_module` MLP 的 `fc1` 为 output-dimension shard，`fc2` 为 input-dimension shard，最终输出 replicated；一步更新最大误差约 `8.9e-8`。早期错误地将 loss 除以 TP world size 会导致更新偏差，这一失败证据说明 TP 与 DDP 的 loss scaling 不能机械套用。
 
 ## GPU 实验读法

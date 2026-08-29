@@ -27,6 +27,20 @@ def _maximum_error(left: torch.Tensor, right: torch.Tensor) -> float:
     return float((left.detach() - right.detach()).abs().max())
 
 
+def _set_fsdp_gradient_divide_factor(module: nn.Module) -> str:
+    """Make data-parallel averaging explicit across PyTorch/backend versions."""
+    factor = float(dist.get_world_size())
+    gradient_setter = getattr(module, "set_gradient_divide_factor", None)
+    if gradient_setter is not None:
+        gradient_setter(factor)
+        return "set_gradient_divide_factor"
+    reduce_scatter_setter = getattr(module, "set_reduce_scatter_divide_factor", None)
+    if reduce_scatter_setter is None:
+        raise RuntimeError("FSDP2 module does not expose a gradient divide-factor API")
+    reduce_scatter_setter(factor)
+    return "set_reduce_scatter_divide_factor"
+
+
 def _parameter_comparisons_mlp(
     parallel: TensorParallelMLP, reference: ReferenceMLP
 ) -> dict[str, float]:
@@ -214,6 +228,7 @@ def run_fsdp2_probe(args: argparse.Namespace, device: torch.device) -> dict[str,
     model = TinyTransformer(model_config).to(device)
     mesh = init_device_mesh(device.type, (dist.get_world_size(),), mesh_dim_names=("fsdp",))
     fully_shard(model, mesh=mesh)
+    divide_factor_api = _set_fsdp_gradient_divide_factor(model)
     sharded_before = all(isinstance(parameter, DTensor) for parameter in model.parameters())
     local_shapes = [
         tuple(cast(Any, parameter).to_local().shape) for parameter in model.parameters()
@@ -268,6 +283,7 @@ def run_fsdp2_probe(args: argparse.Namespace, device: torch.device) -> dict[str,
     torch.manual_seed(args.seed)
     restored = TinyTransformer(model_config).to(device)
     fully_shard(restored, mesh=mesh)
+    restored_divide_factor_api = _set_fsdp_gradient_divide_factor(restored)
     restored_optimizer = torch.optim.SGD(restored.parameters(), lr=args.learning_rate, momentum=0.9)
     restored_model_state, restored_optimizer_state = get_state_dict(restored, restored_optimizer)
     restored_payload = {
@@ -299,6 +315,9 @@ def run_fsdp2_probe(args: argparse.Namespace, device: torch.device) -> dict[str,
         "checkpoint_files": sorted(path.name for path in checkpoint.iterdir()),
         "maximum_error": maximum,
         "correctness_passed": sharded_before and maximum <= args.atol,
+        "gradient_divide_factor": dist.get_world_size(),
+        "gradient_divide_factor_api": divide_factor_api,
+        "restored_gradient_divide_factor_api": restored_divide_factor_api,
         "placements": [
             [str(placement) for placement in parameter.placements]
             for parameter in model.parameters()
@@ -405,6 +424,7 @@ def run_benchmark(args: argparse.Namespace, device: torch.device) -> dict[str, A
                 for layer in base.encoder.layers:
                     fully_shard(layer, mesh=mesh)
             fully_shard(base, mesh=mesh)
+            _set_fsdp_gradient_divide_factor(base)
             model = base
         tokens, labels = make_classification_batch(
             args.per_rank_batch_size,

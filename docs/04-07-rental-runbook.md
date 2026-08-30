@@ -1,5 +1,9 @@
 # 04–07 统一四卡租用实验 Runbook
 
+> 本 runbook 是已经完成 campaign 的工程速查表。第一次租卡请使用更细的
+> [JupyterLab 一站式教程](getting-started/jupyterlab-4gpu.md)，它解释界面、命令、预期输出、
+> 下载和关机。下面命令用于熟悉 shell 的学习者复跑。
+
 ## 硬件决定
 
 租单机 **4×同型号 NVIDIA GPU**，优先复用上一次的 4×RTX 4090 D 24 GiB 主机和镜像。当前正式配置的最大 world size 都是 4；8 GPU、多节点和 2D 并行不是 v1.0 gate。租 8 卡只会增加费用并改变拓扑，现有 runner 不会使用额外四卡。
@@ -7,17 +11,21 @@
 推荐条件：Ubuntu 22.04、可用 NCCL、至少 50 GiB 可写空间、足够保存 Chrome trace。启动后固定：
 
 ```bash
+export PROJECT_ROOT=${PROJECT_ROOT:-/root/TrainScale_Lab}
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export RUN_ROOT=/root/trainscale-results/rental-0407
 mkdir -p "$RUN_ROOT"/{environment,module04,module05,module06,module07}
 ```
+
+若仓库目录带平台生成的后缀，先用 `find /root -maxdepth 3 -name pyproject.toml -type f` 找到它，
+再重新设置 `PROJECT_ROOT`。
 
 同一次 campaign 不升级 PyTorch/CUDA/NCCL，不更换 GPU 顺序，不同时运行无关 GPU 作业。若不能复用原主机，必须把新拓扑视为新环境，不能把新旧吞吐直接混合聚合。
 
 ## 0. 启动后先做环境与代码门
 
 ```bash
-cd /root/TrainScale_Lab
+cd "$PROJECT_ROOT" || exit 1
 git status --short
 git rev-parse HEAD | tee "$RUN_ROOT/environment/project-git-commit.txt"
 nvidia-smi | tee "$RUN_ROOT/environment/nvidia-smi.txt"
@@ -111,6 +119,7 @@ python 06_training_engine/benchmarks/run_gpu_ablation.py \
   --raw-directory "$RUN_ROOT/module06/ablation-raw" \
   --output "$RUN_ROOT/module06/ablation.json"
 
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY all_proxy
 python 06_training_engine/benchmarks/run_overlap_profile.py \
   --config 06_training_engine/configs/gpu_ablation.toml \
   --raw-directory "$RUN_ROOT/module06/profile-raw" \
@@ -162,6 +171,13 @@ python 07_parallelism/benchmarks/summarize_module07.py \
   --gpu-parallelism "$RUN_ROOT/module07/gpu-parallelism.json" \
   --gpu-profiles "$RUN_ROOT/module07/gpu-profiles.json" \
   --output "$RUN_ROOT/module07/acceptance.json"
+
+# 可选：复现“有 overlap 但更慢”的 1 MiB bucket 延伸实验
+python 06_training_engine/benchmarks/run_overlap_profile.py \
+  --config 06_training_engine/configs/gpu_ablation.toml \
+  --bucket-cap-mb 1.0 \
+  --raw-directory "$RUN_ROOT/module06/extension-1m/profile-raw" \
+  --output "$RUN_ROOT/module06/extension-1m/overlap-profile-1m.json"
 
 find "$RUN_ROOT" -type f -print0 | sort -z | xargs -0 sha256sum \
   > "$RUN_ROOT/SHA256SUMS"

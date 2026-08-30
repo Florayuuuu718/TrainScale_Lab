@@ -28,13 +28,26 @@ def main() -> None:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--raw-directory", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--bucket-cap-mb",
+        type=float,
+        help=(
+            "Override the profiling bucket size. By default the middle value from "
+            "gpu_ablation.toml is used. This option is intended for the 1 MiB overlap "
+            "extension experiment."
+        ),
+    )
     args = parser.parse_args()
     config = load_benchmark_config(args.config)
     args.raw_directory.mkdir(parents=True, exist_ok=True)
     available = torch.cuda.device_count()
     ready = torch.cuda.is_available() and dist.is_nccl_available() and available >= 4
     records = []
-    default_bucket = config["bucket_cap_mb"][1]
+    default_bucket = (
+        args.bucket_cap_mb if args.bucket_cap_mb is not None else config["bucket_cap_mb"][1]
+    )
+    if default_bucket <= 0:
+        parser.error("--bucket-cap-mb must be greater than zero")
     for strategy in ("bucket_sync", "bucket_async", "ddp"):
         if not ready:
             records.append({"strategy": strategy, "status": "unavailable"})

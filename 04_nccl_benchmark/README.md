@@ -1,12 +1,19 @@
 # 04 · NCCL Performance Lab
 
-> 状态：本地可实现的配置、契约、解析器、runner、DDP bridge 和 CPU 测试已完成；
-> 真实 collective 曲线与 timeline 等待一次冻结的多 GPU 实验。本目录是 collective
-> 性能测量与 DDP 通信解释的唯一入口。
+> 状态：已完成。4×RTX 4090 D 的 collective、拓扑、DDP bridge、长窗口 scaling 和
+> NCCL 策略延伸实验均已校验；scaling correctness 通过，但测量稳定性限制如实保留。
 
 04 不把 `nccl-tests` 当作孤立跑分工具。它从 03 已归档的真实 1/2/4 GPU DDP
 结果出发，在同一主机、同一软件环境中测量 collective 曲线，并用 GPU timeline
-解释为什么小模型 strong scaling 变慢、weak scaling 也没有线性增长。
+解释为什么小模型 strong scaling 变慢，而 weak scaling 能接近但达不到理想线性增长。
+
+## 开始前先建立联系
+
+03 已经告诉我们“DDP 没有线性加速”，但只看端到端吞吐还不知道时间花在哪里。04 把训练
+拆成消息大小、collective 类型和拓扑路径，建立通信上限，再把真实梯度 payload 放回曲线。
+如果 `rank`、AllReduce、strong/weak scaling 仍不熟悉，先查
+[术语表](../docs/concepts/distributed-systems-glossary.md) 或复习
+[03](../03_distributed_training/README.md)。
 
 ## 本阶段要回答的问题
 
@@ -40,24 +47,35 @@
 └── results/                       # 正式摘要；大型原始数据进入 ignored raw/
 ```
 
-## 当前本地入口
+## 建议学习顺序
+
+1. 先回答上面的五个问题，并把预测写下来；
+2. 按 [实验导航](experiments/README.md) 从协议、曲线、拓扑走到 DDP bridge；
+3. 本地运行解析器与 artifact tests；需要真实曲线时再走
+   [JupyterLab 四卡教程](../docs/getting-started/jupyterlab-4gpu.md)；
+4. 实验后再读 [最终报告](experiments/06_final_report.md)，用
+   [机器可读摘要](results/module04_final_summary.json) 对照结果，不要求绝对数字相同。
+
+## 不租卡也能先完成什么
 
 以下命令不需要多 GPU，并且不会伪造性能数据：
 
 ```powershell
 .venv\Scripts\python 04_nccl_benchmark\benchmarks\check_environment.py
 
-.venv\Scripts\python 04_nccl_benchmark\benchmarks\build_nccl_tests.py `
-  --source-directory /tmp/nccl-tests
-
 .venv\Scripts\python 04_nccl_benchmark\benchmarks\plan_ddp_bridge.py `
   --config 04_nccl_benchmark\configs\ddp_bridge.toml
+
+.venv\Scripts\python -m pytest -q 04_nccl_benchmark\tests
 ```
 
-真实 Linux 多 GPU 命令见 [环境与租卡门](ENVIRONMENT.md) 和
-[实验导航](experiments/README.md)。
+这些命令验证环境探针、配置、公式、parser 和 10 MiB payload 推导，不产生多 GPU 性能值。
+`nccl-tests` 的真实构建与执行要求 Linux/WSL；不要在 Windows PowerShell 中照抄 `/tmp` 路径。
 
-## 开发顺序
+真实 Linux 多 GPU 命令见 [环境与租卡门](ENVIRONMENT.md)、
+[实验导航](experiments/README.md) 和 [JupyterLab 一站式教程](../docs/getting-started/jupyterlab-4gpu.md)。
+
+## 实验实施顺序
 
 1. 冻结 Linux、GPU、driver、CUDA、NCCL、拓扑和 `nccl-tests` commit；
 2. 建立 CPU 可测的配置、解析、公式和结果 schema 测试；
@@ -80,14 +98,17 @@
 - 硬件不足记录 `unavailable`，不能伪造多 GPU 数据；
 - 不同主机或软件栈的绝对带宽不能混成同一性能排名。
 
-## 最终证据
+## 已获得的最终证据
 
-- message size–latency/algbw/busbw 曲线；
-- 至少 2 GPU 的正式证据，4 GPU 为推荐扩展；
-- 同 NUMA/跨 NUMA或其他可控拓扑对照；
-- 03 workload 的 GPU timeline 和实际 collective 大小；
-- collective 曲线与 DDP scaling 现象的对应解释；
-- 环境、配置、原始数据哈希、三次重复值和已知限制。
+- 2/4 GPU 四类 collective 的 message size–latency/algbw/busbw 曲线；
+- PHB/NODE/SYS pair 对照，但差异不足以宣称稳定拓扑排序；
+- 10,494,976-byte 梯度 payload 与 25 MiB bucket 的曲线映射；
+- DDP correctness/timeline，以及五次长窗口 strong/weak scaling；
+- Auto/Ring/Tree 与 Simple/LL 的诊断性延伸对照；
+- 999 个主归档文件、36 个延伸作业和外层归档 SHA-256 校验。
+
+最重要的边界是：long campaign 的 measurement quality 未过稳定性门。中位数可用于
+定性解释，不能包装成高精度扩展效率。这是可信实验的一部分，不是未完成。
 
 ## 范围边界
 
@@ -97,3 +118,6 @@ overlap 留给 06。
 
 进入本模块前，请先完成 [03 · Distributed Training](../03_distributed_training/README.md)。
 逐项开发与验收见 [04 验收清单](../docs/04-issues.md)。
+
+学完本章后进入 [05 · TinyCollective](../05_tiny_collective/README.md)：04 告诉你 AllReduce
+表现怎样，05 会亲手拆开它的数据流和通信轮次。

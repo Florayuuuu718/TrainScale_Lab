@@ -15,6 +15,12 @@ TrainScale Lab is a hands-on open-source project for learners interested in **ML
 | [01 · PyTorch Training](01_pytorch_training/README.md) | Complete module 01 tutorial and reproduction order |
 | [02 · GPU Kernels](02_gpu_kernels/README.md) | Runnable Triton kernels, acceptance checklist, and nine experiment reports |
 | [03 · Distributed Training](03_distributed_training/README.md) | Runnable Gloo/DDP tutorial, cloud 4-GPU protocol, and eight experiment reports |
+| [04 · NCCL Performance](04_nccl_benchmark/README.md) | Collective curves, DDP bridge, topology/policy extensions, and final report |
+| [05 · TinyCollective](05_tiny_collective/README.md) | Educational centralized/ring implementations and NCCL comparison |
+| [06 · Mini Training Engine](06_training_engine/README.md) | Reducers, AMP, buckets, and measured overlap |
+| [07 · Parallelism](07_parallelism/README.md) | DDP/FSDP2/TP correctness, memory, and strategy selection |
+| [JupyterLab 4-GPU guide](docs/getting-started/jupyterlab-4gpu.md) | Start, run, validate, download, and shut down a cloud campaign |
+| [Distributed-systems glossary](docs/concepts/distributed-systems-glossary.md) | Beginner explanations for ranks, collectives, buckets, FSDP2, and TP |
 | [Source code](01_pytorch_training/trainscale_training) | Data, models, engine, checkpoint, benchmarks, and profiler |
 | [Configurations](01_pytorch_training/configs/README.md) | TOML experiment recipes |
 | [Correctness tests](01_pytorch_training/tests/README.md) | Explanation of all 10 tests |
@@ -25,7 +31,10 @@ TrainScale Lab is a hands-on open-source project for learners interested in **ML
 
 ## Start Here
 
-The repository now contains the complete module 01 and its repository foundation: a synthetic MLP baseline, CIFAR-10 CNN training, checkpoint/resume, AMP, gradient accumulation, profiling, and controlled performance experiments. The goal is training-system correctness and experimental method, not leaderboard accuracy.
+The v1.0 learning path now spans all seven modules: reproducible training, GPU kernels, DDP,
+NCCL analysis, collectives from first principles, a miniature training engine, and FSDP2/TP.
+The goal is training-system correctness and experimental method, not leaderboard scores or a
+hardware benchmark ranking.
 
 If you are new to PyTorch, follow the Chinese beginner path in this order:
 
@@ -58,10 +67,11 @@ For module 02, keep the stable root `.venv` by default and run the [crash-isolat
 
 Module 03 is complete: local 2/4-rank CPU/Gloo correctness, scaling, profiling, and the one-GPU NCCL baseline pass. The same frozen config was then run three times on an AutoDL single-node 4×RTX 4090D instance. Real 1/2/4-GPU strong/weak results, topology, raw repetitions, median aggregation, download checksum, and the cloud shutdown workflow are archived; only the unmeasured 8-GPU cases remain `unavailable`.
 
-Module 04's hardware-independent implementation is ready: the shared artifact contract, strict
-configs, pinned build helper, nccl-tests parser, three-run aggregation, DDP bridge, tutorials,
-and CPU tests are executable. Real 2/4-GPU collective curves and timelines remain explicitly
-pending multi-GPU acceptance.
+Modules 04–07 are complete for the v1.0 scope. The verified single-node 4×RTX 4090 D campaign
+covers collective curves and DDP bridging, educational centralized/ring/NCCL comparisons,
+reducer/AMP/bucket ablations, real overlap traces, and FSDP2/TP correctness, memory, throughput,
+and profiler evidence. Reports preserve instability, backend limitations, and negative results
+instead of presenting every advanced technique as a speedup.
 
 ## What You Will Learn
 
@@ -107,7 +117,8 @@ FSDP2 / Tensor Parallel
 
 ## Repository Layout
 
-All seven module directories now exist. Modules 01–03 are sealed; module 03 includes both local correctness and real cloud 1/2/4-GPU scaling, with 8 GPUs retained as an explicit optional boundary. Each later directory has a README that states its scope and current status.
+All seven v1.0 modules now have implementation, correctness gates, experiment reports, and reviewed
+evidence. Eight-GPU, multi-node, pipeline, and 2D parallelism remain explicit optional extensions.
 
 ```text
 trainscale-lab/
@@ -137,12 +148,10 @@ Every experiment follows the same loop:
 6. **Validate** — recheck numerical correctness and convergence, not only speed.
 7. **Record** — commit configs, raw data, plots, and conclusions so others can reproduce them.
 
-Recommended experiment table:
-
-| experiment | hardware | precision | batch size | throughput | peak memory | correctness |
-|---|---|---|---:|---:|---:|---|
-| baseline | pending | FP32 | pending | pending | pending | unverified |
-| optimization-A | same | TBD | same | pending | pending | unverified |
+The repository does not use empty placeholder tables as progress evidence. Every executed experiment
+must produce a structured artifact with environment, commit, configuration, correctness, repeated
+measurements, variability, and raw-file hashes. Missing hardware is recorded as `unavailable`. See
+the [documentation and experiment standard](docs/documentation-standard.md).
 
 ## Stage-by-Stage Work
 
@@ -221,7 +230,7 @@ focus is why a technique is chosen—not merely how to make its configuration ru
 | CPU only | Training loops, tests, Gloo multiprocessing, collective logic |
 | 1 NVIDIA GPU | AMP, Profiler, CUDA/Triton, single-GPU benchmarks |
 | 2–4 GPUs | DDP, NCCL, Ring AllReduce, introductory FSDP2 |
-| 8 GPUs or multiple nodes | Scaling, topology effects, overlap, composed parallelism |
+| 8 GPUs or multiple nodes | Large-scale scaling, inter-node networking, and composed parallelism (optional) |
 
 Validate expensive experiments first with small correctness tests. Run only frozen benchmark configurations in the cloud, and publish the instance type and cost in the report.
 
@@ -255,11 +264,14 @@ Every experiment report must record:
 - throughput definition, peak memory, and correctness tolerance;
 - failed experiments and known limitations.
 
-Unmeasured results are explicitly labeled `pending`. Absolute performance across different hardware is not ranked directly; relative changes in the same environment are preferred.
+Unavailable or unmeasured capabilities are labeled explicitly instead of being filled with zero or
+example performance values. Absolute performance across different hardware is not ranked directly;
+relative changes in the same environment are preferred.
 
 ## Contributing
 
-The project is at an early stage. Contributions are welcome in the form of:
+The v1.0 learning path is complete. Contributions that improve reproducibility and teaching quality
+are still welcome in the form of:
 
 - smaller and clearer reference implementations;
 - benchmarks reproducible across different hardware;

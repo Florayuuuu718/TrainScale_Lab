@@ -10,6 +10,9 @@
 - **只有 CPU，或暂时只学习基础训练**：可以留在原生 Windows，按[通用环境搭建](environment.md)选择 CPU wheel。
 - **原生 Linux**：沿用通用环境中的 Python/uv 规则，并使用 Linux 的 `.venv/bin/...` 命令；不需要 WSL。
 
+如果 Windows pytest 显示 05–07 的 Linux/Gloo 集成项被跳过，按
+[Linux/Gloo 集成测试教程](linux-gloo-validation.md)在 WSL2 CPU 环境补齐；这一步不需要 GPU。
+
 不要先在 Windows 中创建 CUDA 环境，再把同一个 `.venv` 复制给 Ubuntu。Windows 与 Linux 应分别创建环境；性能实验的 Linux 仓库应位于 `/home/<用户名>/...`。
 
 进入 02 时也不要预先创建两套 WSL Python 环境：默认 stable 根 `.venv` 先跑[真实 kernel 环境探针](../../02_gpu_kernels/ENVIRONMENT.md)，只有更新驱动后仍失败才建立隔离 nightly 兜底；CUDA Toolkit 则等 CUDA C++ 实验再装。
@@ -53,3 +56,10 @@ CPU/GPU wheel、driver、CUDA runtime 和 `nvcc` 的区别见[环境搭建](envi
 - 为什么“CUDA 训练能跑”不等于 nvcc、CUPTI、Triton 都可用？
 
 回答不清楚时不要进入 02，回到 01 README 按实验顺序重跑并对照源码。
+
+## 完成 01 以后
+
+进入 [02 · GPU Kernels](../../02_gpu_kernels/README.md) 前，先确认你能解释一次训练 step、
+checkpoint 为什么保存完整状态，以及 benchmark 为什么需要 warm-up。之后按
+[文档总导航](../README.md) 的 01→07 主线推进；等到 04–07 的正式多 GPU 实验时，再使用
+[JupyterLab 四卡教程](jupyterlab-4gpu.md)，无需提前为尚未调通的代码付费租卡。

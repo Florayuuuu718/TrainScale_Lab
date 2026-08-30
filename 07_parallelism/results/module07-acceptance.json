@@ -1,32 +1,31 @@
 {
   "schema_version": 1,
-  "recorded_at": "2026-08-29T13:57:22.287186+08:00",
-  "status": "passed_local_gates",
+  "recorded_at": "2026-08-29T18:56:14.123558+08:00",
+  "status": "complete",
   "gates": {
     "memory_model": "success",
     "custom_tp_cpu_gloo": "success",
-    "fsdp2_cpu_gloo": "success",
+    "fsdp2_cpu_gloo": "unavailable",
     "native_tp_cpu_gloo": "success",
-    "gpu_parallelism": "not_provided",
-    "gpu_profiles": "not_provided"
+    "fsdp2_cuda_nccl_preflight": "success",
+    "native_tp_cuda_nccl_preflight": "success",
+    "gpu_parallelism": "success",
+    "gpu_profiles": "success"
   },
   "local_evidence": {
     "memory_model_record_count": 4,
     "tp_case_count": 4,
-    "maximum_custom_tp_error": 1.1920928955078125e-07,
-    "maximum_fsdp2_error": 1.4901161193847656e-08,
-    "maximum_native_tp_error": 8.940696716308594e-08
+    "maximum_custom_tp_error": 5.960464477539063e-08,
+    "maximum_fsdp2_error": null,
+    "maximum_native_tp_error": 1.1920928955078125e-07,
+    "maximum_cuda_fsdp2_error": 1.4901161193847656e-08,
+    "maximum_cuda_native_tp_error": 5.960464477539063e-08
   },
-  "pending_gpu_gates": [
-    "2/4-GPU FSDP2 and native TP correctness preflights",
-    "DDP/FSDP2/TP throughput and peak-memory comparison",
-    "4-GPU collective traces for DDP, FSDP2, and TP",
-    "controlled single-GPU OOM transition if the configured model can expose one"
-  ],
+  "pending_gpu_gates": [],
   "optional_not_blocking": [
     "2D TP x DP/FSDP",
     "pipeline parallelism",
     "multi-node scaling"
   ],
-  "boundary": "Local gates validate sharding math, DTensor placements, FSDP2 one-step updates, and distributed checkpoint resume. They do not prove CUDA memory savings or speedup."
+  "boundary": "CPU/Gloo and CUDA/NCCL capabilities are reported separately. CUDA/NCCL preflights may satisfy the GPU learning track when CPU/Gloo FSDP2 is unavailable; they do not erase that backend limitation. GPU memory and throughput conclusions apply only to the recorded hardware, model, and software environment."
 }

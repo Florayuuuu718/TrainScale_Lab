@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "artifact_type": "module05.reviewed_summary",
+  "status": "complete",
+  "correctness": {
+    "cpu_gloo_cases": 24,
+    "status": "passed",
+    "coverage": "world sizes 2/3/4; divisible and ragged element counts"
+  },
+  "gpu_campaign": {
+    "source_commit": "13f4b49b9c535d4e3f70489c28ecd7073969ffd8",
+    "gpu": "4 x NVIDIA GeForce RTX 4090 D 24 GiB",
+    "status": "passed",
+    "archive_sha256": "133b1ea5b77dd2966a1cd643c097115e7d47d5cbf9a2ea21ab6c057478a13462"
+  },
+  "representative_bus_bandwidth_gbps": {
+    "world_4": {
+      "10494976_bytes": {"centralized": 3.035, "ring": 5.888, "torch_nccl": 9.257},
+      "67108864_bytes": {"centralized": 3.069, "ring": 7.617, "torch_nccl": 9.317}
+    },
+    "world_2_67108864_bytes": {"centralized": 6.046, "ring": 7.571, "torch_nccl": 7.570}
+  },
+  "conclusion": "Ring removes the centralized root bottleneck as world size grows, but the readable Python implementation still lacks NCCL fusion, topology selection, protocols, and kernel-level optimization.",
+  "boundary": "Tiny-message results are launch-noise dominated and are not used to rank algorithms."
+}

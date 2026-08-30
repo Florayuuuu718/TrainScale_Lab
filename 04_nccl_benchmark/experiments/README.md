@@ -10,5 +10,8 @@
    运行、timeline、下载校验和关机；
 6. [05 · Scaling stability follow-up](05_scaling_stability_followup.md)：修复过短测量窗口，
    用五次长窗口运行决定 speedup 是否可以正式报告。
+7. [06 · Final report](06_final_report.md)：把 collective、DDP scaling、拓扑和 NCCL 策略
+   延伸结果收束为可迁移的知识结论。
 
-实验 05 只在短窗口 scaling 的重复性不足时触发；它不要求重跑 NCCL 曲线或 profiler。
+实验 05 已触发并完成。结果仍未通过稳定性门，因此报告保留中位数和范围，但不声称高精度
+scaling efficiency。实验 06 是推荐的最终阅读入口。

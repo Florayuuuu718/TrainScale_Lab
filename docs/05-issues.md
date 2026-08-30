@@ -13,8 +13,11 @@
 | 05-06 | ragged/非整除 chunk | 05-05 | world=3、padding 或 uneven chunk tests | 已完成 |
 | 05-07 | 异步 P2P 与生命周期 | 05-05 | handle、tag、顺序和 timeout tests | 已完成 |
 | 05-08 | 通信量与轮数推导 | 05-02..07 | 公式、CPU tests、trace 自动核对 | 已完成 |
-| 05-09 | GPU/NCCL 性能对照 | 04 完成，05-05 | 同消息/dtype/world size 正式曲线 | 待统一租卡 |
-| 05-10 | 模块发布验收 | 05-01..09 | correctness matrix、报告、acceptance JSON | 本地门完成，待 05-09 |
+| 05-09 | GPU/NCCL 性能对照 | 04 完成，05-05 | 同消息/dtype/world size 正式曲线 | 已完成 |
+| 05-10 | 模块发布验收 | 05-01..09 | correctness matrix、报告、acceptance JSON | 已完成 |
+
+最终证据为 24 个 CPU/Gloo case 和 2/4 GPU × centralized/ring/NCCL 对照。大消息验证
+ring 缓解 root 热点；短消息噪声不进入排名。
 
 ## 不阻塞完成的扩展
 

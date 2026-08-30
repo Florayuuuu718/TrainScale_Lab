@@ -15,6 +15,12 @@ TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Tr
 | [01 · PyTorch Training](01_pytorch_training/README.md) | 01 模块完整教学与复现顺序 |
 | [02 · GPU Kernels](02_gpu_kernels/README.md) | 可运行 Triton 算子、验收清单与九项实验报告 |
 | [03 · Distributed Training](03_distributed_training/README.md) | 可运行 Gloo/DDP 教程、云端四卡流程与八项实验报告 |
+| [04 · NCCL Performance](04_nccl_benchmark/README.md) | 通信曲线、DDP bridge、拓扑/协议延伸与最终报告 |
+| [05 · TinyCollective](05_tiny_collective/README.md) | 手写 centralized/ring 与 NCCL 对照 |
+| [06 · Mini Training Engine](06_training_engine/README.md) | reducer、AMP、bucket 与真实 overlap 实验 |
+| [07 · Parallelism](07_parallelism/README.md) | DDP/FSDP2/TP 正确性、显存与策略选择 |
+| [JupyterLab 四卡一站式教程](docs/getting-started/jupyterlab-4gpu.md) | 从开机、Terminal、运行、下载校验到关机 |
+| [分布式术语表](docs/concepts/distributed-systems-glossary.md) | rank、collective、bucket、FSDP2/TP 等直观解释 |
 | [训练源码](01_pytorch_training/trainscale_training) | 数据、模型、引擎、checkpoint、benchmark 与 profiler |
 | [实验配置](01_pytorch_training/configs/README.md) | TOML 实验配方 |
 | [正确性测试](01_pytorch_training/tests/README.md) | 10 个测试的逐项解释 |
@@ -25,14 +31,18 @@ TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Tr
 
 ## 新手从这里开始
 
-仓库目前已完成 01 模块及其仓库基建：从 synthetic MLP 正确性基线扩展到 CIFAR-10 CNN、checkpoint/resume、AMP、梯度累积、Profiler 和性能消融。目标是验证训练系统与实验方法，不是追求 CIFAR-10 榜单精度。
+仓库主线 01–07 已形成完整学习闭环：从可复现训练、GPU kernel、DDP，继续到 NCCL、
+手写 collective、mini training engine、FSDP2/TP。目标不是追求某个榜单或硬件峰值，而是学会
+“最小实现 → correctness → 测量 → profiler/通信解释 → 单变量复测”的系统方法。
 
-请按顺序阅读和操作：
+第一次学习请按顺序阅读和操作，不需要提前租多卡：
 
 1. [文档总导航](docs/README.md)
 2. [01 模块从这里开始](docs/getting-started/README.md)
 3. [PyTorch 训练基础概念](docs/concepts/pytorch-training-basics.md)
 4. [01 · PyTorch Training 完整复现](01_pytorch_training/README.md)
+5. 完成 01–03 后，按 [04–07 学习与实验总纲](docs/04-07-development-plan.md) 进入通信与并行；
+6. 需要云端四卡时，严格跟随 [JupyterLab 一站式教程](docs/getting-started/jupyterlab-4gpu.md)。
 
 如果你使用 Windows + NVIDIA GPU，并准备完成后续 compile、Profiler、CUDA/Triton 与 NCCL 路线，请在运行实验前先完成[WSL2 + 官方 Ubuntu + PyTorch GPU 从零教程](docs/getting-started/wsl2-gpu.md)。教程明确标注每条命令应在管理员 PowerShell、普通 PowerShell 还是 Ubuntu 终端执行，并解释项目为什么应放在 Ubuntu 的 `/home/<用户名>/projects/` 中。
 
@@ -58,9 +68,10 @@ uv sync --extra cpu --extra dev
 
 03 已完成：本地 2/4 rank CPU/Gloo 正确性、scaling、Profiler 和 RTX 5060 单 GPU NCCL 基线全部通过；同一冻结配置随后在 AutoDL 单机 4×RTX 4090D 上运行三次，归档了真实 1/2/4 GPU strong/weak 结果、拓扑、原始重复值、中位数汇总、下载哈希和关机止费流程。只有未租用的 8 GPU case 继续诚实记录为 `unavailable`。
 
-04 已完成无需多 GPU 的开发部分：公共 artifact 契约、严格配置、固定版本构建助手、
-`nccl-tests` 输出解析、三次聚合、DDP bridge、教程和 CPU 测试均可运行。真实 2/4 GPU
-collective 曲线与 timeline 尚未采集，继续明确标记为待多 GPU 验收。
+04–07 已完成本地 correctness 与单机 4×RTX 4090 D 正式实验。04 得到了 collective 曲线、
+DDP bridge、长窗口 scaling 和 NCCL 策略延伸；05 对照了 centralized/ring/NCCL；06 完成
+reducer/AMP/bucket 消融，并用 1 MiB bucket 证明“真实 overlap 仍可能更慢”；07 完成
+FSDP2/TP correctness、显存、吞吐和 profiler。所有结论都保留重复波动、后端限制和适用边界。
 
 ## 你会学到什么
 
@@ -106,7 +117,8 @@ FSDP2 / Tensor Parallel
 
 ## 仓库结构
 
-七个模块目录均已建立；01–03 已封存。03 同时完成本地正确性和云端真实 1/2/4 GPU scaling，8 GPU 保留为明确的可选边界。各后续目录的 README 明确记录范围和当前状态。
+七个模块目录均已建立，01–07 的 v1.0 必需证据均已完成。8 GPU、多节点、PP 和二维并行继续
+保留为可选延伸，不因“更高级”而扩大新手主线。
 
 ```text
 trainscale-lab/
@@ -136,12 +148,9 @@ trainscale-lab/
 6. **验证**：重新检查数值正确性和训练收敛，不能只看速度。
 7. **记录**：提交配置、原始数据、图表和结论，使他人能够复现。
 
-推荐为每项优化保留如下实验表：
-
-| experiment | hardware | precision | batch size | throughput | peak memory | correctness |
-|---|---|---|---:|---:|---:|---|
-| baseline | 待实测 | FP32 | 待实测 | 待实测 | 待实测 | 待验证 |
-| optimization-A | 同上 | 待定 | 同上 | 待实测 | 待实测 | 待验证 |
+项目不再使用空白占位表表示进度。实际执行的实验必须生成结构化 artifact，记录环境、commit、
+配置、correctness、重复值、波动和原始文件哈希；没有硬件时明确使用 `unavailable`。完整要求见
+[文档与实验发布规范](docs/documentation-standard.md)。
 
 ## 分阶段实践任务
 
@@ -219,7 +228,7 @@ Broadcast，扫描小消息到大消息，区分 latency-bound 与 bandwidth-bou
 | 只有 CPU | 训练循环、测试、Gloo 多进程、collective 算法逻辑 |
 | 1 张 NVIDIA GPU | AMP、Profiler、CUDA/Triton、单卡 benchmark |
 | 2–4 张 GPU | DDP、NCCL、Ring AllReduce、FSDP2 入门 |
-| 8 张或多节点 | scaling、拓扑影响、通信计算重叠、组合并行 |
+| 8 张或多节点 | 大规模 scaling、跨节点网络、组合并行（可选延伸） |
 
 昂贵实验应先通过小规模 correctness test；云端只运行已经冻结配置的 benchmark，并在报告中公开实例型号与费用。
 
@@ -253,11 +262,12 @@ Broadcast，扫描小消息到大消息，区分 latency-bound 与 bandwidth-bou
 - 吞吐的统计口径、峰值显存和正确性阈值；
 - 已知限制与排障说明。
 
-未经实际测量的结果一律标注“待实测”。不同硬件的绝对性能不直接排名，优先比较同一环境下的相对变化。
+未经实际测量的能力标注为 `unavailable` 或“未测量”，不填入 0 或示例性能值。不同硬件的
+绝对性能不直接排名，优先比较同一环境下的相对变化。
 
 ## 参与贡献
 
-项目尚在早期阶段。欢迎贡献：
+项目的 v1.0 学习主线已经完成，仍欢迎围绕可复现性和教学质量继续贡献：
 
 - 更小、更清楚的原理实现；
 - 可在不同硬件复现的 benchmark；
@@ -268,7 +278,9 @@ Broadcast，扫描小消息到大消息，区分 latency-bound 与 bandwidth-bou
 
 ## 项目边界
 
-TrainScale Lab 是教学与研究型实现，不承诺生产环境所需的稳定性、安全性和容错能力。早期阶段不会把 RDMA verbs、DPDK、Linux 内核网络栈或完整 NCCL 源码作为前置知识；这些主题将在实际瓶颈需要时再扩展。
+TrainScale Lab 是教学与研究型实现，不承诺生产环境所需的稳定性、安全性和容错能力。主线
+不会把 RDMA verbs、DPDK、Linux 内核网络栈或完整 NCCL 源码作为前置知识；这些主题只在
+扩展实验确实遇到相应瓶颈时再引入。
 
 ## License
 

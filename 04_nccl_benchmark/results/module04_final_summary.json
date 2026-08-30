@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "artifact_type": "module04.reviewed_summary",
+  "status": "complete_with_measurement_limit",
+  "campaign": {
+    "date": "2026-08-27 to 2026-08-29",
+    "source_commits": ["120fa6aed78767b56827aa02555fcac988e481f2", "13f4b49b9c535d4e3f70489c28ecd7073969ffd8", "bf4f4478eedfc1762c6ce038db07cec7f07a8180"],
+    "gpu": "4 x NVIDIA GeForce RTX 4090 D 24 GiB",
+    "software": "Ubuntu 22.04, PyTorch 2.8.0+cu128, CUDA toolkit 12.8, NCCL 2.27.3",
+    "archive_sha256": "133b1ea5b77dd2966a1cd643c097115e7d47d5cbf9a2ea21ab6c057478a13462",
+    "integrity": "999 internal files and all formal artifacts verified"
+  },
+  "collective_results": {
+    "allreduce_large_message_plateau_gbps": {
+      "phb_pair_2_3": 7.81,
+      "sys_pair_0_2": 7.85,
+      "interpretation": "The 0.51% difference is below the evidence needed for a topology claim."
+    },
+    "ddp_payload_bytes": 10494976,
+    "ddp_payload_allreduce_busbw_gbps": {
+      "world_2": 7.61,
+      "world_4": 9.45
+    }
+  },
+  "ddp_scaling_followup": {
+    "correctness": "passed",
+    "measurement_quality": "failed",
+    "strong": {
+      "world_1": {"median_samples_per_second": 143536.60, "relative_range": 0.0861},
+      "world_2": {"median_samples_per_second": 135000.54, "relative_range": 0.1176, "speedup": 0.941},
+      "world_4": {"median_samples_per_second": 135344.78, "relative_range": 0.1255, "speedup": 0.943}
+    },
+    "weak": {
+      "world_1": {"median_samples_per_second": 74571.89, "relative_range": 0.1382},
+      "world_2": {"median_samples_per_second": 138116.68, "relative_range": 0.0300, "speedup": 1.852, "efficiency": 0.926},
+      "world_4": {"median_samples_per_second": 263882.90, "relative_range": 0.0938, "speedup": 3.539, "efficiency": 0.885}
+    },
+    "boundary": "Use medians and qualitative trends only. The small-model baseline remains noisy, so these values are not high-precision scaling efficiency."
+  },
+  "explainability_extension": {
+    "archive_sha256": "705d3165228579b7a7c0b52736589e83053c54c2a8c11db4527ad56aa71d1da3",
+    "integrity": "36 of 36 jobs exited zero and reported zero out-of-bounds values",
+    "topology_plateau_gbps": {"phb": 7.84, "node": 7.85, "sys": 7.89},
+    "policy_plateau_gbps": {"auto": 9.58, "ring_simple": 9.56, "tree_simple": 8.29, "ring_ll": 4.78},
+    "conclusion": "No stable topology ranking was observed. Auto tuning was robust; forced algorithm/protocol settings are diagnostics, not general recommendations."
+  }
+}

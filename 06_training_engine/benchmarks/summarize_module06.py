@@ -69,9 +69,13 @@ def summarize(
             "AMP overflow/skip and accumulation=4 evidence",
         ],
         "boundary": (
-            "Local gates prove trainability, global-batch equivalence, accumulation, "
-            "None-gradient, "
-            "checkpoint, and reducer lifecycle. They do not prove CUDA/NCCL overlap or speedup."
+            "GPU ablation, profiler, and overflow gates passed on the recorded hardware; "
+            "their throughput and overlap conclusions do not automatically transfer to other "
+            "models, bucket plans, interconnects, or software versions."
+            if complete
+            else "Local gates prove trainability, global-batch equivalence, accumulation, "
+            "None-gradient, checkpoint, and reducer lifecycle. They do not prove CUDA/NCCL "
+            "overlap or speedup."
         ),
     }
 

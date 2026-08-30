@@ -21,13 +21,34 @@ def summarize(
     gpu_parallelism: dict[str, Any] | None,
     gpu_profiles: dict[str, Any] | None,
 ) -> dict[str, Any]:
+    gpu_preflights = (
+        gpu_parallelism.get("correctness", {}).get("preflights", [])
+        if gpu_parallelism is not None
+        else []
+    )
+    cuda_fsdp_ready = any(
+        item.get("mode") == "fsdp2_probe" and item.get("status") == "success"
+        for item in gpu_preflights
+    )
+    cuda_tp_ready = any(
+        item.get("mode") == "native_tp_probe" and item.get("status") == "success"
+        for item in gpu_preflights
+    )
     local = {
         "memory_model": memory.get("status"),
         "custom_tp_cpu_gloo": tp_correctness.get("status"),
         "fsdp2_cpu_gloo": fsdp2_capability.get("status"),
         "native_tp_cpu_gloo": native_tp_capability.get("status"),
     }
-    local_ready = all(status == "success" for status in local.values())
+    # FSDP2/DTensor support is backend-dependent. A successful CUDA/NCCL
+    # preflight is authoritative for the GPU learning track when a CPU/Gloo
+    # probe is unavailable; the unavailable CPU result remains visible.
+    local_ready = (
+        local["memory_model"] == "success"
+        and local["custom_tp_cpu_gloo"] == "success"
+        and (local["fsdp2_cpu_gloo"] == "success" or cuda_fsdp_ready)
+        and (local["native_tp_cpu_gloo"] == "success" or cuda_tp_ready)
+    )
     gpu_status = "not_provided" if gpu_parallelism is None else gpu_parallelism.get("status")
     profile_status = "not_provided" if gpu_profiles is None else gpu_profiles.get("status")
     complete = local_ready and gpu_status == "success" and profile_status == "success"
@@ -36,13 +57,33 @@ def summarize(
         for record in tp_correctness.get("metrics", {}).get("records", [])
         for rank in record.get("ranks", [])
     ]
-    fsdp_errors = [
+    fsdp_errors = (
+        [
+            rank.get("maximum_error", 0.0)
+            for rank in fsdp2_capability.get("metrics", {}).get("ranks", [])
+        ]
+        if fsdp2_capability.get("status") == "success"
+        else []
+    )
+    native_errors = (
+        [
+            rank.get("maximum_error", 0.0)
+            for rank in native_tp_capability.get("metrics", {}).get("ranks", [])
+        ]
+        if native_tp_capability.get("status") == "success"
+        else []
+    )
+    cuda_fsdp_errors = [
         rank.get("maximum_error", 0.0)
-        for rank in fsdp2_capability.get("metrics", {}).get("ranks", [])
+        for item in gpu_preflights
+        if item.get("mode") == "fsdp2_probe" and item.get("status") == "success"
+        for rank in item.get("ranks", [])
     ]
-    native_errors = [
+    cuda_tp_errors = [
         rank.get("maximum_error", 0.0)
-        for rank in native_tp_capability.get("metrics", {}).get("ranks", [])
+        for item in gpu_preflights
+        if item.get("mode") == "native_tp_probe" and item.get("status") == "success"
+        for rank in item.get("ranks", [])
     ]
     return {
         "schema_version": 1,
@@ -50,6 +91,8 @@ def summarize(
         "status": "complete" if complete else "passed_local_gates" if local_ready else "failed",
         "gates": {
             **local,
+            "fsdp2_cuda_nccl_preflight": "success" if cuda_fsdp_ready else "not_provided",
+            "native_tp_cuda_nccl_preflight": "success" if cuda_tp_ready else "not_provided",
             "gpu_parallelism": gpu_status,
             "gpu_profiles": profile_status,
         },
@@ -59,6 +102,8 @@ def summarize(
             "maximum_custom_tp_error": max(tp_errors, default=None),
             "maximum_fsdp2_error": max(fsdp_errors, default=None),
             "maximum_native_tp_error": max(native_errors, default=None),
+            "maximum_cuda_fsdp2_error": max(cuda_fsdp_errors, default=None),
+            "maximum_cuda_native_tp_error": max(cuda_tp_errors, default=None),
         },
         "pending_gpu_gates": []
         if complete
@@ -74,8 +119,10 @@ def summarize(
             "multi-node scaling",
         ],
         "boundary": (
-            "Local gates validate sharding math, DTensor placements, FSDP2 one-step updates, and "
-            "distributed checkpoint resume. They do not prove CUDA memory savings or speedup."
+            "CPU/Gloo and CUDA/NCCL capabilities are reported separately. CUDA/NCCL preflights "
+            "may satisfy the GPU learning track when CPU/Gloo FSDP2 is unavailable; they do not "
+            "erase that backend limitation. GPU memory and throughput conclusions apply only to "
+            "the recorded hardware, model, and software environment."
         ),
     }
 

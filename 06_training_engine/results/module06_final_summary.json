@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "artifact_type": "module06.reviewed_summary",
+  "status": "complete",
+  "source_commits": ["13f4b49b9c535d4e3f70489c28ecd7073969ffd8", "bf4f4478eedfc1762c6ce038db07cec7f07a8180"],
+  "correctness": {
+    "local_reducer_cases": 10,
+    "maximum_gradient_error": 1.788e-7,
+    "maximum_parameter_error": 1.49e-8,
+    "amp_overflow_cases": 4,
+    "amp_overflow_status": "passed"
+  },
+  "gpu_medium_fp32_world_4_samples_per_second": {
+    "bulk": 6835.48,
+    "per_parameter": 5171.31,
+    "bucket_sync": 5675.07,
+    "bucket_async": 5881.37,
+    "ddp": 6752.20
+  },
+  "bucket_ablation": {
+    "bucket_1_mib_samples_per_second": 5451.38,
+    "bucket_10_mib_samples_per_second": 5881.37,
+    "bucket_25_mib_samples_per_second": 5896.53,
+    "one_mib_vs_ten_mib": -0.07311
+  },
+  "overlap_extension": {
+    "archive_sha256": "3baafa93ac3f50ac8112eed4ded6012735bb93146f9c2dd76cafb0934671648f",
+    "raw_artifacts_verified": 33,
+    "ten_mib_nccl_kernels_per_rank_for_5_steps": 5,
+    "one_mib_nccl_kernels_per_rank_for_5_steps": 25,
+    "one_mib_bucket_sync_median_overlap_percent": 0.0,
+    "one_mib_bucket_async_median_overlap_percent": 2.676,
+    "conclusion": "A smaller bucket created real communication/backward overlap, but five times as many collectives made throughput 7.31% lower. Overlap is a mechanism, not a performance guarantee."
+  },
+  "amp": {
+    "observation": "AMP was 13.8% to 14.1% slower in this tiny workload.",
+    "boundary": "AMP benefits depend on tensor-core utilization and whether extra scaling/casting overhead is amortized."
+  }
+}

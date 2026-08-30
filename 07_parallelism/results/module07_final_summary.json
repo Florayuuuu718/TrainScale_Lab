@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "artifact_type": "module07.reviewed_summary",
+  "status": "complete",
+  "source_commit": "bf4f4478eedfc1762c6ce038db07cec7f07a8180",
+  "correctness": {
+    "cuda_nccl_fsdp2_world_sizes": [2, 4],
+    "cuda_nccl_native_tp_world_sizes": [2, 4],
+    "maximum_fsdp2_error": 1.49e-8,
+    "maximum_native_tp_error": 5.96e-8,
+    "checkpoint_resume_maximum_error": 0.0,
+    "status": "passed"
+  },
+  "world_4_medium": {
+    "samples_per_second": {"ddp": 3216.09, "fsdp_root": 1900.73, "fsdp_layer": 1142.61},
+    "peak_memory_mib": {"ddp": 48.5, "fsdp_root": 44.0, "fsdp_layer": 39.2},
+    "fsdp_root_memory_change_vs_ddp": -0.0937,
+    "fsdp_layer_memory_change_vs_ddp": -0.1931
+  },
+  "tensor_parallel_medium": {
+    "world_1_reference_samples_per_second": 9554.45,
+    "world_2_samples_per_second": 1367.39,
+    "world_4_samples_per_second": 1350.54,
+    "local_parameter_mib": {"world_1": 0.500, "world_2": 0.251, "world_4": 0.126}
+  },
+  "profiler": {
+    "status": "passed",
+    "expected_collectives": {"ddp": "AllReduce", "fsdp2": "AllGather + ReduceScatter", "tp": "AllReduce"}
+  },
+  "backend_boundary": "The PyTorch 2.8 CPU/Gloo FSDP2 probe was unavailable because its reduction scaling did not match the global reference. CUDA/NCCL preflights passed and are the authoritative GPU gate; the CPU limitation remains documented.",
+  "conclusion": "Sharding reduced local state, but this tiny model was communication dominated. DDP is the rational baseline while the model fits; FSDP2 or TP should be chosen for a demonstrated memory or layer-capacity bottleneck, not because they are more advanced."
+}

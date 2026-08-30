@@ -28,11 +28,13 @@ checkpoints/
 05_tiny_collective/results/raw/
 06_training_engine/results/raw/
 07_parallelism/results/raw/
-04_nccl_benchmark/trainscale-module04-*/
-04_nccl_benchmark/trainscale-module04-*.tar.gz
-04_nccl_benchmark/trainscale-module04-*.tar.gz.sha256
+/04_nccl_benchmark/trainscale-module04-*
 *.nsys-rep
 *.ncu-rep
+
+# Downloaded evidence bundles stay local; compact reviewed summaries are tracked.
+/local-evidence/*
+!/local-evidence/README.md
 
 # Editors and OS
 .idea/

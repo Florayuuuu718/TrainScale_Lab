@@ -3,8 +3,8 @@
 本目录只保存 04–07 真正跨模块复用的 artifact envelope、统计公式、汇总和绘图工具。
 模块专属 runner 留在对应阶段中，避免公共目录变成第二套训练框架。
 
-> 状态：04 已实现首版公共 artifact/status/hash/config 契约及 CPU 测试；后续模块按
-> 实际需要扩展。01–03 的历史 JSON 和 SHA-256 保持冻结。
+> 状态：04–07 已共用 artifact/status/hash/config 契约并完成本地与四卡验证。01–03 的
+> 历史 JSON 和 SHA-256 保持冻结。
 
 ## 采用原则
 

@@ -36,3 +36,22 @@ def test_acceptance_distinguishes_local_from_gpu_completion() -> None:
     payload = summary.summarize(success, success, success, success, None, None)
     assert payload["status"] == "passed_local_gates"
     assert payload["gates"]["gpu_parallelism"] == "not_provided"
+
+
+def test_cuda_preflight_can_replace_unavailable_cpu_fsdp_gate() -> None:
+    summary = _load(MODULE_ROOT / "benchmarks" / "summarize_module07.py", "module07_gpu_summary")
+    success = {"status": "success", "metrics": {"records": [], "ranks": []}}
+    unavailable = {"status": "unavailable", "metrics": {"ranks": []}}
+    gpu = {
+        "status": "success",
+        "correctness": {
+            "preflights": [
+                {"mode": "fsdp2_probe", "status": "success"},
+                {"mode": "native_tp_probe", "status": "success"},
+            ]
+        },
+    }
+    payload = summary.summarize(success, success, unavailable, success, gpu, success)
+    assert payload["status"] == "complete"
+    assert payload["gates"]["fsdp2_cpu_gloo"] == "unavailable"
+    assert payload["gates"]["fsdp2_cuda_nccl_preflight"] == "success"

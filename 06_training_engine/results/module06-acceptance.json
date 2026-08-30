@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-08-29T17:56:36.613064+08:00",
+  "status": "complete",
+  "gates": {
+    "single_device_baseline": "success",
+    "cpu_gloo_correctness": "success",
+    "gpu_ablation": "success",
+    "overlap_profile": "success",
+    "amp_overflow": "success"
+  },
+  "local_evidence": {
+    "baseline_loss_ratio": 0.005045459476056995,
+    "correctness_case_count": 10,
+    "maximum_gradient_error": 1.7881393432617188e-07,
+    "maximum_parameter_error": 1.4901161193847656e-08
+  },
+  "pending_gpu_gates": [],
+  "boundary": "GPU ablation, profiler, and overflow gates passed on the recorded hardware; their throughput and overlap conclusions do not automatically transfer to other models, bucket plans, interconnects, or software versions."
+}

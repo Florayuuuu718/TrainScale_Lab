@@ -1,11 +1,18 @@
 # 06 · Mini Training Engine + Gradient Reducer Lab
 
-> 状态：本地 CPU/Gloo 实现与 correctness gate 已完成；CUDA/NCCL 消融和 overlap timeline
-> 待统一租卡实验。
+> 状态：已完成。CPU/Gloo correctness、4 GPU reducer 消融、AMP overflow、默认 timeline
+> 和 1 MiB overlap 延伸实验均已通过与校验。
 
 06 不重写 01 的通用训练循环，也不把 03 的 DDP 再包装一次。它用同一个 Tiny Transformer
 逐步实现 bulk、per-parameter、bucketed synchronous 和 bucketed asynchronous gradient
 reducer，再与 PyTorch DDP 比较。
+
+## 开始前先建立联系
+
+05 解释了 collective 怎样移动数据，06 接着问“梯度什么时候 ready、何时发起通信、何时必须
+等待”。因此本章的优化对象不是模型结构，而是 backward 到 optimizer step 之间的 reducer
+状态机。对 bucket、async handle 或 overlap 不熟悉时，先读
+[术语表](../docs/concepts/distributed-systems-glossary.md)。
 
 ## 已实现内容
 
@@ -28,6 +35,11 @@ reducer，再与 PyTorch DDP 比较。
 
 ## 本地 gate
 
+单设备 baseline 可在 Windows/CPU 运行；下面的 2-rank Gloo correctness runner 推荐在
+Linux/WSL CPU 环境运行。它不需要 CUDA，但需要操作系统支持当前 torchrun/Gloo 路径。
+Windows 中被跳过的集成项可按
+[Linux/Gloo 正确性门教程](../docs/getting-started/linux-gloo-validation.md)完整补跑。
+
 ```bash
 python 06_training_engine/benchmarks/run_single_device_baseline.py \
   --config 06_training_engine/configs/local_baseline.toml \
@@ -48,7 +60,7 @@ python 06_training_engine/benchmarks/summarize_module06.py \
 forward 的参数。每个 rank 的同步梯度和 optimizer update 都与单进程 global-batch reference
 比较。CPU gate 证明数学与状态机，不证明 NCCL 性能或真实 CUDA overlap。
 
-## 统一租卡 gate
+## GPU gate（已完成，可复现）
 
 先检查 20 个单变量条件，不启动 GPU：
 
@@ -83,6 +95,18 @@ overflow probe 另测 2/4 卡的 bucket-async 与 DDP，验证 scale 下降、st
 只比较 bucket sync、bucket async、DDP。所有命令、日志、rank JSON、Chrome trace 都持久保存并
 写入 SHA-256。
 
+## 最值得学习的结果
+
+- 4 GPU medium FP32 中，bucket async 比 sync 高 3.64%，但仍慢于 bulk/DDP；
+- AMP 在 tiny workload 中慢约 14%，说明混合精度不是无条件加速；
+- 1 MiB bucket 让真实 overlap 中位数达到 2.676%，却使吞吐下降 7.31%，因为 NCCL kernel
+  数量从每 rank 5 个增到 25 个；
+- overflow probe 验证 scale 下降、step skip 与参数不变，而不只是验证“能运行”。
+
+完整推导见 [最终实验报告](experiments/06_final_report.md)，云端操作见
+[JupyterLab 四卡教程](../docs/getting-started/jupyterlab-4gpu.md)，机器可读摘要见
+[results/module06_final_summary.json](results/module06_final_summary.json)。
+
 ## 解释边界
 
 - async collective 在 backward 结束前 launch 只是 overlap candidate；只有 CUDA/NCCL timeline
@@ -94,3 +118,6 @@ overflow probe 另测 2/4 卡的 bucket-async 与 DDP，验证 scale 下降、st
 
 实验说明见 [`experiments/`](experiments/)，逐项状态见
 [`docs/06-issues.md`](../docs/06-issues.md)。
+
+学完后进入 [07 · FSDP2 / Tensor Parallel](../07_parallelism/README.md)：07 会复用同一个 Tiny
+Transformer，避免更换 workload 后无法判断显存与通信变化来自哪里。

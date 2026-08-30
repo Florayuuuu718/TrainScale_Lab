@@ -1,7 +1,14 @@
-# 04–07 开发总纲
+# 04–07 学习与实验总纲
 
-这份文档是 04–07 的开发驾驶舱。它只回答阶段边界、依赖、共同完成定义和当前顺序；
-具体命令与源码导航留在各模块 README，逐项状态留在对应验收清单。
+这份文档最初用于规划 04–07，现在作为已经完成的设计记录和学习地图。它回答阶段边界、
+依赖、共同完成定义和为什么采用当前顺序；具体命令与源码导航留在各模块 README，最终结果
+留在各模块 `experiments/*_final_report.md`。
+
+## 当前结论
+
+04–07 的 v1.0 必需实现、本地 correctness 和单机四卡实验已完成。8 GPU、多节点、PP、2D
+并行和生产级容错继续留作可选扩展。完成并不代表所有实验都加速：04 的 strong scaling、
+06 的 1 MiB bucket、07 的 tiny TP/FSDP2 都保留了负结果，并用通信与 profiler 解释原因。
 
 ## 不变的项目目标
 
@@ -41,7 +48,7 @@ TrainScale Lab 面向 ML Systems、AI Infrastructure 和 Distributed Training �
 7. acceptance 汇总所有可执行 gate，并把缺失硬件标为 `unavailable`；
 8. 下一阶段只有在当前必需项关闭后才能成为唯一 active milestone。
 
-## 推荐实施顺序
+## 推荐学习与复现顺序
 
 | 顺序 | 工作 | 目的 |
 |---:|---|---|
@@ -64,10 +71,11 @@ TrainScale Lab 面向 ML Systems、AI Infrastructure 和 Distributed Training �
 - 不重写 01–03 已封存结果来追求目录统一；
 - 每个新增 feature 必须能指出它要验证的瓶颈、指标和 correctness gate。
 
-## 开发入口
+## 学习入口
 
 - [04 README](../04_nccl_benchmark/README.md) · [04 验收清单](04-issues.md)
 - [05 README](../05_tiny_collective/README.md) · [05 验收清单](05-issues.md)
 - [06 README](../06_training_engine/README.md) · [06 验收清单](06-issues.md)
 - [07 README](../07_parallelism/README.md) · [07 验收清单](07-issues.md)
 - [公共 benchmark 契约](../benchmarks/README.md)
+- [JupyterLab 四卡一站式教程](getting-started/jupyterlab-4gpu.md)

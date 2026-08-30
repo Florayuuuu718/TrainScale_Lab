@@ -36,3 +36,4 @@ def test_all_successful_gates_complete_module() -> None:
     )
     assert result["status"] == "complete"
     assert result["pending_gpu_gates"] == []
+    assert "GPU ablation" in result["boundary"]

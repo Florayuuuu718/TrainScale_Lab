@@ -1,61 +1,99 @@
 # TrainScale Lab 文档导航
 
-如果你第一次接触 PyTorch，请不要从源码逐文件阅读。这个项目的学习顺序是：先知道问题，再运行最小实验，最后回到源码理解每一步。
+TrainScale Lab 的目标不是让你照抄一串命令，而是让你逐步建立分析训练系统的能力。每一章都
+遵循同一个循环：先理解问题和做出预测，再实现最小正确版本，最后用 benchmark、Profiler 和
+结构化结果验证或修正预测。
 
-## 我们现在位于哪里
+如果你是第一次接触 PyTorch，不要从源码目录开始逐文件阅读。先选择下面的一条路线。
 
-| 模块 | 目标 | 当前状态 |
+## 我应该从哪里开始
+
+### 路线 A：从零完整学习
+
+适合刚接触 PyTorch、GPU 或分布式训练的学习者：
+
+1. [01 新手入口](getting-started/README.md)：认识训练循环、环境和第一次运行；
+2. [01 · PyTorch Training](../01_pytorch_training/README.md)：训练、验证、恢复和可信测量；
+3. [02 · GPU Kernels](../02_gpu_kernels/README.md)：从算子正确性进入 GPU 性能；
+4. [03 · Distributed Training](../03_distributed_training/README.md)：理解 rank、数据分片和 DDP；
+5. [04–07 学习地图](04-07-development-plan.md)：进入通信、reducer 和模型切分；
+6. 依次完成 [04](../04_nccl_benchmark/README.md) →
+   [05](../05_tiny_collective/README.md) →
+   [06](../06_training_engine/README.md) →
+   [07](../07_parallelism/README.md)。
+
+遇到不熟悉的缩写时，先查
+[分布式训练与通信术语表](concepts/distributed-systems-glossary.md)，不需要停下来通读框架源码。
+
+### 路线 B：我只想先在本地体验
+
+- 只有 CPU：使用 [通用环境教程](getting-started/environment.md)，可完成训练语义、Gloo、
+  collective 调度、配置和大部分 correctness tests。
+- Windows + NVIDIA GPU：使用 [WSL2 + Ubuntu 完整教程](getting-started/wsl2-gpu.md)，完成
+  PyTorch GPU、CUDA/Triton、单卡 Profiler 和 NCCL 基础检查。
+- Windows 上看到 05–07 的 Linux/Gloo 测试被跳过：使用
+  [Linux/Gloo 正确性门教程](getting-started/linux-gloo-validation.md)在 WSL2 CPU 环境补齐，
+  不需要租卡。
+- 本地只有一张 GPU：先完成 01–03 和 04–07 的本地 gate；多 GPU 性能结果明确记为
+  `unavailable`，不需要伪造数据。
+
+### 路线 C：我要复现四卡实验
+
+第一次租用云 GPU，直接使用
+[JupyterLab 四卡一站式教程](getting-started/jupyterlab-4gpu.md)。它从实例选择、打开 Terminal、
+环境预检开始，依次运行 04–07，最后打包、下载、校验并关机。熟悉 Linux shell 后，可以改用
+[四卡 Runbook](04-07-rental-runbook.md) 作为简洁速查表。
+
+## 七章怎样衔接
+
+| 模块 | 先解决的问题 | 做出的最小系统 | 用什么证据判断 |
+|---|---|---|---|
+| [01](../01_pytorch_training/README.md) | 一次训练怎样才可靠 | 可恢复的 PyTorch trainer | loss、更新、checkpoint、吞吐 |
+| [02](../02_gpu_kernels/README.md) | 单个算子为什么快或慢 | PyTorch/CUDA/Triton kernels | 数值误差、延迟、带宽、Profiler |
+| [03](../03_distributed_training/README.md) | 多个进程怎样训练同一模型 | DDP + sampler + checkpoint | 数据覆盖、梯度一致、scaling |
+| [04](../04_nccl_benchmark/README.md) | DDP 的通信时间从哪里来 | NCCL benchmark + DDP bridge | latency/bandwidth 曲线、timeline |
+| [05](../05_tiny_collective/README.md) | AllReduce 内部如何移动数据 | centralized 与 ring | 通信轮次、通信量、NCCL 对照 |
+| [06](../06_training_engine/README.md) | 怎样安排梯度同步 | mini engine + reducers | correctness、消融、真实 overlap |
+| [07](../07_parallelism/README.md) | 模型或状态放不下怎么办 | FSDP2 与 TP | 更新一致、峰值显存、collective |
+
+顺序不是随意的：04 用通信曲线解释 03；05 把 04 使用的 AllReduce 拆开；06 把 collective
+放回 backward；07 再利用 06 的 Tiny Transformer 比较状态分片和层内切分。这样每一章只增加
+一个主要变量，实验结果才容易解释。
+
+## 当前完成状态
+
+| 模块 | 状态 | 仍然保留的边界 |
 |---|---|---|
-| 01 | 仓库基建、可复现的单卡训练、恢复与性能实验 | 已封存：本地完整验收通过 |
-| [02](../02_gpu_kernels/README.md) | CUDA/Triton 自定义算子 | 已封存：CUDA/Triton、前反向、Profiler 与发布验收通过 |
-| [03](../03_distributed_training/README.md) | DDP、数据分片、checkpoint 与 scaling | 已封存：本地正确性、云端 1/2/4 GPU 与发布验收通过 |
-| [04](../04_nccl_benchmark/README.md) | NCCL 曲线与 DDP 通信解释 | 本地与 4 GPU 实验已完成，补充稳定性实验待下次统一租卡 |
-| [05](../05_tiny_collective/README.md) | centralized/ring collective 教学实现 | 本地正确性已完成，GPU 对照待统一租卡 |
-| [06](../06_training_engine/README.md) | Mini Engine、gradient reducer 与 overlap | 本地正确性已完成，GPU ablation 与 timeline 待统一租卡 |
-| [07](../07_parallelism/README.md) | FSDP2、TP 与可选二维并行 | 本地 FSDP2/TP gates 已完成，GPU 显存与性能待统一租卡 |
+| 01 | 已完成并封存 | 不追求数据集排行榜精度 |
+| 02 | 已完成并封存 | 不覆盖所有 GPU 架构和算子 |
+| 03 | 已完成并封存 | 8 GPU 与多节点为可选扩展 |
+| 04 | 已完成 | DDP scaling 波动限制高精度效率结论 |
+| 05 | 已完成 | 教学实现不替代 NCCL |
+| 06 | 已完成 | overlap 与 AMP 不保证当前负载加速 |
+| 07 | 已完成 | CPU/Gloo FSDP2 限制与 CUDA/NCCL 分开记录 |
 
-01 不追求真实数据集的最高准确率。我们用 synthetic 隔离验证数学链路，再用 CIFAR-10 子集验证真实图像管道和 CNN，并对 checkpoint、AMP、累积、workers、compile 与 Profiler 给出实测证据。
+“已完成”表示范围内的实现、correctness、正式实验、结果校验和报告齐全，不表示所有优化都
+变快，也不表示扩展项被偷偷当作必修项。
 
-## 初学者推荐阅读顺序
+## 文档怎样分工
 
-1. [01 从这里开始](getting-started/README.md)：先建立全局认识，再按命令运行。
-2. 选择环境教程：
-   - **Windows + NVIDIA GPU 完整路线**：[从零搭建 WSL2 + Ubuntu + PyTorch GPU](getting-started/wsl2-gpu.md)，从安装发行版、选择项目位置一路验收到训练、compile 与 Profiler。
-   - **原生 Windows CPU/基础路线或原生 Linux**：[通用环境搭建](getting-started/environment.md)，理解虚拟环境、wheel、driver、CUDA runtime 和 `nvcc`。
-3. [01 仓库基建](getting-started/repository-foundation.md)：理解 Git、License、`pyproject.toml`、`uv.lock` 和 CI 在解决什么问题。
-4. [PyTorch 训练基础概念](concepts/pytorch-training-basics.md)：理解 dataset、batch、epoch、logits、loss、反向传播和验证。
-5. [01 · PyTorch Training](../01_pytorch_training/README.md)：完整复现当前训练、查看结果并定位源码。
-6. [测试说明](../01_pytorch_training/tests/README.md)：理解 10 个测试分别证明了什么。
-7. [实验说明](../01_pytorch_training/experiments/README.md)：阅读成功实验、理论推理与排障提示。
-8. [checkpoint 状态契约](checkpoint-contract.md)：理解为什么断点恢复不能只保存模型权重。
-9. [02 环境指南](../02_gpu_kernels/ENVIRONMENT.md)：先跑环境探针；默认只用 stable 根环境，失败才进入隔离兜底。
-10. [02 · GPU Kernels](../02_gpu_kernels/README.md)：读范围和 benchmark 契约，再按实验顺序复现。
-11. [02 验收清单](02-issues.md)：查看进入 03 前必须关闭的 12 项工作。
-12. [03 · Distributed Training](../03_distributed_training/README.md)：从两 rank Gloo 开始，再进入 NCCL/scaling。
-13. [03 云端四卡实验](../03_distributed_training/experiments/07_cloud_4gpu.md)：从租用、部署到结果校验和关机。
-14. [03 验收清单](03-issues.md)：查看本地与云端证据怎样共同关闭阶段验收。
-15. [04–07 开发总纲](04-07-development-plan.md)：查看后续依赖、共同完成定义和范围闸门。
-16. [04 · NCCL Performance Lab](../04_nccl_benchmark/README.md)：从 03 的 scaling 反例进入通信测量。
-17. [04 验收清单](04-issues.md)：按环境、曲线、DDP bridge 和发布验收推进。
-18. [05–07 验收清单](05-issues.md)：完成 04 后按总纲进入后续阶段，并分别查看
-    [06](06-issues.md) 和 [07](07-issues.md) 的必需项与可选边界。
-19. [04–07 统一四卡租用 Runbook](04-07-rental-runbook.md)：按固定环境、失败停止、结果哈希和关机门一次完成剩余 GPU 实验。
+| 文档 | 什么时候读 |
+|---|---|
+| 模块 `README.md` | 进入一章时，了解问题、源码入口、最短命令和边界 |
+| `experiments/README.md` | 准备做实验时，按预测和控制变量推进 |
+| `*_final_report.md` | 实验后，对照参考结果、一般规律和适用范围 |
+| `results/*_summary.json` | 自动检查或精确引用代表性数字 |
+| `docs/*-issues.md` | 维护者检查验收项，不是新手的必读主线 |
+| [文档与实验发布规范](documentation-standard.md) | 新增或修改教程、实验和结果时 |
 
-## 文档类型
+大型 stdout、rank JSON、checkpoint 和 Chrome trace 不进入 Git。它们保存在带 SHA-256 的
+校验归档中；仓库只提交配置、紧凑摘要和解释报告。
 
-| 目录 | 内容 | 阅读目的 |
-|---|---|---|
-| `docs/getting-started/` | 环境和仓库搭建 | 让新机器可以从零复现 |
-| `docs/concepts/` | 不依赖具体命令的概念解释 | 建立知识框架 |
-| `docs/experiments/` | 已冻结实验的过程与实测结果 | 学会提出假设、控制变量和解释结果 |
-| `01_pytorch_training/` | 01 模块入口、配置、测试和实验导航 | 把概念映射到代码与命令 |
-| `02_gpu_kernels/` | 02 环境、实现、测试、benchmark 与实测报告 | 把算子机制映射到正确性与性能证据 |
-| `03_distributed_training/` | DDP 源码、配置、测试、实验与结果 | 把多进程语义映射到正确性和 scaling 证据 |
-| `04_nccl_benchmark/`–`07_parallelism/` | 后续模块问题、开发顺序和验收边界 | 按最小实现到可复现优化继续学习 |
+## 阅读和复现约定
 
-## 阅读约定
-
-- 命令默认从仓库根目录执行，Windows 使用 PowerShell。
-- “预期输出”用于判断流程是否正确，数值可能因硬件和随机种子不同略有变化。
-- `01_pytorch_training/results/` 的小型摘要和图表进入 Git；其 `raw/`、`data/` 和 `.venv/` 不提交。
-- 各阶段将本地语义证据、真实 GPU 结果、历史失败和硬件限制分开标注；未执行的 GPU gate 不会伪装成已完成。
+- 命令默认从仓库根目录执行；每份环境教程会注明使用 PowerShell 还是 Linux Terminal。
+- 先确认 correctness，再看性能；`success`、`failed`、`unavailable` 的含义不能混用。
+- 参考数值用于校验量级和趋势，不要求不同硬件得到完全相同的吞吐。
+- 正式结论使用重复实验中位数和波动范围，不使用单次最快值。
+- Profiler 用来解释机制，独立 benchmark 用来判断是否更快，两者不能互相替代。
+- 遇到失败先保留日志并换新输出目录，不覆盖失败证据后反复运行到出现“漂亮数字”。

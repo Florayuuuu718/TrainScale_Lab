@@ -1,5 +1,7 @@
 # 06 · Mini Training Engine + Gradient Reducer Lab
 
+> 交互式入口：[06 · Reducer, Bucket and Overlap](../notebooks/06_reducer_bucket_overlap.ipynb)
+
 > 状态：已完成。CPU/Gloo correctness、4 GPU reducer 消融、AMP overflow、默认 timeline
 > 和 1 MiB overlap 延伸实验均已通过与校验。
 

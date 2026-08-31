@@ -19,6 +19,7 @@ TrainScale Lab is a hands-on open-source project for learners interested in **ML
 | [05 · TinyCollective](05_tiny_collective/README.md) | Educational centralized/ring implementations and NCCL comparison |
 | [06 · Mini Training Engine](06_training_engine/README.md) | Reducers, AMP, buckets, and measured overlap |
 | [07 · Parallelism](07_parallelism/README.md) | DDP/FSDP2/TP correctness, memory, and strategy selection |
+| [Interactive notebooks](notebooks/README.md) | Install Jupyter locally and learn from 00 in reference/local/gpu modes |
 | [JupyterLab 4-GPU guide](docs/getting-started/jupyterlab-4gpu.md) | Start, run, validate, download, and shut down a cloud campaign |
 | [Distributed-systems glossary](docs/concepts/distributed-systems-glossary.md) | Beginner explanations for ranks, collectives, buckets, FSDP2, and TP |
 | [Source code](01_pytorch_training/trainscale_training) | Data, models, engine, checkpoint, benchmarks, and profiler |

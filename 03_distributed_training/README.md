@@ -1,5 +1,7 @@
 # 03 · Distributed Training
 
+> 交互式入口：[03 · DDP Fundamentals](../notebooks/03_ddp_fundamentals.ipynb)
+
 > 状态：03 已完成。CPU/Gloo 的进程语义、数据分片、梯度同步、checkpoint/resume、
 > 1/2/4 rank scaling 与通信 Profiler 均已实测；本地单 GPU NCCL 基线通过，并在
 > AutoDL 单机 4×RTX 4090D 上完成三次 1/2/4 GPU strong/weak scaling。8 GPU 因

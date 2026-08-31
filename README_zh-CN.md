@@ -19,6 +19,7 @@ TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Tr
 | [05 · TinyCollective](05_tiny_collective/README.md) | 手写 centralized/ring 与 NCCL 对照 |
 | [06 · Mini Training Engine](06_training_engine/README.md) | reducer、AMP、bucket 与真实 overlap 实验 |
 | [07 · Parallelism](07_parallelism/README.md) | DDP/FSDP2/TP 正确性、显存与策略选择 |
+| [交互式 Notebook](notebooks/README.md) | 本机安装 JupyterLab，从 00 开始按 reference/local/gpu 学习 |
 | [JupyterLab 四卡一站式教程](docs/getting-started/jupyterlab-4gpu.md) | 从开机、Terminal、运行、下载校验到关机 |
 | [分布式术语表](docs/concepts/distributed-systems-glossary.md) | rank、collective、bucket、FSDP2/TP 等直观解释 |
 | [训练源码](01_pytorch_training/trainscale_training) | 数据、模型、引擎、checkpoint、benchmark 与 profiler |
@@ -40,9 +41,10 @@ TrainScale Lab 是一个面向 **ML Systems / AI Infrastructure / Distributed Tr
 1. [文档总导航](docs/README.md)
 2. [01 模块从这里开始](docs/getting-started/README.md)
 3. [PyTorch 训练基础概念](docs/concepts/pytorch-training-basics.md)
-4. [01 · PyTorch Training 完整复现](01_pytorch_training/README.md)
-5. 完成 01–03 后，按 [04–07 学习与实验总纲](docs/04-07-development-plan.md) 进入通信与并行；
-6. 需要云端四卡时，严格跟随 [JupyterLab 一站式教程](docs/getting-started/jupyterlab-4gpu.md)。
+4. 想先交互式体验时打开 [00 · Start Here](notebooks/00_start_here.ipynb)；
+5. [01 · PyTorch Training 完整复现](01_pytorch_training/README.md)
+6. 完成 01–03 后，按 [04–07 学习与实验总纲](docs/04-07-development-plan.md) 进入通信与并行；
+7. 需要云端四卡时，严格跟随 [JupyterLab 一站式教程](docs/getting-started/jupyterlab-4gpu.md)。
 
 如果你使用 Windows + NVIDIA GPU，并准备完成后续 compile、Profiler、CUDA/Triton 与 NCCL 路线，请在运行实验前先完成[WSL2 + 官方 Ubuntu + PyTorch GPU 从零教程](docs/getting-started/wsl2-gpu.md)。教程明确标注每条命令应在管理员 PowerShell、普通 PowerShell 还是 Ubuntu 终端执行，并解释项目为什么应放在 Ubuntu 的 `/home/<用户名>/projects/` 中。
 
@@ -130,6 +132,7 @@ trainscale-lab/
 ├── 06_training_engine/        # 最终的迷你分布式训练引擎
 ├── 07_parallelism/            # FSDP2、TP 与组合并行
 ├── benchmarks/                # 统一 benchmark 入口与结果 schema
+├── notebooks/                 # 00–07 交互式学习层与本地 Jupyter 安装说明
 ├── docs/                      # 跨模块概念、环境与实验记录
 └── README.md
 ```

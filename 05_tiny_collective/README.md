@@ -1,5 +1,7 @@
 # 05 · TinyCollective
 
+> 交互式入口：[05 · Collective Algorithms](../notebooks/05_collective_algorithms.ipynb)
+
 > 状态：已完成。24 个 CPU/Gloo correctness case 与 2/4 GPU centralized/ring/NCCL
 > 对照均通过，正式结论和边界已归档。
 

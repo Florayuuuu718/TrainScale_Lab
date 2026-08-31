@@ -1,5 +1,7 @@
 # 01 · PyTorch Training
 
+> 交互式入口：[01 · Reliable Training Loop](../notebooks/01_reliable_training_loop.ipynb)
+
 > 状态：已封存。源码、锁定环境、10 项测试、训练/恢复、workers、AMP/compile 与 CUDA Profiler 均已在正式路线验收；后续只接受修正，不再追加改变 01 范围的功能。
 
 这个目录是一间可以独立进入的训练实验室。你在这里学习的不是“调用一个现成模型”，而是亲手验证一条训练系统：数据怎样进入模型、loss 怎样产生梯度、参数怎样更新、验证为什么不能更新参数、训练怎样保存和恢复，以及性能数据应该怎样测量和解释。

@@ -1,5 +1,7 @@
 # 07 — 从 DDP 到 FSDP2 与 Tensor Parallel
 
+> 交互式入口：[07 · Parallelism Strategies](../notebooks/07_parallelism_strategies.ipynb)
+
 > 状态：已完成。2/4 GPU FSDP2/原生 TP correctness、DDP/FSDP2/TP 吞吐与显存、
 > 4 GPU profiler 均通过。CPU/Gloo FSDP2 的版本限制单独保留，不影响 CUDA/NCCL gate。
 

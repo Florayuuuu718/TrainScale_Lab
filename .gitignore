@@ -32,6 +32,12 @@ checkpoints/
 *.nsys-rep
 *.ncu-rep
 
+# Jupyter local state and temporary notebook runs
+notebooks/_runs/
+**/.ipynb_checkpoints/
+notebooks/**/*.html
+notebooks/**/*.pdf
+
 # Downloaded evidence bundles stay local; compact reviewed summaries are tracked.
 /local-evidence/*
 !/local-evidence/README.md

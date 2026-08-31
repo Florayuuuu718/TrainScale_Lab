@@ -15,11 +15,15 @@ jobs:
         with:
           version: "0.11.2"
           enable-cache: true
-      - name: Install Python 3.11 and CPU dependencies
-        run: uv sync --extra cpu --extra dev
+      - name: Install Python 3.11, CPU and Notebook dependencies
+        run: uv sync --extra cpu --extra dev --extra notebook
       - name: Lint
         run: uv run ruff check .
       - name: Type check
         run: uv run mypy
       - name: Test
         run: uv run pytest
+      - name: Execute notebooks in reference mode
+        env:
+          TRAINSCALE_NOTEBOOK_MODE: reference
+        run: uv run pytest -q notebooks/tests

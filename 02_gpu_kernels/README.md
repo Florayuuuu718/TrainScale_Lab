@@ -1,5 +1,7 @@
 # 02 · GPU Kernels
 
+> 交互式入口：[02 · GPU Kernel Reasoning](../notebooks/02_gpu_kernel_reasoning.ipynb)
+
 > 状态：已完成并通过本机发布验收。Windows driver 610.88 下，默认 `torch 2.12.1+cu129 / Triton 3.7.1` 环境通过 15 项 GPU 测试；CUDA 13.0 Vector Add/Softmax、LayerNorm backward、MatMul 有限 autotune、Profiler、汇总与验收 JSON 均已归档。
 
 02 从“训练过程中看见 GPU kernel”推进到“亲手实现、验证、测量并解释一个 kernel”。01 已经通过 [AMP/compile 实验](../01_pytorch_training/experiments/04_fp32_amp_compile.md)和 [CUDA Profiler 实验](../01_pytorch_training/experiments/06_profiler.md)观察 PyTorch/Inductor 产生的 kernel；02 不重复训练系统实验，而是把单个算子作为研究对象。

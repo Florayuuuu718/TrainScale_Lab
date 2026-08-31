@@ -1,5 +1,7 @@
 # 04 · NCCL Performance Lab
 
+> 交互式入口：[04 · NCCL Latency and Bandwidth](../notebooks/04_nccl_latency_bandwidth.ipynb)
+
 > 状态：已完成。4×RTX 4090 D 的 collective、拓扑、DDP bridge、长窗口 scaling 和
 > NCCL 策略延伸实验均已校验；scaling correctness 通过，但测量稳定性限制如实保留。
 

@@ -85,6 +85,8 @@ TrainScale Lab 的目标不是让你照抄一串命令，而是让你逐步建�
 | `results/*_summary.json` | 自动检查或精确引用代表性数字 |
 | `docs/*-issues.md` | 维护者检查验收项，不是新手的必读主线 |
 | [文档与实验发布规范](documentation-standard.md) | 新增或修改教程、实验和结果时 |
+| [交互式 Notebook](../notebooks/README.md) | 在本机安装 JupyterLab，并从 00–07 交互式学习 |
+| [Notebook 学习层设计](notebook-learning-layer-design.md) | 了解 Notebook 的形式、内容与验收边界 |
 
 大型 stdout、rank JSON、checkpoint 和 Chrome trace 不进入 Git。它们保存在带 SHA-256 的
 校验归档中；仓库只提交配置、紧凑摘要和解释报告。
